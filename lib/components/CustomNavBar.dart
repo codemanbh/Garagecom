@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/main.dart';
+import 'package:garagecom/providers/NavProvider.dart';
+import 'package:provider/provider.dart';
 
 class CustomNavBar extends StatefulWidget {
   const CustomNavBar({super.key});
@@ -23,13 +26,14 @@ class _CustomNavBarState extends State<CustomNavBar> {
     setState(() {
       _selectedIndex = index;
     });
+    Provider.of<NavProvider>(context, listen: false).navToPage(index);
     Navigator.of(context).pushReplacementNamed(_routes[index]);
   }
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _selectedIndex,
+      currentIndex: context.read<NavProvider>().pageIndex,
       onTap: _onItemTapped,
       items: const [
         BottomNavigationBarItem(

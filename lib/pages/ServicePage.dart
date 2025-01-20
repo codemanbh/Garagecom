@@ -1,30 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/models/CarPart.dart';
 import '../components/CustomNavBar.dart';
+import '../models/ServiceParts.dart';
 
 class ServicePage extends StatelessWidget {
   const ServicePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> carParts = [
-      {'name': 'Oil Filter', 'lastReplaced': ''},
-      {'name': 'Air Filter', 'lastReplaced': ''},
-      {'name': 'Brake Pads', 'lastReplaced': ''},
-      {'name': 'Tires', 'lastReplaced': ''},
-      {'name': 'Battery', 'lastReplaced': ''},
-    ];
+    ServiceParts serviceParts = ServiceParts();
+    List<CarPart> carParts = serviceParts.parts;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Service')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // const Text(
-            //   'Popular Car Parts',
-            //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            // ),
             const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
@@ -39,7 +32,7 @@ class ServicePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            part['name'],
+                            part.partName ?? '',
                             style: const TextStyle(fontSize: 16),
                           ),
                           SizedBox(
@@ -52,7 +45,9 @@ class ServicePage extends StatelessWidget {
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
                                 // Save the entered value to `lastReplaced`
-                                part['lastReplaced'] = value;
+                                if (value.isNotEmpty) {
+                                  part.lastReplaced = int.tryParse(value) ?? 0;
+                                }
                               },
                             ),
                           ),
@@ -63,15 +58,15 @@ class ServicePage extends StatelessWidget {
                 },
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                // Save or submit the car parts replacement data
-                print(carParts); // Debug: Replace with saving logic
-              },
-              child: const Text('Save'),
-            ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Save or submit the car parts replacement data
+          serviceParts.savePartsList(); // Debug: Replace with saving logic
+        },
+        child: const Text('Save'),
       ),
       bottomNavigationBar: CustomNavBar(),
     );
