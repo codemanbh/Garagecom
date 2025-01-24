@@ -38,7 +38,7 @@ class ServicePage extends StatelessWidget {
                           SizedBox(
                             width: 150,
                             child: TextField(
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Last Replaced (km)',
                                 border: OutlineInputBorder(),
                               ),
