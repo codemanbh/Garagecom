@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 // themes
-import 'package:garagecom/flutter_custom_themes_vol1/flutter_midnight_neon_theme.dart';
-import './flutter_custom_themes_vol1/flutter_monokai_theme.dart';
+// import 'package:garagecom/flutter_custom_themes_vol1/flutter_midnight_neon_theme.dart';
+// import './flutter_custom_themes_vol1/flutter_monokai_theme.dart';
+import './theme/flutter_midnight_neon_theme.dart';
+import './theme/flutter_monokai_theme.dart';
 // providers
 import 'package:garagecom/providers/NavProvider.dart';
 import 'package:garagecom/providers/SettingsProvider.dart';
