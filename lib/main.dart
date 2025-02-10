@@ -13,6 +13,7 @@ import './pages/ProfilePage.dart';
 import './pages/ServicePage.dart';
 import './pages/SettingsPage.dart';
 import './pages/CreatePostPage.dart';
+import './pages/TestPage.dart';
 
 void main() {
   // list of providers
@@ -38,14 +39,15 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-        initialRoute: '/homePage',
+        initialRoute: '/loginPage',
         routes: {
           '/loginPage': (context) => LoginPage(),
           '/homePage': (context) => HomePage(),
           '/profilePage': (context) => ProfilePage(),
           '/servicePage': (context) => ServicePage(),
           '/settingsPage': (context) => SettingsPage(),
-          '/createPostPage': (context) => CreatePostPage()
+          '/createPostPage': (context) => CreatePostPage(),
+          '/testPage': (context) => TestPage()
         });
   }
 }
