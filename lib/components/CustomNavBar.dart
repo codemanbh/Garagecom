@@ -18,7 +18,7 @@ class _CustomNavBarState extends State<CustomNavBar> {
     '/homePage',
     '/servicePage',
     '/createPostPage',
-    '/profilePage',
+    '/aiPage',
     '/settingsPage',
   ];
 
@@ -49,8 +49,8 @@ class _CustomNavBarState extends State<CustomNavBar> {
           label: 'Create',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
+          icon: Icon(Icons.camera),
+          label: 'Dashbourd',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),

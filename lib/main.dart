@@ -16,6 +16,7 @@ import './pages/ServicePage.dart';
 import './pages/SettingsPage.dart';
 import './pages/CreatePostPage.dart';
 import './pages/TestPage.dart';
+import './pages/CameraPage.dart';
 
 void main() {
   // list of providers
@@ -49,7 +50,8 @@ class MyApp extends StatelessWidget {
           '/servicePage': (context) => ServicePage(),
           '/settingsPage': (context) => SettingsPage(),
           '/createPostPage': (context) => CreatePostPage(),
-          '/testPage': (context) => TestPage()
+          '/testPage': (context) => TestPage(),
+          '/aiPage': (context) => CameraPage()
         });
   }
 }
