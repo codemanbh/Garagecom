@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/pages/ProfilePage.dart';
 import '../components/CustomNavBar.dart';
+import 'ProfileSettingsPage.dart'; // Import the ProfileSettingsPage
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -15,6 +17,18 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
+          // Profile section
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Profile'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+          ),
+          const Divider(),
           // Dark mode toggle
           ListTile(
             leading: const Icon(Icons.dark_mode),
@@ -38,16 +52,6 @@ class SettingsPage extends StatelessWidget {
               },
             ),
           ),
-          // const Divider(),
-          // // Language selection
-          // ListTile(
-          //   leading: const Icon(Icons.language),
-          //   title: const Text('Language'),
-          //   subtitle: const Text('English'),
-          //   onTap: () {
-          //     // Handle language change
-          //   },
-          // ),
           const Divider(),
           // Account settings
           ListTile(

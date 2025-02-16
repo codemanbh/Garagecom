@@ -7,7 +7,7 @@ class Comment {
   int parentCommentID = 0;
   int parrentPost = 0;
 
-  bool createComment() {
+  bool createComment() { // TODO: implement this
     return false;
   }
 

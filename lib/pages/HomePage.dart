@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../components/CustomNavBar.dart';
-import './CommentPage.dart';
 import '../components/PostCard.dart';
 import '../models/Post.dart';
 
@@ -32,15 +31,17 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Home'),
       ),
-      bottomNavigationBar: CustomNavBar(),
-      body: Expanded(
-        child: ListView.builder(
-          itemCount: posts.length,
-          itemBuilder: (context, index) {
-            final post = posts[index];
-            return PostCard(post: post);
-          },
-        ),
+      bottomNavigationBar: const CustomNavBar(),
+      body: ListView.builder(
+        itemCount: posts.length,
+        itemBuilder: (context, index) {
+          final post = posts[index];
+          return PostCard(
+            post: post,
+            onUpvote: () => upvote(index),
+            onDownvote: () => downvote(index),
+          );
+        },
       ),
     );
   }
