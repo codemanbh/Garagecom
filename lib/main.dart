@@ -16,8 +16,13 @@ import './pages/ServicePage.dart';
 import './pages/SettingsPage.dart';
 import './pages/CreatePostPage.dart';
 import './pages/TestPage.dart';
+import './pages/CameraPage.dart';
 
-void main() {
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+void main() async {
+  await dotenv.load(fileName: 'assets/.env'); // loud the env variables
+
   // list of providers
   runApp(MultiProvider(
     providers: [
@@ -49,7 +54,8 @@ class MyApp extends StatelessWidget {
           '/servicePage': (context) => ServicePage(),
           '/settingsPage': (context) => SettingsPage(),
           '/createPostPage': (context) => CreatePostPage(),
-          '/testPage': (context) => TestPage()
+          '/testPage': (context) => TestPage(),
+          '/aiPage': (context) => CameraPage()
         });
   }
 }
