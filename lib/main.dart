@@ -18,7 +18,11 @@ import './pages/CreatePostPage.dart';
 import './pages/TestPage.dart';
 import './pages/CameraPage.dart';
 
-void main() {
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+void main() async {
+  await dotenv.load(fileName: 'assets/.env'); // loud the env variables
+
   // list of providers
   runApp(MultiProvider(
     providers: [

@@ -45,6 +45,4 @@ app.*.map.json
 
 docs/
 
-
-
-lib/utils/*.dart
+/assets/.env

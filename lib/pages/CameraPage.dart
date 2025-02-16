@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import '../components/CustomNavBar.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import '../utils/EnvVars.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class CameraPage extends StatefulWidget {
   @override
@@ -12,6 +12,13 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
+  @override
+  void initState() {
+    super.initState();
+    print(
+        "------------------------->" + (dotenv.env['ROBOFLOW_API_KEY'] ?? ''));
+  }
+
   File? _image;
   bool _isProcessing = false;
   String problems = '';
@@ -77,7 +84,8 @@ class _CameraPageState extends State<CameraPage> {
       // await Future.delayed(Duration(seconds: 2)); // Simulating processing time
 
       _image = File(pickedFile.path);
-      await uploadImage(_image!, Envvars.roboFlowApiKey);
+
+      await uploadImage(_image!, dotenv.env['ROBOFLOW_API_KEY'] ?? '');
 
       _isProcessing = false;
       setState(() {});
