@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:garagecom/pages/ProfilePage.dart';
 import '../components/CustomNavBar.dart';
-import 'ProfileSettingsPage.dart'; // Import the ProfileSettingsPage
+// import '../ProfileSettingsPage.dart'; // Import the ProfileSettingsPage
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
