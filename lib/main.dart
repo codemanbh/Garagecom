@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-// themes
-// import 'package:garagecom/flutter_custom_themes_vol1/flutter_midnight_neon_theme.dart';
-// import './flutter_custom_themes_vol1/flutter_monokai_theme.dart';
+
+// theme
 import './theme/flutter_midnight_neon_theme.dart';
 import './theme/flutter_monokai_theme.dart';
+
+// packages
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 // providers
 import 'package:garagecom/providers/NavProvider.dart';
 import 'package:garagecom/providers/SettingsProvider.dart';
@@ -17,8 +20,7 @@ import './pages/SettingsPage.dart';
 import './pages/CreatePostPage.dart';
 import './pages/TestPage.dart';
 import './pages/CameraPage.dart';
-
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import './pages/AddPartPage.dart';
 
 void main() async {
   await dotenv.load(fileName: 'assets/.env'); // loud the env variables
@@ -29,7 +31,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ChangeNotifierProvider(create: (_) => NavProvider()),
     ],
-    child: MyApp(),
+    child: const MyApp(),
   ));
 }
 
@@ -46,16 +48,17 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-        initialRoute: '/loginPage',
+        initialRoute: '/AddPartPage',
         routes: {
-          '/loginPage': (context) => LoginPage(),
-          '/homePage': (context) => HomePage(),
-          '/profilePage': (context) => ProfilePage(),
-          '/servicePage': (context) => ServicePage(),
-          '/settingsPage': (context) => SettingsPage(),
-          '/createPostPage': (context) => CreatePostPage(),
-          '/testPage': (context) => TestPage(),
-          '/aiPage': (context) => CameraPage()
+          '/loginPage': (context) => const LoginPage(),
+          '/homePage': (context) => const HomePage(),
+          '/profilePage': (context) => const ProfilePage(),
+          '/servicePage': (context) => const ServicePage(),
+          '/settingsPage': (context) => const SettingsPage(),
+          '/createPostPage': (context) => const CreatePostPage(),
+          '/testPage': (context) => const TestPage(),
+          '/aiPage': (context) => CameraPage(),
+          '/AddPartPage': (context) => const AddPartPage()
         });
   }
 }

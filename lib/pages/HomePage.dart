@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../components/CustomNavBar.dart';
 import '../components/PostCard.dart';
 import '../models/Post.dart';
+import '../managers/PostsManager.dart';
+import '../managers/PostsManager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,7 +13,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Post> posts = Post.posts;
+  @override
+  void initState() {
+    super.initState();
+    PostsManager pm = PostsManager();
+  }
+
+  List<Post> posts = PostsManager.posts;
 
   void upvote(int index) {
     setState(() {

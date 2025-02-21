@@ -26,7 +26,8 @@ class _PostCardState extends State<PostCard> {
     post = widget.post;
   }
 
-  void navigateToCommentPage(BuildContext context, String title, String? imageUrl) {
+  void navigateToCommentPage(
+      BuildContext context, String title, String? imageUrl) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -47,13 +48,13 @@ class _PostCardState extends State<PostCard> {
       margin: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          if (post.imageUrl != null) // Display image if URL is provided
-            Image.network(
-              post.imageUrl!,
-              width: double.infinity,
-              height: 150,
-              fit: BoxFit.cover,
-            ),
+          // if (post.imageUrl != null) // Display image if URL is provided
+          //   Image.network(
+          //     post.imageUrl!,
+          //     width: double.infinity,
+          //     height: 150,
+          //     fit: BoxFit.cover,
+          //   ),
           ListTile(
             title: Text(post.title),
             trailing: Row(
@@ -70,7 +71,8 @@ class _PostCardState extends State<PostCard> {
                 ),
               ],
             ),
-            onTap: () => navigateToCommentPage(context, post.title, post.imageUrl),
+            onTap: () =>
+                navigateToCommentPage(context, post.title, post.imageUrl),
           ),
         ],
       ),
