@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 // pages
 import './pages/LoginPage.dart';
 import './pages/HomePage.dart';
-import './pages/ProfilePage.dart';
+import 'pages/AccountSettingsPage.dart';
 import './pages/ServicePage.dart';
 import './pages/SettingsPage.dart';
 import './pages/CreatePostPage.dart';
@@ -48,11 +48,11 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-        initialRoute: '/AddPartPage',
+        initialRoute: '/loginPage',
         routes: {
           '/loginPage': (context) => const LoginPage(),
           '/homePage': (context) => const HomePage(),
-          '/profilePage': (context) => const ProfilePage(),
+          '/profilePage': (context) => const AccountSettingsPage(),
           '/servicePage': (context) => const ServicePage(),
           '/settingsPage': (context) => const SettingsPage(),
           '/createPostPage': (context) => const CreatePostPage(),

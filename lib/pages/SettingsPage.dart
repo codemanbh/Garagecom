@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:garagecom/pages/ProfilePage.dart';
+import 'package:garagecom/pages/AccountSettingsPage.dart';
 import '../components/CustomNavBar.dart';
 // import '../ProfileSettingsPage.dart'; // Import the ProfileSettingsPage
 
@@ -46,7 +46,10 @@ class SettingsPage extends StatelessWidget {
             leading: const Icon(Icons.account_circle),
             title: const Text('Account Settings'),
             onTap: () {
-              // Navigate to account settings
+               Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => AccountSettingsPage()),
+  );
             },
           ),
         ],
