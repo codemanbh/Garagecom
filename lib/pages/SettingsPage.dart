@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:garagecom/pages/ProfilePage.dart';
-import 'package:garagecom/providers/SettingsProvider.dart';
-import 'package:provider/provider.dart';
+import 'package:garagecom/pages/AccountSettingsPage.dart';
 import '../components/CustomNavBar.dart';
 // import '../ProfileSettingsPage.dart'; // Import the ProfileSettingsPage
 
@@ -24,10 +22,10 @@ class SettingsPage extends StatelessWidget {
             leading: const Icon(Icons.dark_mode),
             title: const Text('Dark Mode'),
             trailing: Switch(
-              value: Provider.of<SettingsProvider>(context).darkMode,
+              value: true,
               onChanged: (value) {
                 // Handle dark mode toggle logic
-                Provider.of<SettingsProvider>(context).toggleDarkMode();
+                // Provider.of<SettingsProvider>(context).toggleDarkMode();
               },
             ),
           ),
@@ -49,7 +47,10 @@ class SettingsPage extends StatelessWidget {
             leading: const Icon(Icons.account_circle),
             title: const Text('Account Settings'),
             onTap: () {
-              // Navigate to account settings
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AccountSettingsPage()),
+              );
             },
           ),
         ],
