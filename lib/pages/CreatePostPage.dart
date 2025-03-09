@@ -54,57 +54,102 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: Colors.grey[100],
       bottomNavigationBar: CustomNavBar(),
-      appBar: AppBar(title: const Text('Create Post')),
-      body: Padding(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text('Create Post',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Title TextField
+            Text('Title'),
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                // labelText: 'Title',
+                filled: true,
+                // fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
             const SizedBox(height: 16),
-            //  Description
+            // Description TextField
+            Text('Description'),
+
             TextField(
               controller: _descriptionController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                // labelText: 'Description',
+                filled: true,
+                // fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
             const SizedBox(height: 16),
-            // Image Picker
+            // Image Picker Container
             GestureDetector(
               onTap: _pickImage,
               child: Container(
-                height: 80,
+                height: 200,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8.0),
+                  // color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.0),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: _selectedImage == null
-                    ? const Center(child: Text('Tap to select an image'))
-                    : Image.file(
-                        File(_selectedImage!.path),
-                        fit: BoxFit.cover,
+                    ? Center(
+                        child: Text('Tap to select an image',
+                            style: TextStyle(color: Colors.grey[600])))
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: Image.file(
+                          File(_selectedImage!.path),
+                          fit: BoxFit.cover,
+                        ),
                       ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(height: 24),
             // Submit Button
-            ElevatedButton(
-              onPressed: _submitPost,
-              child: const Text('Submit Post'),
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                textStyle: const TextStyle(fontSize: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _submitPost,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  // backgroundColor: Colors,
+                ),
+                child:
+                    const Text('Submit Post', style: TextStyle(fontSize: 16)),
               ),
             ),
           ],

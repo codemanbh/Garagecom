@@ -12,7 +12,11 @@ class Post {
   int autherID = 0;
   String imageUrl = '';
 
-  Post({required this.title, required this.numOfVotes, this.imageUrl = ''});
+  Post(
+      {required this.title,
+      required this.numOfVotes,
+      this.imageUrl = '',
+      this.description = ''});
 
   bool upVote() {
     numOfVotes++;

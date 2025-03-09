@@ -20,6 +20,8 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   int postVotes = 0;
+  String? imageUrl = '';
+
   final List<Map<String, dynamic>> comments = [
     {'text': 'This is a very helpful question!', 'votes': 3},
     {'text': 'I have the same query as well.', 'votes': 1},
@@ -30,6 +32,7 @@ class _CommentPageState extends State<CommentPage> {
   void initState() {
     super.initState();
     postVotes = widget.initialVotes;
+    imageUrl = widget.imageUrl;
   }
 
   void upvotePost() {
@@ -80,7 +83,7 @@ class _CommentPageState extends State<CommentPage> {
             children: [
               'imageUrl' != null
                   ? Image.network(
-                      'https://i.redd.it/bfstbsaux1g21.jpg',
+                      imageUrl ?? '',
                       width: double.infinity,
                       height: 200,
                       fit: BoxFit.cover,
@@ -88,7 +91,7 @@ class _CommentPageState extends State<CommentPage> {
                   : SizedBox(),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text('questionBody'),
+                // child: Text('questionBody'),
               ),
               // Add other widgets for comments, etc.
 
@@ -100,7 +103,7 @@ class _CommentPageState extends State<CommentPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                widget.questionBody,
+                "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. ",
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),

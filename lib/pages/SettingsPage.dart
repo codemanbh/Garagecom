@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:garagecom/pages/ProfilePage.dart';
+import 'package:garagecom/providers/SettingsProvider.dart';
+import 'package:provider/provider.dart';
 import '../components/CustomNavBar.dart';
 // import '../ProfileSettingsPage.dart'; // Import the ProfileSettingsPage
 
@@ -22,9 +24,10 @@ class SettingsPage extends StatelessWidget {
             leading: const Icon(Icons.dark_mode),
             title: const Text('Dark Mode'),
             trailing: Switch(
-              value: isDarkMode,
+              value: Provider.of<SettingsProvider>(context).darkMode,
               onChanged: (value) {
                 // Handle dark mode toggle logic
+                Provider.of<SettingsProvider>(context).toggleDarkMode();
               },
             ),
           ),

@@ -43,12 +43,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Flutter Demo',
-        theme: FluttterMidnightNeonTheme.lightTheme,
-        darkTheme: FluttterMidnightNeonTheme.darkTheme,
+        theme: FlutterMidnightNeonTheme.lightTheme,
+        darkTheme: FlutterMidnightNeonTheme.darkTheme,
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-        initialRoute: '/AddPartPage',
+        initialRoute: '/homePage',
         routes: {
           '/loginPage': (context) => const LoginPage(),
           '/homePage': (context) => const HomePage(),

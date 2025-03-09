@@ -1,74 +1,78 @@
 import 'package:flutter/material.dart';
 
-class FluttterMidnightNeonTheme {
-  FluttterMidnightNeonTheme._();
+class FlutterMidnightNeonTheme {
+  FlutterMidnightNeonTheme._();
 
-  // If you want to modify both themes at once, modify the colors below.
+  // Global color definitions used in both light and dark themes.
 
-  static const Color _primaryColor = Color(0xFF6A71D7); // Soft indigo
-  static const Color _primaryInverseColor = Color(0xFF4E56A6); // Muted blue
-  static const Color _onSurfaceColor =
-      Color.fromARGB(255, 236, 247, 250); // Light lavender
-  static const Color _onSurfaceVariant = Color(0xFF8991CC); // Dusty periwinkle
-  static const Color _onPrimaryColor =
-      Color.fromARGB(255, 237, 239, 255); // Pale lavender
-  static const Color _surfaceColor = Color(0xFF444B8A); // Dark indigo
-  static const Color _backgroundColor = Color(0xFF393F72); // Deep blue-gray
-  static const Color _onSecondaryColor =
-      Color(0xFFE0E2FA); // Very light lavender
-  static const Color _onBackgroundColor = Color(0xFFB4B8DA); // Soft gray-blue
-  static const Color _secondaryColor =
-      Color(0xFF787FBF); // Medium lavender blue
-  static const Color _primaryContainer = Color(0xFF515785); // Deep muted indigo
-  static const Color _errorColor = Color(0xFFBE7D9B); // Muted pinkish-red
-  static const Color _onErrorColor = Color(0xFF3A324D); // Dark purple-gray
+  // Primary accent: Electric Purple
+  static const Color _primaryColor = Color(0xFF7F5AF0);
+  // Darker variant of primary for contrast elements
+  static const Color _primaryInverseColor = Color(0xFF553C9A);
+  // Text and icon color for surfaces
+  static const Color _onSurfaceColor = Color(0xFFE0E0E0);
+  // Secondary text/icon color on surfaces
+  static const Color _onSurfaceVariant = Color(0xFFB0B0B0);
+  // Contrast color for text/icons on primary elements
+  static const Color _onPrimaryColor = Color(0xFFFFFFFF);
+  // Surface color for cards, sheets, etc.
+  static const Color _surfaceColor = Color(0xFF1F1F1F);
+  // Background color of the app (near-black)
+  static const Color _backgroundColor = Color(0xFF121212);
+  // Secondary accent: Neon Teal
+  static const Color _secondaryColor = Color(0xFF64FFDA);
+  // Contrast color for secondary elements (used here as dark text)
+  static const Color _onSecondaryColor = Color(0xFF000000);
+  // Text color on the background
+  static const Color _onBackgroundColor = Color(0xFFCCCCCC);
+  // Muted version of primary used for containers
+  static const Color _primaryContainer = Color(0xFF4B3B6D);
+  // Error color (inspired by Material dark error)
+  static const Color _errorColor = Color(0xFFCF6679);
+  // Text/icon color on error elements
+  static const Color _onErrorColor = Color(0xFF000000);
 
-  // If you want to modify the light theme only, modify the colors below.
-
+  // Light theme (can be adjusted separately if needed)
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
       brightness: Brightness.light,
-      seedColor: FluttterMidnightNeonTheme._primaryColor,
-      background: FluttterMidnightNeonTheme._backgroundColor,
-      primary: FluttterMidnightNeonTheme._primaryColor,
-      secondary: FluttterMidnightNeonTheme._secondaryColor,
-      inversePrimary: FluttterMidnightNeonTheme._primaryInverseColor,
-      onSurface: FluttterMidnightNeonTheme._onSurfaceColor,
-      surface: FluttterMidnightNeonTheme._surfaceColor,
-      onSurfaceVariant: FluttterMidnightNeonTheme._onSurfaceVariant,
-      onPrimary: FluttterMidnightNeonTheme._onPrimaryColor,
-      onSecondary: FluttterMidnightNeonTheme._onSecondaryColor,
-      onBackground: FluttterMidnightNeonTheme._onBackgroundColor,
-      primaryContainer: FluttterMidnightNeonTheme._primaryContainer,
-      error: FluttterMidnightNeonTheme._errorColor,
-      onError: FluttterMidnightNeonTheme._onErrorColor,
+      seedColor: _primaryColor,
+      background: _backgroundColor,
+      primary: _primaryColor,
+      secondary: _secondaryColor,
+      inversePrimary: _primaryInverseColor,
+      onSurface: _onSurfaceColor,
+      surface: _surfaceColor,
+      onSurfaceVariant: _onSurfaceVariant,
+      onPrimary: _onPrimaryColor,
+      onSecondary: _onSecondaryColor,
+      onBackground: _onBackgroundColor,
+      primaryContainer: _primaryContainer,
+      error: _errorColor,
+      onError: _onErrorColor,
     ),
   );
 
-  // If you want to modify the dark theme only, modify the colors below.
-
+  // Dark theme designed for dark mode with high contrast and vibrant accents.
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
       brightness: Brightness.dark,
-      seedColor: FluttterMidnightNeonTheme._primaryColor,
-      background: FluttterMidnightNeonTheme._backgroundColor,
-      primary: FluttterMidnightNeonTheme._primaryColor,
-      secondary: FluttterMidnightNeonTheme._secondaryColor,
-      inversePrimary: FluttterMidnightNeonTheme._primaryInverseColor,
-      onSurface: FluttterMidnightNeonTheme._onSurfaceColor,
-      surface: FluttterMidnightNeonTheme._surfaceColor,
-      onSurfaceVariant: FluttterMidnightNeonTheme._onSurfaceVariant,
-      onPrimary: FluttterMidnightNeonTheme._onPrimaryColor,
-      onSecondary: FluttterMidnightNeonTheme._onSecondaryColor,
-      onBackground: FluttterMidnightNeonTheme._onBackgroundColor,
-      primaryContainer: FluttterMidnightNeonTheme._primaryContainer,
-      error: FluttterMidnightNeonTheme._errorColor,
-      onError: FluttterMidnightNeonTheme._onErrorColor,
+      seedColor: _primaryColor,
+      background: _backgroundColor,
+      primary: _primaryColor,
+      secondary: _secondaryColor,
+      inversePrimary: _primaryInverseColor,
+      onSurface: _onSurfaceColor,
+      surface: _surfaceColor,
+      onSurfaceVariant: _onSurfaceVariant,
+      onPrimary: _onPrimaryColor,
+      onSecondary: _onSecondaryColor,
+      onBackground: _onBackgroundColor,
+      primaryContainer: _primaryContainer,
+      error: _errorColor,
+      onError: _onErrorColor,
     ),
   );
 }
-
-// A custom theme by Ivan Robayo | Check out FlutterCustomThemesVol1 for more.
-// GitHub: @navirobayo 

@@ -101,7 +101,7 @@ class _CameraPageState extends State<CameraPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 'Instructions:',
@@ -114,18 +114,22 @@ class _CameraPageState extends State<CameraPage> {
               Text("3. Wait for processing."),
               Text("4. Review the processed image and problem signs meaning."),
               SizedBox(height: 20),
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () => _pickImage(ImageSource.camera),
-                    child: Text('Open Camera'),
+                    label: Text('Open Camera'),
+                    iconAlignment: IconAlignment.end,
+                    icon: Icon(Icons.camera_alt_outlined),
                   ),
                   SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => _pickImage(ImageSource.gallery),
-                    child: Text('Choose from Gallery'),
-                  ),
+                  ElevatedButton.icon(
+                      iconAlignment: IconAlignment.end,
+                      onPressed: () => _pickImage(ImageSource.gallery),
+                      label: Text('Choose from Gallery'),
+                      icon: Icon(Icons.photo_library_outlined)),
                 ],
               ),
               SizedBox(height: 20),
