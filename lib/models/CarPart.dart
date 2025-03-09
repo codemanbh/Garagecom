@@ -1,15 +1,21 @@
 class CarPart {
-  int? partID;
   String? partName;
-  int? lastReplaced;
-  int? lifeTime;
-  bool needReplacment = false;
+  String? imagePath;
+  int? lastReplaced; // In kilometers
+  int? lastReplacedTime; // In months
+  String? lastReplacedDate;
+  String? nextReplacedDate;
+  String? replacementInterval; // New field
+  double? lifespanProgress; // New field (value between 0.0 and 1.0)
 
-  CarPart({this.partName, this.lastReplaced});
-
-  set imagePath(String imagePath) {}
-
-  set replacementInterval(int replacementInterval) {}
-
-  set lastReplacedTime(int lastReplacedTime) {}
+  CarPart({
+    this.partName,
+    this.imagePath,
+    this.lastReplaced,
+    this.lastReplacedTime,
+    this.lastReplacedDate,
+    this.nextReplacedDate,
+    this.replacementInterval,
+    this.lifespanProgress,
+  });
 }
