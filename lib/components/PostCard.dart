@@ -55,20 +55,32 @@ class _PostCardState extends State<PostCard> {
           //     fit: BoxFit.cover,
           //   ),
           ListTile(
-            title: Text(post.title),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: widget.onUpvote,
-                  icon: const Icon(Icons.arrow_upward),
-                ),
-                Text(post.numOfVotes.toString()),
-                IconButton(
-                  onPressed: widget.onDownvote,
-                  icon: const Icon(Icons.arrow_downward),
-                ),
-              ],
+            leading: CircleAvatar(backgroundColor: Colors.white),
+            title: Text(post.autherUsername ?? "asd"),
+            subtitle: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+              child: Text(post.description),
+            ),
+            trailing: SizedBox(
+              height: 200,
+              // width: 100,
+              child: Column(
+                // mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+
+                children: [
+                  IconButton(
+                    onPressed: widget.onUpvote,
+                    icon: const Icon(Icons.arrow_upward),
+                  ),
+                  Text(post.numOfVotes.toString()),
+                  IconButton(
+                    onPressed: widget.onDownvote,
+                    icon: const Icon(Icons.arrow_downward),
+                  ),
+                ],
+              ),
             ),
             onTap: () =>
                 navigateToCommentPage(context, post.title, post.imageUrl),

@@ -14,6 +14,7 @@ class Post {
 
   Post(
       {required this.title,
+      required this.autherUsername,
       required this.numOfVotes,
       this.imageUrl = '',
       this.description = ''});
