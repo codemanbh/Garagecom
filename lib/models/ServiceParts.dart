@@ -1,15 +1,22 @@
-import './CarPart.dart';
+import 'package:garagecom/models/CarPart.dart';
 
 class ServiceParts {
-  // for testing
   List<CarPart> parts = [
-    CarPart(partName: 'Oil Filter', lastReplaced: 10),
-    CarPart(partName: 'Air Filter', lastReplaced: 30),
-    CarPart(partName: 'Brake Pads', lastReplaced: 100),
-    CarPart(partName: 'Tires', lastReplaced: 10),
-    CarPart(partName: 'Battery', lastReplaced: 20),
+    CarPart(
+      partName: 'Brake Pads',
+      lastReplacedDate: '2023-01-15',
+      nextReplacedDate: '2024-01-15',
+      replacementInterval: 'Every 12 months',
+      lifespanProgress: 0.6, // 60% lifespan remaining
+    ),
+    CarPart(
+      partName: 'Engine Oil',
+      lastReplacedDate: '2023-09-01',
+      nextReplacedDate: '2024-03-01',
+      replacementInterval: 'Every 6 months',
+      lifespanProgress: 0.3, // 30% lifespan remaining
+    ),
   ];
 
-  void loudPartsList() {}
   void savePartsList() {}
 }

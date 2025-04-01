@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import '../components/CustomNavBar.dart';
 import '../models/CarPart.dart';
 import '../models/ServiceParts.dart';
+import 'PartDetailsPage.dart'; // Import the new details page
 
 class ServicePage extends StatelessWidget {
   const ServicePage({Key? key}) : super(key: key);
@@ -16,16 +17,17 @@ class ServicePage extends StatelessWidget {
       Navigator.of(context).pushNamed('/AddPartPage');
     }
 
+    void goToPartDetailsPage(CarPart part) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PartDetailsPage(part: part),
+        ),
+      );
+    }
+
     return Scaffold(
-      // Use Material 3 if desired
       appBar: AppBar(
         title: const Text('Service'),
-        // Round app bar
-        // shape: const RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.vertical(
-        //     bottom: Radius.circular(30),
-        //   ),
-        // ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -39,84 +41,69 @@ class ServicePage extends StatelessWidget {
           itemCount: carParts.length,
           itemBuilder: (context, index) {
             final part = carParts[index];
-            return Card(
-              // ElevatedCard is a Material 3 widget. If you’re not on Material 3,
-              // you can use a normal Card with elevation & shape set.
-              // style: CardTheme.of(context).style?.copyWith(
-              //       shape: MaterialStateProperty.all(
-              //         RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(16.0),
-              //         ),
-              //       ),
-              //     ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top row: Part name + camera icon
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          part.partName ?? '',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.camera_alt),
-                          onPressed: () async {
-                            final picker = ImagePicker();
-                            final pickedFile = await picker.pickImage(
-                              source: ImageSource.gallery,
-                            );
-                            if (pickedFile != null) {
-                              part.imagePath = pickedFile.path;
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12.0),
-                    // Middle row: Last replaced by km and months
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Last Replaced (km)',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                part.lastReplaced = int.tryParse(value) ?? 0;
-                              }
-                            },
+            return GestureDetector(
+              onTap: () => goToPartDetailsPage(part),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Part Name
+                      Text(
+                        part.partName ?? '',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 12.0),
+                      // Last Replaced Date with Icon
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today, size: 16.0),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            'Last Replaced: ${part.lastReplacedDate ?? 'N/A'}',
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
-                        ),
-                        const SizedBox(width: 12.0),
-                        Expanded(
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Last Replaced (months)',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                part.lastReplacedTime =
-                                    int.tryParse(value) ?? 0;
-                              }
-                            },
+                        ],
+                      ),
+                      const SizedBox(height: 8.0),
+                      // Next Replaced Date with Icon
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_month, size: 16.0),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            'Next Replaced: ${part.nextReplacedDate ?? 'N/A'}',
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                      const SizedBox(height: 8.0),
+                      // Replacement Interval with Icon
+                      Row(
+                        children: [
+                          const Icon(Icons.schedule, size: 16.0, color: Colors.orange),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            'Replacement Interval: ${part.replacementInterval ?? 'N/A'}',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8.0),
+                      // Progress Indicator
+                      LinearProgressIndicator(
+                        value: part.lifespanProgress, // A value between 0.0 and 1.0
+                        backgroundColor: Colors.grey[300],
+                        color: _getProgressColor(part.lifespanProgress),
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        '${(part.lifespanProgress! * 100).toStringAsFixed(0)}% Lifespan Remaining',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -133,5 +120,17 @@ class ServicePage extends StatelessWidget {
       ),
       bottomNavigationBar: const CustomNavBar(),
     );
+  }
+
+  // Helper function to determine progress bar color
+  Color _getProgressColor(double? progress) {
+    if (progress == null) return Colors.grey;
+    if (progress > 0.75) {
+      return Colors.green;
+    } else if (progress > 0.5) {
+      return Colors.orange;
+    } else {
+      return Colors.red;
+    }
   }
 }

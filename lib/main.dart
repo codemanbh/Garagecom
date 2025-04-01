@@ -48,6 +48,7 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         // home: const MyHomePage(title: 'Flutter Demo Home Page'),
+
         initialRoute: '/loginPage',
         routes: {
           '/loginPage': (context) => const LoginPage(),
