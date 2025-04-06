@@ -18,6 +18,8 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // TextStyle txtSyle1 =
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +32,22 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Text(
+              'Welcome to Garadgecom!',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              'Log in or create an account to get started.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(
+              height: 20,
+            ),
             TextField(
               controller: emailController,
               decoration: const InputDecoration(
@@ -68,6 +86,16 @@ class _LoginPageState extends State<LoginPage> {
                 Navigator.of(context).pushNamed('/homePage');
               },
               child: const Text('Home page'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Navigate to the signup page or implement signup logic
+                Navigator.of(context).pushNamed('/testPage');
+              },
+              child: const Text('Test Page'),
+            ),
+            SizedBox(
+              height: 60,
             ),
           ],
         ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../components/VoteButtons.dart';
+import '../components/CommentCard.dart';
 
 class CommentPage extends StatefulWidget {
   final String postTitle;
@@ -69,6 +71,77 @@ class _CommentPageState extends State<CommentPage> {
     }
   }
 
+  Widget PostHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        'imageUrl' != null
+            ? Image.network(
+                imageUrl ?? '',
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+              )
+            : SizedBox(),
+        const Padding(
+          padding: const EdgeInsets.all(16.0),
+          // child: Text('questionBody'),
+        ),
+        // Add other widgets for comments, etc.
+
+        // Display the full question
+        Text(
+          widget.postTitle,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(4.0),
+                child: Text(
+                  "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. ",
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+            VoteButtons(),
+          ],
+        ),
+
+        // Post votes
+      ],
+    );
+  }
+
+  Widget writeComment() {
+    return TextField(
+      minLines: 1,
+      maxLines: 3,
+      controller: commentController,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: 23),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        hintText: 'Write a comment...',
+        suffixIcon: IconButton(
+          onPressed: addComment,
+          icon: const Icon(Icons.send, color: Colors.blue),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,47 +154,7 @@ class _CommentPageState extends State<CommentPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              'imageUrl' != null
-                  ? Image.network(
-                      imageUrl ?? '',
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    )
-                  : SizedBox(),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                // child: Text('questionBody'),
-              ),
-              // Add other widgets for comments, etc.
-
-              // Display the full question
-              Text(
-                widget.postTitle,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. ",
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-
-              // Post votes
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: upvotePost,
-                    icon: const Icon(Icons.arrow_upward),
-                  ),
-                  Text('$postVotes'),
-                  IconButton(
-                    onPressed: downvotePost,
-                    icon: const Icon(Icons.arrow_downward),
-                  ),
-                ],
-              ),
+              PostHeader(),
               const Divider(height: 32),
 
               // Comments section
@@ -136,26 +169,7 @@ class _CommentPageState extends State<CommentPage> {
                 itemCount: comments.length,
                 itemBuilder: (context, index) {
                   final comment = comments[index];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      title: Text(comment['text']),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            onPressed: () => upvoteComment(index),
-                            icon: const Icon(Icons.arrow_upward),
-                          ),
-                          Text('${comment['votes']}'),
-                          IconButton(
-                            onPressed: () => downvoteComment(index),
-                            icon: const Icon(Icons.arrow_downward),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return CommentCard();
                 },
               ),
 
@@ -167,17 +181,7 @@ class _CommentPageState extends State<CommentPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              TextField(
-                controller: commentController,
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
-                  labelText: 'Write a comment...',
-                  suffixIcon: IconButton(
-                    onPressed: addComment,
-                    icon: const Icon(Icons.send, color: Colors.blue),
-                  ),
-                ),
-              ),
+              writeComment()
             ],
           ),
         ),

@@ -44,6 +44,7 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.red,
       margin: const EdgeInsets.all(8.0),
       child: Column(
         children: [
@@ -55,32 +56,35 @@ class _PostCardState extends State<PostCard> {
           //     fit: BoxFit.cover,
           //   ),
           ListTile(
-            leading: CircleAvatar(backgroundColor: Colors.white),
-            title: Text(post.autherUsername ?? "asd"),
+            title: Row(
+              children: [
+                CircleAvatar(backgroundColor: Colors.white, radius: 13),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(post.autherUsername ?? "asd"),
+              ],
+            ),
             subtitle: Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: Text(post.description),
             ),
-            trailing: SizedBox(
-              height: 200,
-              // width: 100,
-              child: Column(
-                // mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+            trailing: Column(
+              // mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
 
-                children: [
-                  IconButton(
-                    onPressed: widget.onUpvote,
-                    icon: const Icon(Icons.arrow_upward),
-                  ),
-                  Text(post.numOfVotes.toString()),
-                  IconButton(
-                    onPressed: widget.onDownvote,
-                    icon: const Icon(Icons.arrow_downward),
-                  ),
-                ],
-              ),
+              children: [
+                IconButton(
+                  onPressed: widget.onUpvote,
+                  icon: const Icon(Icons.arrow_upward),
+                ),
+                Text(post.numOfVotes.toString()),
+                IconButton(
+                  onPressed: widget.onDownvote,
+                  icon: const Icon(Icons.arrow_downward),
+                ),
+              ],
             ),
             onTap: () =>
                 navigateToCommentPage(context, post.title, post.imageUrl),

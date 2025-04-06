@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 // pages
 import './pages/LoginPage.dart';
 import './pages/HomePage.dart';
-import 'pages/AccountSettingsPage.dart';
+import './pages/AccountSettingsPage.dart';
 import './pages/ServicePage.dart';
 import './pages/SettingsPage.dart';
 import './pages/CreatePostPage.dart';

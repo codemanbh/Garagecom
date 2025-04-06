@@ -4,6 +4,7 @@ import '../components/PostCard.dart';
 import '../models/Post.dart';
 import '../managers/PostsManager.dart';
 import '../managers/PostsManager.dart';
+import '../components/PostWidget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: const Text('Home'),
       ),
       bottomNavigationBar: const CustomNavBar(),
@@ -44,10 +46,16 @@ class _HomePageState extends State<HomePage> {
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[index];
-          return PostCard(
-            post: post,
-            onUpvote: () => upvote(index),
-            onDownvote: () => downvote(index),
+          return PostWidget(
+            accountId: '1',
+            accountName: 'accoudMaster',
+            postTitle: "Car battery draining overnight",
+            postContent:
+                "I keep waking up to a dead battery. What could be causing this?",
+            numOfVotes: 2,
+            postId: 'as',
+            upvote: () => upvote(index),
+            downvote: () => downvote(index),
           );
         },
       ),

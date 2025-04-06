@@ -23,6 +23,7 @@ class FlutterMonokaiTheme {
 
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
+    // fontFamily: 'inter',
     colorScheme: ColorScheme.fromSeed(
       brightness: Brightness.light,
       seedColor: FlutterMonokaiTheme._primaryColor,

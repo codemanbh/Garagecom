@@ -59,10 +59,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
-        title: const Text('Create Post',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        iconTheme: const IconThemeData(color: Colors.black),
+        // centerTitle: true,
+        title: const Text('Create Post'),
+        // iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -70,12 +69,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title TextField
-            Text('Title'),
+
             TextField(
               controller: _titleController,
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
-                // labelText: 'Title',
+                hintText: 'Title',
+                // labelStyle: TextStyle(fontSize: 30),
                 filled: true,
+
                 // fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
@@ -87,13 +89,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ),
             const SizedBox(height: 16),
             // Description TextField
-            Text('Description'),
 
             TextField(
               controller: _descriptionController,
               maxLines: 4,
+              style: TextStyle(fontSize: 18),
               decoration: InputDecoration(
-                // labelText: 'Description',
+                hintText: 'Description',
                 filled: true,
                 // fillColor: Colors.white,
                 border: OutlineInputBorder(
