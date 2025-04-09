@@ -2,6 +2,7 @@ import './Comment.dart';
 import 'package:dio/dio.dart';
 
 class Post {
+  int postID;
   String title = '';
   String description = '';
   List<String> images = [];
@@ -11,13 +12,16 @@ class Post {
   String autherUsername = '';
   int autherID = 0;
   String imageUrl = '';
+  int accountId = 0;
 
   Post(
-      {required this.title,
+      {required this.postID,
+      required this.title,
       required this.autherUsername,
       required this.numOfVotes,
       this.imageUrl = '',
-      this.description = ''});
+      this.description = '',
+      this.accountId = 0});
 
   bool upVote() {
     numOfVotes++;

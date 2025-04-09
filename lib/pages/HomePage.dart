@@ -5,6 +5,8 @@ import '../models/Post.dart';
 import '../managers/PostsManager.dart';
 import '../managers/PostsManager.dart';
 import '../components/PostWidget.dart';
+import '../components/CategoriesSection.dart';
+import '../searchDelegates/PostSearchDelegate.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -39,25 +41,44 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        actions: [
+          IconButton(
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: PostSearchDelegate(PostsManager.posts),
+                );
+              },
+              icon: Icon(Icons.search))
+        ],
         title: const Text('Home'),
       ),
       bottomNavigationBar: const CustomNavBar(),
-      body: ListView.builder(
-        itemCount: posts.length,
-        itemBuilder: (context, index) {
-          final post = posts[index];
-          return PostWidget(
-            accountId: '1',
-            accountName: 'accoudMaster',
-            postTitle: "Car battery draining overnight",
-            postContent:
-                "I keep waking up to a dead battery. What could be causing this?",
-            numOfVotes: 2,
-            postId: 'as',
-            upvote: () => upvote(index),
-            downvote: () => downvote(index),
-          );
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: posts.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return CategoriesSection();
+                } else {
+                  final post = posts[index - 1];
+                  return PostWidget(
+                    accountId: post.accountId,
+                    accountName: post.autherUsername,
+                    postTitle: post.title,
+                    postContent: post.description,
+                    numOfVotes: post.numOfVotes,
+                    postId: post.postID,
+                    upvote: () => upvote(index),
+                    downvote: () => downvote(index),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

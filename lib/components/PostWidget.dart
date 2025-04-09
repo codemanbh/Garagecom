@@ -3,9 +3,9 @@ import '../pages/CommentPage.dart';
 import '../components/VoteButtons.dart';
 
 class PostWidget extends StatelessWidget {
-  final String accountId;
+  final int accountId;
   final String accountName;
-  final String postId;
+  final int postId;
   final String postTitle;
   final String postContent;
   final int numOfVotes;
@@ -26,11 +26,6 @@ class PostWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String postAccount = 'AccourdMaster';
-    String postTitle = "Car battery draining overnight";
-    String postContent =
-        "I keep waking up to a dead battery. What could be causing this?";
-
     return Container(
       padding: EdgeInsets.fromLTRB(10, 9, 10, 10),
       decoration: BoxDecoration(
@@ -44,47 +39,51 @@ class PostWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CommentPage(
-                      postTitle: 'asd', questionBody: 'asd', initialVotes: 0),
-                ),
-              );
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(backgroundColor: Colors.white, radius: 10),
-                    SizedBox(
-                      width: 7,
-                    ),
-                    Text(postAccount),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(postTitle,
-                    style:
-                        TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
-                SizedBox(
-                  height: 5,
-                ),
-                SizedBox(
-                  width: 300,
-                  child: Text(postContent,
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CommentPage(
+                        postTitle: 'asd', questionBody: 'asd', initialVotes: 0),
+                  ),
+                );
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(backgroundColor: Colors.white, radius: 10),
+                      SizedBox(
+                        width: 7,
+                      ),
+                      Text(
+                        this.accountName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(postTitle,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style:
+                          TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(postContent,
                       maxLines: 3,
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 16)),
-                )
-              ],
+                ],
+              ),
             ),
           ),
           // votes

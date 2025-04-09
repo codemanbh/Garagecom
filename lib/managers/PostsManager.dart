@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import '../models/Post.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import './posts.dart';
+import '../data/posts.dart';
 
 class PostsManager {
   static List<Post> posts = [];
@@ -129,6 +129,7 @@ class PostsManager {
 
     List<dynamic> x = posts_map
         .map((x) => Post(
+            postID: x['id'],
             title: x['title'],
             numOfVotes: 0,
             autherUsername: x['autherUsername'],

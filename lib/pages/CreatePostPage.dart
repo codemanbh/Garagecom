@@ -150,8 +150,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   ),
                   // backgroundColor: Colors,
                 ),
-                child:
-                    const Text('Submit Post', style: TextStyle(fontSize: 16)),
+                child: const Text('Send post', style: TextStyle(fontSize: 16)),
               ),
             ),
           ],
