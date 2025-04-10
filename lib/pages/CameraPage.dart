@@ -172,7 +172,7 @@ class _CameraPageState extends State<CameraPage> {
     
     return Card(
       elevation: 1,
-     
+      
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Container(
         height: 200,

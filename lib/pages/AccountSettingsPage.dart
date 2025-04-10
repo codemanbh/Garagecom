@@ -6,6 +6,11 @@ class AccountSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the surface color from theme - same as used in CameraPage
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account Settings'),
@@ -42,100 +47,209 @@ class AccountSettingsPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             // Full Name
-            TextFormField(
-              decoration: const InputDecoration(
+            TextField(
+              decoration: InputDecoration(
                 labelText: 'Full Name',
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person, color: colorScheme.primary),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
             // Email
             TextFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Email',
-                prefixIcon: Icon(Icons.email),
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.email, color: colorScheme.primary),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
             // Phone Number
             TextFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Phone Number',
-                prefixIcon: Icon(Icons.phone),
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.phone, color: colorScheme.primary),
+                filled: true,
+               fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
             // Bio
             TextFormField(
               maxLines: 3,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Bio',
-                prefixIcon: Icon(Icons.info),
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.info, color: colorScheme.primary),
+                filled: true,
+             fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
             // Password
             TextFormField(
               obscureText: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Password',
-                prefixIcon: Icon(Icons.lock),
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.lock, color: colorScheme.primary),
+                filled: true,
+              fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
             // Confirm Password
             TextFormField(
               obscureText: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Confirm Password',
-                prefixIcon: Icon(Icons.lock),
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.lock, color: colorScheme.primary),
+                filled: true,
+             fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
-             const SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Car name
-             TextFormField(
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Car name ',
-                prefixIcon: Icon(Icons.car_repair),
-                border: OutlineInputBorder(),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Car name',
+                prefixIcon: Icon(Icons.car_repair, color: colorScheme.primary),
+                filled: true,
+        fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
-             TextFormField(
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Car model ',
-                prefixIcon: Icon(Icons.car_repair_sharp),
-                border: OutlineInputBorder(),
+            // Car model
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Car model',
+                prefixIcon: Icon(Icons.car_repair_sharp, color: colorScheme.primary),
+                filled: true,
+     fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
-             TextFormField(
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'mailage  ',
-                prefixIcon: Icon(Icons.car_repair_rounded),
-                border: OutlineInputBorder(),
+            // Mileage
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Mileage',
+                prefixIcon: Icon(Icons.car_repair_rounded, color: colorScheme.primary),
+                filled: true,
+      fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 30),
             
             // Save Button
-            
             ElevatedButton(
               onPressed: () {
                 // Add logic to save changes
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                backgroundColor: Colors.blue, // Custom button color
+                backgroundColor: colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: const Text(
                 'Save Changes',
