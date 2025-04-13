@@ -7,6 +7,7 @@ import '../managers/PostsManager.dart';
 import '../components/PostWidget.dart';
 import '../components/CategoriesSection.dart';
 import '../searchDelegates/PostSearchDelegate.dart';
+import '../components/CategoriesDialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -61,7 +62,11 @@ class _HomePageState extends State<HomePage> {
               itemCount: posts.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return CategoriesSection();
+                  return ElevatedButton(
+                      onPressed: () async {
+                        await showCategoriesDialog(context);
+                      },
+                      child: Text('Select categories'));
                 } else {
                   final post = posts[index - 1];
                   return PostWidget(

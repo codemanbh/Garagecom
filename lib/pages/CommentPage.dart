@@ -73,7 +73,7 @@ class _CommentPageState extends State<CommentPage> {
 
   Widget PostHeader() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         'imageUrl' != null
             ? Image.network(
@@ -92,7 +92,11 @@ class _CommentPageState extends State<CommentPage> {
         // Display the full question
         Text(
           widget.postTitle,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         const Row(

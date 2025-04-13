@@ -14,7 +14,7 @@ class _CommentCardState extends State<CommentCard> {
   String wasPostedBefore = '2 days ago';
 
   TextStyle usernameStyle = TextStyle(fontSize: 16);
-  TextStyle contentStyle = TextStyle(fontSize: 18);
+  TextStyle contentStyle = TextStyle(fontSize: 16);
   TextStyle wasPostedBeforeStyle =
       TextStyle(fontSize: 16, color: const Color.fromARGB(201, 255, 255, 255));
 
@@ -54,7 +54,7 @@ class _CommentCardState extends State<CommentCard> {
             ),
           ),
           // right
-          VoteButtons(),
+          VoteButtons(size: 'small'),
         ],
       ),
     );

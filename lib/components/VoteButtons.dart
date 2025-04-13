@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class VoteButtons extends StatefulWidget {
-  const VoteButtons({super.key});
+  final String size;
+  const VoteButtons({super.key, this.size = 'large'});
 
   @override
   State<VoteButtons> createState() => _VoteButtonsState();
@@ -12,11 +13,15 @@ class _VoteButtonsState extends State<VoteButtons> {
     IconData i = direction == 'up' ? Icons.arrow_upward : Icons.arrow_downward;
     return IconButton.filled(
       onPressed: () {},
-      icon: Icon(i, size: 18),
+      icon: Icon(i, size: widget.size == 'large' ? 18 : 13),
       color: Theme.of(context).scaffoldBackgroundColor,
       style: IconButton.styleFrom(
           backgroundColor: Colors.white, minimumSize: Size(18, 18)),
     );
+  }
+
+  double lineHeight() {
+    return widget.size == 'large' ? 2 : 0;
   }
 
   @override
@@ -25,7 +30,9 @@ class _VoteButtonsState extends State<VoteButtons> {
       padding: const EdgeInsets.all(1),
       decoration: BoxDecoration(
         // color: Colors.blue,
-        color: const Color.fromARGB(255, 157, 157, 157),
+        color: widget.size == 'large'
+            ? const Color.fromARGB(255, 157, 157, 157)
+            : const Color.fromARGB(0, 157, 157, 157),
         borderRadius: BorderRadius.circular(200), // Half of the width/height
       ),
       child: Column(
@@ -33,8 +40,12 @@ class _VoteButtonsState extends State<VoteButtons> {
           voteButton('up'),
           Container(
             margin: EdgeInsets.symmetric(vertical: 3),
-            child: const Text('0',
-                style: TextStyle(fontSize: 16, color: Colors.white)),
+            child: Text('0',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  height: lineHeight(),
+                )),
           ),
           voteButton('down'),
         ],
