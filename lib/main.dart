@@ -62,6 +62,8 @@ class MyApp extends StatelessWidget {
           '/testPage': (context) => const TestPage(),
           '/aiPage': (context) => CameraPage(),
           '/AddPartPage': (context) => const AddPartPage(),
+          '/AccountSettingsPage': (context) => const AccountSettingsPage(),
+          
         });
   }
 }

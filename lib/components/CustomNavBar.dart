@@ -3,6 +3,7 @@ import 'package:garagecom/main.dart';
 import 'package:garagecom/providers/NavProvider.dart';
 import 'package:provider/provider.dart';
 
+
 class CustomNavBar extends StatefulWidget {
   const CustomNavBar({super.key});
 
@@ -18,8 +19,8 @@ class _CustomNavBarState extends State<CustomNavBar> {
     '/homePage',
     '/servicePage',
     '/createPostPage',
-    '/aiPage',
-    '/settingsPage',
+        '/aiPage',
+    '/AccountSettingsPage',
   ];
 
   void _onItemTapped(int index) {
@@ -53,8 +54,8 @@ class _CustomNavBarState extends State<CustomNavBar> {
           label: 'Dashbourd',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'Settings',
+          icon: Icon(Icons.account_circle),
+          label: 'Account',
         ),
       ],
       selectedItemColor: ThemeData().secondaryHeaderColor,
