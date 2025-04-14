@@ -3,7 +3,6 @@ import '../components/CustomNavBar.dart';
 import '../components/PostCard.dart';
 import '../models/Post.dart';
 import '../managers/PostsManager.dart';
-import '../managers/PostsManager.dart';
 import '../components/PostWidget.dart';
 import '../components/CategoriesSection.dart';
 import '../searchDelegates/PostSearchDelegate.dart';
@@ -39,51 +38,154 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        title: const Text('Home'),
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: PostSearchDelegate(PostsManager.posts),
-                );
-              },
-              icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: PostSearchDelegate(PostsManager.posts),
+              );
+            },
+            icon: Icon(Icons.search)
+          )
         ],
-        title: const Text('Home'),
       ),
       bottomNavigationBar: const CustomNavBar(),
       body: Column(
         children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: posts.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return ElevatedButton(
-                      onPressed: () async {
-                        await showCategoriesDialog(context);
-                      },
-                      child: Text('Select categories'));
-                } else {
-                  final post = posts[index - 1];
-                  return PostWidget(
-                    accountId: post.accountId,
-                    accountName: post.autherUsername,
-                    postTitle: post.title,
-                    postContent: post.description,
-                    numOfVotes: post.numOfVotes,
-                    postId: post.postID,
-                    upvote: () => upvote(index),
-                    downvote: () => downvote(index),
-                  );
-                }
-              },
+          // Categories section - compact design
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: colorScheme.onSurfaceVariant.withOpacity(0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.category_rounded,
+                  color: colorScheme.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Post Categories',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      Text(
+                        'Filter posts by category',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await showCategoriesDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    backgroundColor: colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                  child: const Text(
+                    'Select',
+                    style: TextStyle(fontSize: 14, color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ),
+          
+          // Posts list with consistent styling
+          Expanded(
+            child: posts.isEmpty 
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.post_add,
+                      size: 64,
+                      color: colorScheme.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No Posts Available',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Select categories or check back later',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                itemCount: posts.length,
+                itemBuilder: (context, index) {
+                  final post = posts[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: PostWidget(
+                      accountId: post.accountId.toString(),
+                      accountName: post.autherUsername,
+                      postTitle: post.title,
+                      postContent: post.description,
+                      numOfVotes: post.numOfVotes,
+                      postId: post.postID.toString(),
+                      upvote: () => upvote(index),
+                      downvote: () => downvote(index),
+                    ),
+                  );
+                },
+              ),
+          ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Add navigation to create post page
+        },
+        backgroundColor: colorScheme.primary,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
