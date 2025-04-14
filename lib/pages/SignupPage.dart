@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
+    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -25,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Sign Up'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -35,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Welcome to Garagecom!',
+                'Create Your Account',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
               ),
@@ -43,13 +47,35 @@ class _LoginPageState extends State<LoginPage> {
                 height: 20,
               ),
               Text(
-                'Log in or create an account to get started.',
+                'Join Garagecom and start managing your car maintenance.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 20),
               ),
               SizedBox(
                 height: 40,
               ),
+              TextFormField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  prefixIcon: Icon(Icons.person, color: colorScheme.primary),
+                  filled: true,
+                  fillColor: theme.colorScheme.surfaceContainerLow,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                  ),
+                ),
+                keyboardType: TextInputType.name,
+              ),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -93,11 +119,33 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 obscureText: true,
               ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: confirmPasswordController,
+                decoration: InputDecoration(
+                  labelText: 'Confirm Password',
+                  prefixIcon: Icon(Icons.lock_outline, color: colorScheme.primary),
+                  filled: true,
+                  fillColor: theme.colorScheme.surfaceContainerLow,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                  ),
+                ),
+                obscureText: true,
+              ),
               const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
-                  // Implement login logic here
-                  print('Login button pressed');
+                  // Implement sign up logic here
+                  print('Sign up button pressed');
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
@@ -107,53 +155,34 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 child: const Text(
-                  'Login',
+                  'Sign Up',
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
               const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  // Navigate to the signup page
-                  Navigator.of(context).pushNamed('/signup');
-                },
-                child: Text(
-                  'Create an account',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Already have an account? ',
+                    style: TextStyle(fontSize: 16),
                   ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  // Navigate to the signup page or implement signup logic
-                  Navigator.of(context).pushNamed('/homePage');
-                },
-                child: Text(
-                  'Home page',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
+                  TextButton(
+                    onPressed: () {
+                      // Navigate back to login page
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Log In',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colorScheme.primary,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-              TextButton(
-                onPressed: () {
-                  // Navigate to the signup page or implement signup logic
-                  Navigator.of(context).pushNamed('/testPage');
-                },
-                child: Text(
-                  'Test Page',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 60,
-              ),
+              const SizedBox(height: 30),
             ],
           ),
         ),

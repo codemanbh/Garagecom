@@ -47,6 +47,20 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
+  void _checkImage() {
+    if (_image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select an image before submitting.')),
+      );
+      return;
+    }
+
+    // Add your submission logic here
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Post submitted successfully!')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -336,42 +350,63 @@ class _CameraPageState extends State<CameraPage> {
 
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
-      child: Row(
+      // Submit button
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: _isProcessing ? null : () => _pickImage(ImageSource.camera),
-              icon: Icon(
-                Icons.camera_alt,
-    color: colorScheme.onPrimary, // Explicitly set the icon color
-                size: 20,
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _pickImage(ImageSource.camera),
+                  icon: Icon(
+                    Icons.camera_alt,
+                    color: colorScheme.onPrimary,
+                    size: 20,
+                  ),
+                  label: Text('Take Photo'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
                 ),
-              label: Text('Take Photo'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                padding: EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _pickImage(ImageSource.gallery),
+                  icon: Icon(Icons.photo_library),
+                  label: Text('Gallery'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: colorScheme.primary,
+                    side: BorderSide(color: colorScheme.primary),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
                 ),
-                disabledBackgroundColor: colorScheme.primary.withOpacity(0.3),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: _checkImage,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              padding: EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100),
               ),
             ),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: _isProcessing ? null : () => _pickImage(ImageSource.gallery),
-              icon: Icon(Icons.photo_library),
-              label: Text('Gallery'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: colorScheme.primary,
-                side: BorderSide(color: colorScheme.primary),
-                padding: EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+            child: Text(
+              'Check Image',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
         ],

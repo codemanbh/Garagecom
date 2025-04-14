@@ -13,6 +13,7 @@ import 'package:garagecom/providers/SettingsProvider.dart';
 import 'package:provider/provider.dart';
 // pages
 import './pages/LoginPage.dart';
+import './pages/SignupPage.dart';
 import './pages/HomePage.dart';
 import './pages/AccountSettingsPage.dart';
 import './pages/ServicePage.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         initialRoute: '/loginPage',
         routes: {
           '/loginPage': (context) => const LoginPage(),
+          '/signup': (context) => const SignupPage(),
           '/homePage': (context) => const HomePage(),
           '/profilePage': (context) => const AccountSettingsPage(),
           '/servicePage': (context) => const ServicePage(),

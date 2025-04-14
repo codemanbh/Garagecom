@@ -248,7 +248,7 @@ class AccountSettingsPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 backgroundColor: colorScheme.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(100),
                 ),
               ),
               child: const Text(
