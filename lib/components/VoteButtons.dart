@@ -16,7 +16,7 @@ class _VoteButtonsState extends State<VoteButtons> {
       icon: Icon(i, size: widget.size == 'large' ? 18 : 13),
       color: Theme.of(context).scaffoldBackgroundColor,
       style: IconButton.styleFrom(
-          backgroundColor: Colors.white, minimumSize: Size(18, 18)),
+          backgroundColor: Colors.white, minimumSize: const Size(18, 18)),
     );
   }
 
@@ -39,7 +39,7 @@ class _VoteButtonsState extends State<VoteButtons> {
         children: [
           voteButton('up'),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 3),
+            margin: const EdgeInsets.symmetric(vertical: 3),
             child: Text('0',
                 style: TextStyle(
                   fontSize: 16,

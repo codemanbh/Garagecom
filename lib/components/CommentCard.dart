@@ -13,19 +13,19 @@ class _CommentCardState extends State<CommentCard> {
   String content = "I don't know, maybe you should take your car to the garage";
   String wasPostedBefore = '2 days ago';
 
-  TextStyle usernameStyle = TextStyle(fontSize: 16);
-  TextStyle contentStyle = TextStyle(fontSize: 16);
+  TextStyle usernameStyle = const TextStyle(fontSize: 16);
+  TextStyle contentStyle = const TextStyle(fontSize: 16);
   TextStyle wasPostedBeforeStyle =
-      TextStyle(fontSize: 16, color: const Color.fromARGB(201, 255, 255, 255));
+      const TextStyle(fontSize: 16, color: Color.fromARGB(201, 255, 255, 255));
 
-  SizedBox smallSpace = SizedBox(
+  SizedBox smallSpace = const SizedBox(
     height: 7,
   );
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         // crossAxisAlignment: CrossAxisAlignment.st,
@@ -37,7 +37,7 @@ class _CommentCardState extends State<CommentCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '@' + username,
+                  '@$username',
                   style: usernameStyle,
                 ),
                 smallSpace,
@@ -54,7 +54,7 @@ class _CommentCardState extends State<CommentCard> {
             ),
           ),
           // right
-          VoteButtons(size: 'small'),
+          const VoteButtons(size: 'small'),
         ],
       ),
     );

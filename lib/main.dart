@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 // theme
 import './theme/flutter_midnight_neon_theme.dart';
-import './theme/flutter_monokai_theme.dart';
 
 // packages
 import 'package:flutter_dotenv/flutter_dotenv.dart';

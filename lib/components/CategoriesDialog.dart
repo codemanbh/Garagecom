@@ -34,7 +34,7 @@ Future<void> showCategoriesDialog(BuildContext context) async {
         content: Container(
           width: double.maxFinite,
           constraints: const BoxConstraints(maxHeight: 400),
-          child: SingleChildScrollView(
+          child: const SingleChildScrollView(
             child: CategoriesSection(),
           ),
         ),

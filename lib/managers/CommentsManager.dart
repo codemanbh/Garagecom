@@ -1,5 +1,4 @@
 import '../models/Comment.dart';
-import 'package:dio/dio.dart';
 
 class CommentsManager {
   List<Comment> comments = [];

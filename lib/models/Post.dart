@@ -1,5 +1,4 @@
 import './Comment.dart';
-import 'package:dio/dio.dart';
 
 class Post {
   int postID;

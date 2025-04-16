@@ -6,15 +6,15 @@ import '../data/posts.dart';
 
 class PostsManager {
   static List<Post> posts = [];
-  Dio _dio = Dio();
+  final Dio _dio = Dio();
 
   PostsManager() {
     fetchPosts();
   }
 
-  Future<bool> fetchPostDetails(int post_id) async {
+  Future<bool> fetchPostDetails(int postId) async {
     final response =
-        await _dio.get('http://192.168.243.1:3000/api/posts/${post_id}');
+        await _dio.get('http://192.168.243.1:3000/api/posts/$postId');
     if (response.statusCode == 200) {
       // Post post = Post();
     }
@@ -44,7 +44,7 @@ class PostsManager {
     // List<dynamic> p = json.decode(jsonString)['posts'];
     // print(posts);
 
-    List<Map<String, dynamic>> posts_map = [
+    List<Map<String, dynamic>> postsMap = [
       {
         "id": 1,
         "autherUsername": "GlitchHorizon",
@@ -127,7 +127,7 @@ class PostsManager {
       }
     ];
 
-    List<dynamic> x = posts_map
+    List<dynamic> x = postsMap
         .map((x) => Post(
             postID: x['id'],
             title: x['title'],

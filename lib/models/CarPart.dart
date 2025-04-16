@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
+
 class CarPart {
   String? partName;
-  String? itemImagePath; // New field
-  String? receiptImagePath; // New field
+  String? itemImagePath;
+  String? receiptImagePath;
   int? lastReplaced; // In kilometers
   int? lastReplacedTime; // In months
   String? lastReplacedDate;
@@ -10,7 +12,7 @@ class CarPart {
   double? lifespanProgress; // Value between 0.0 and 1.0
   String? notes;
   String? warrantyExpiryDate;
-  String? storeLocation; // New field
+  String? storeLocation;
 
   CarPart({
     this.partName,
@@ -24,7 +26,7 @@ class CarPart {
     this.lifespanProgress,
     this.notes,
     this.warrantyExpiryDate,
-    this.storeLocation,
+    this.storeLocation, required int carId,
   });
 
   int? get replacementIntervalMonths => null;

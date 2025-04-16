@@ -64,7 +64,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      bottomNavigationBar: CustomNavBar(),
+      bottomNavigationBar: const CustomNavBar(),
       appBar: AppBar(
         title: const Text(
           'Create Post',
@@ -95,11 +95,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
                           controller: _titleController,
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          decoration: InputDecoration(
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          decoration: const InputDecoration(
                             hintText: 'Post Title',
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16),
                           ),
                         ),
                       ),
@@ -115,11 +115,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         child: TextField(
                           controller: _descriptionController,
                           maxLines: 4,
-                          style: TextStyle(fontSize: 16),
-                          decoration: InputDecoration(
+                          style: const TextStyle(fontSize: 16),
+                          decoration: const InputDecoration(
                             hintText: 'Description',
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
                         ),
                       ),
@@ -149,7 +149,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     final colorScheme = theme.colorScheme;
     
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -171,7 +171,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
               ),
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               text,
@@ -191,7 +191,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Container(
+      child: SizedBox(
         height: 200,
         width: double.infinity,
         child: Column(
@@ -202,14 +202,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
               size: 48,
               color: colorScheme.onSurfaceVariant,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'No image selected',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Take or upload a photo for your post',
               style: theme.textTheme.bodySmall?.copyWith(
@@ -248,7 +248,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
               backgroundColor: colorScheme.surface.withOpacity(0.7),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                icon: Icon(Icons.close, size: 16),
+                icon: const Icon(Icons.close, size: 16),
                 color: colorScheme.onSurface,
                 onPressed: () {
                   setState(() {
@@ -282,27 +282,27 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     color: colorScheme.onPrimary,
                     size: 20,
                   ),
-                  label: Text('Take Photo'),
+                  label: const Text('Take Photo'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () => _pickImage(ImageSource.gallery),
-                  icon: Icon(Icons.photo_library),
-                  label: Text('Gallery'),
+                  icon: const Icon(Icons.photo_library),
+                  label: const Text('Gallery'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: colorScheme.primary,
                     side: BorderSide(color: colorScheme.primary),
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
@@ -311,18 +311,18 @@ class _CreatePostPageState extends State<CreatePostPage> {
               ),
             ],
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           ElevatedButton(
             onPressed: _submitPost,
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
-              padding: EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(100),
               ),
             ),
-            child: Text(
+            child: const Text(
               'Submit Post',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),

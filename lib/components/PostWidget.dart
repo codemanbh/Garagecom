@@ -120,7 +120,7 @@ class PostWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceVariant,
+                    color: colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -138,7 +138,7 @@ class PostWidget extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   child: ElevatedButton.icon(
                     onPressed: upvote,
-                    icon: Icon(Icons.thumb_up, size: 16),
+                    icon: const Icon(Icons.thumb_up, size: 16),
                     label: const Text('Upvote'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primaryContainer,
@@ -156,10 +156,10 @@ class PostWidget extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   child: ElevatedButton.icon(
                     onPressed: downvote,
-                    icon: Icon(Icons.thumb_down, size: 16),
+                    icon: const Icon(Icons.thumb_down, size: 16),
                     label: const Text('Downvote'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.surfaceVariant,
+                      backgroundColor: colorScheme.surfaceContainerHighest,
                       foregroundColor: colorScheme.onSurfaceVariant,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       shape: RoundedRectangleBorder(

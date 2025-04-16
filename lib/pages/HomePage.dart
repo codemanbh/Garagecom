@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
                 delegate: PostSearchDelegate(PostsManager.posts),
               );
             },
-            icon: Icon(Icons.search)
+            icon: const Icon(Icons.search)
           )
         ],
       ),

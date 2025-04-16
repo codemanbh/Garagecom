@@ -135,7 +135,7 @@ class _CommentPageState extends State<CommentPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceVariant,
+                        color: colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -166,7 +166,7 @@ class _CommentPageState extends State<CommentPage> {
                       icon: const Icon(Icons.thumb_down, size: 16),
                       label: const Text('Downvote'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.surfaceVariant,
+                        backgroundColor: colorScheme.surfaceContainerHighest,
                         foregroundColor: colorScheme.onSurfaceVariant,
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         shape: RoundedRectangleBorder(
@@ -264,7 +264,7 @@ class _CommentPageState extends State<CommentPage> {
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(8),
                         minimumSize: const Size(0, 0),
-                        backgroundColor: colorScheme.surfaceVariant,
+                        backgroundColor: colorScheme.surfaceContainerHighest,
                         foregroundColor: colorScheme.onSurfaceVariant,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),

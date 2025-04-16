@@ -7,7 +7,7 @@ class PostCard extends StatefulWidget {
   final VoidCallback onUpvote;
   final VoidCallback onDownvote;
 
-  const PostCard({
+  const PostCard({super.key, 
     required this.post,
     required this.onUpvote,
     required this.onDownvote,
@@ -58,8 +58,8 @@ class _PostCardState extends State<PostCard> {
           ListTile(
             title: Row(
               children: [
-                CircleAvatar(backgroundColor: Colors.white, radius: 13),
-                SizedBox(
+                const CircleAvatar(backgroundColor: Colors.white, radius: 13),
+                const SizedBox(
                   width: 10,
                 ),
                 Text(post.autherUsername ?? "asd"),

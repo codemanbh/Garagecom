@@ -21,7 +21,7 @@ class _TestPageState extends State<TestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Test Page"),
+          title: const Text("Test Page"),
         ),
         body: ListView.builder(
             itemCount: symbols.length,

@@ -10,7 +10,7 @@ class PostSearchDelegate extends SearchDelegate<Post?> {
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
-        icon: Icon(Icons.clear),
+        icon: const Icon(Icons.clear),
         onPressed: () {
           query = ''; // Clears the search query
         },
@@ -21,7 +21,7 @@ class PostSearchDelegate extends SearchDelegate<Post?> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back),
       onPressed: () {
         close(context,
             null); // Closes the search delegate without returning a result

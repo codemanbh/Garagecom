@@ -34,20 +34,42 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Welcome to Garagecom!',
+              // Added logo at the top
+              Center(
+                child: Container(
+                  height: 150,
+                  width: 350,
+                  margin: const EdgeInsets.only(top: 50, bottom: 20),
+                  child: Image.asset(
+                    'assets/logo-raw-purple.png', 
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      print('Logo loading error: $error');
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const Text(
+                'Welcome!',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
-              Text(
+              const Text(
                 'Log in or create an account to get started.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 20),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 40,
               ),
               TextFormField(
@@ -151,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 60,
               ),
             ],

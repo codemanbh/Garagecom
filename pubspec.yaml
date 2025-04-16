@@ -70,6 +70,10 @@ flutter:
     - assets/.env
     - assets/data/comments.json
     - assets/data/posts.json
+    - assets/xx.png
+    - assets/Made with insMind-car-icon-3657902_1280.png
+    - assets/logo.png 
+    - assets/logo-raw-purple.png # Add the .png extension
 
   # - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

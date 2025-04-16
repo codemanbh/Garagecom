@@ -81,7 +81,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     // Show a confirmation
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Profile updated successfully!'),
+        content: const Text('Profile updated successfully!'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
       ),
@@ -93,8 +93,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     final colorScheme = theme.colorScheme;
     
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(8),
@@ -106,7 +106,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, color: colorScheme.primary),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +118,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   value,
                   style: TextStyle(
@@ -226,12 +226,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 ),
                 if (isEditMode)
                   Container(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.camera_alt,
                       color: Colors.white,
                       size: 24,
@@ -263,7 +263,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               // View mode - display information
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerLow.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(16),
@@ -292,7 +292,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               const SizedBox(height: 24),
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerLow.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(16),
@@ -324,8 +324,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     isEditMode = true;
                   });
                 },
-                icon: Icon(Icons.edit , color: Colors.white,),
-                label: Text('Edit Profile'),
+                icon: const Icon(Icons.edit , color: Colors.white,),
+                label: const Text('Edit Profile'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: colorScheme.primary,
@@ -371,7 +371,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               ),
               
               const SizedBox(height: 16),
-              Divider(),
+              const Divider(),
               const SizedBox(height: 16),
               
               Padding(
@@ -402,7 +402,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               ),
 
               const SizedBox(height: 16),
-              Divider(),
+              const Divider(),
               const SizedBox(height: 16),
               
               Padding(
@@ -432,8 +432,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               const SizedBox(height: 30),
               ElevatedButton.icon(
                 onPressed: saveChanges,
-                icon: Icon(Icons.save ,color: Colors.white,),
-                label: Text('Save Changes'),
+                icon: const Icon(Icons.save ,color: Colors.white,),
+                label: const Text('Save Changes'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: colorScheme.primary,

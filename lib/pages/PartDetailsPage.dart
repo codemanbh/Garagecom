@@ -6,7 +6,7 @@ import '../models/CarPart.dart';
 class PartDetailsPage extends StatefulWidget {
   final CarPart part;
 
-  const PartDetailsPage({Key? key, required this.part}) : super(key: key);
+  const PartDetailsPage({super.key, required this.part});
 
   @override
   _PartDetailsPageState createState() => _PartDetailsPageState();
@@ -51,7 +51,7 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Changes saved successfully!'),
+          content: const Text('Changes saved successfully!'),
           backgroundColor: Theme.of(context).primaryColor, // Use theme color
         ),
       );

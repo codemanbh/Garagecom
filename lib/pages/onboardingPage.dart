@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
 }
@@ -33,19 +35,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 await prefs.setBool("onboardingShown", true);
                 Navigator.pushReplacementNamed(context, "/home");
               },
-              child: Text("Get Started"),
+              child: const Text("Get Started"),
             )
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
                   onPressed: () => _controller.jumpToPage(2),
-                  child: Text("Skip"),
+                  child: const Text("Skip"),
                 ),
                 IconButton(
-                  icon: Icon(Icons.arrow_forward),
+                  icon: const Icon(Icons.arrow_forward),
                   onPressed: () => _controller.nextPage(
-                    duration: Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 500),
                     curve: Curves.ease,
                   ),
                 ),
@@ -62,12 +64,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(title,
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white)),
-            SizedBox(height: 10),
-            Text(subtitle, style: TextStyle(fontSize: 18, color: Colors.white)),
+            const SizedBox(height: 10),
+            Text(subtitle, style: const TextStyle(fontSize: 18, color: Colors.white)),
           ],
         ),
       ),

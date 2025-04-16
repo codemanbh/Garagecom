@@ -43,7 +43,7 @@ class _CategoriesSectionState extends State<CategoriesSection> {
             ),
             backgroundColor: isSelected 
                 ? colorScheme.primaryContainer.withOpacity(0.2) 
-                : colorScheme.surfaceVariant,
+                : colorScheme.surfaceContainerHighest,
             selectedColor: colorScheme.primaryContainer,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(100),
