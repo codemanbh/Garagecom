@@ -65,11 +65,19 @@ class _HomePageState extends State<HomePage> {
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(8),
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.2),
+                color: colorScheme.primary.withOpacity(0.2),
+                width: 1,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.primary.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -108,13 +116,16 @@ class _HomePageState extends State<HomePage> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     backgroundColor: colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 3,
+                    shadowColor: colorScheme.primary.withOpacity(0.5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
                   child: const Text(
                     'Select',
-                    style: TextStyle(fontSize: 14, color: Colors.white),
+                    style: TextStyle(fontSize: 14),
                   ),
                 ),
               ],
@@ -160,9 +171,12 @@ class _HomePageState extends State<HomePage> {
                   final post = posts[index];
                   return Card(
                     margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    elevation: 2,
+                    elevation: 4,
+                    color: colorScheme.surface,
+                    shadowColor: colorScheme.primary.withOpacity(0.4),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
                     ),
                     child: PostWidget(
                       accountId: post.accountId.toString(),

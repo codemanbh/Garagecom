@@ -226,10 +226,13 @@ class _ServicePageState extends State<ServicePage> {
                         return GestureDetector(
                           onTap: () => goToPartDetailsPage(part),
                           child: Card(
-                            elevation: 2,
+                            elevation: 4,
                             margin: const EdgeInsets.only(bottom: 16),
+                            color: colorScheme.surface,
+                            shadowColor: colorScheme.primary.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),

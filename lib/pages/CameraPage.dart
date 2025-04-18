@@ -13,26 +13,25 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
   File? _image;
   bool _isProcessing = false;
-  String problems = ''; // Start with empty problems
+  String problems = '';
 
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
-    
+
     try {
       setState(() {
         _isProcessing = true;
       });
-      
+
       final XFile? pickedFile = await picker.pickImage(source: source);
-      
+
       if (pickedFile != null) {
-        // Simulate processing delay
         await Future.delayed(const Duration(seconds: 2));
-        
+
         setState(() {
           _image = File(pickedFile.path);
           _isProcessing = false;
-          problems = 'Engine Light, Low Tire Pressure'; // Mock results
+          problems = 'Engine Light, Low Tire Pressure';
         });
       } else {
         setState(() {
@@ -57,7 +56,6 @@ class _CameraPageState extends State<CameraPage> {
       return;
     }
 
-    // Add your submission logic here
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Post submitted successfully!')),
     );
@@ -69,58 +67,98 @@ class _CameraPageState extends State<CameraPage> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      
       appBar: AppBar(
-        title: const Text(
-          'Dashboard Analysis',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        
+        title: const Text('Dashboard Analysis', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       bottomNavigationBar: const CustomNavBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                children: [
-                  const SizedBox(height: 8),
-                  // Instructions Card
-                  _buildInstructionsCard(theme),
-                  const SizedBox(height: 16),
-                  
-                  // Image preview or placeholder
-                  _image != null 
-                      ? _buildImagePreview(theme) 
-                      : _buildImagePlaceholder(theme),
-                  const SizedBox(height: 16),
-                  
-                  // Results section
-                  if (_isProcessing)
-                    _buildProcessingIndicator(theme)
-                  else if (problems.isNotEmpty && _image != null)
-                    _buildResultsCard(theme),
-                ],
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.04,
+              child: Image.asset(
+                'assets/images/dark_dashboard_bg.png',
+                fit: BoxFit.cover,
               ),
             ),
-            
-            // Bottom action bar
-            _buildBottomActionBar(theme),
-          ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    children: [
+                      const SizedBox(height: 8),
+                      _buildHeaderBanner(theme),
+                      const SizedBox(height: 16),
+                      _buildInstructionsCard(theme),
+                      const SizedBox(height: 16),
+                      _image != null ? _buildImagePreview(theme) : _buildImagePlaceholder(theme),
+                      const SizedBox(height: 16),
+                      if (_isProcessing)
+                        _buildProcessingIndicator(theme)
+                      else if (problems.isNotEmpty && _image != null)
+                        _buildResultsCard(theme),
+                    ],
+                  ),
+                ),
+                _buildBottomActionBar(theme),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderBanner(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [colorScheme.primary, colorScheme.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.primary.withOpacity(0.4),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.analytics_outlined, size: 40, color: Colors.white),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              'Snap your dashboard to detect car issues with AI',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildInstructionsCard(ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      elevation: 4,
+      shadowColor: colorScheme.primary.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -134,48 +172,29 @@ class _CameraPageState extends State<CameraPage> {
               ),
             ),
             const Divider(height: 24),
-            _buildInstructionStep('1', 'Take a clear photo of your car dashboard', theme),
-            _buildInstructionStep('2', 'Wait for AI to analyze warning lights', theme),
-            _buildInstructionStep('3', 'Review detected issues and recommendations', theme),
+            _buildInstructionStep('Take a photo of your car dashboard', theme, Icons.camera_alt_outlined),
+            _buildInstructionStep('Wait for AI to analyze the image', theme, Icons.autorenew),
+            _buildInstructionStep('Review detected issues', theme, Icons.report_problem_outlined),
           ],
         ),
       ),
     );
   }
-  
-  Widget _buildInstructionStep(String number, String text, ThemeData theme) {
+
+  Widget _buildInstructionStep(String text, ThemeData theme, IconData icon) {
     final colorScheme = theme.colorScheme;
-    
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: colorScheme.primary,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                number,
-                style: TextStyle(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
+          Icon(icon, color: colorScheme.secondary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               text,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-              ),
+              style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
             ),
           ),
         ],
@@ -185,36 +204,26 @@ class _CameraPageState extends State<CameraPage> {
 
   Widget _buildImagePlaceholder(ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
-      elevation: 1,
-      
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      elevation: 4,
+      shadowColor: colorScheme.primary.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+      ),
       child: SizedBox(
         height: 200,
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.camera_alt_outlined,
-              size: 48,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            Icon(Icons.camera_alt_outlined, size: 48, color: colorScheme.onSurfaceVariant),
             const SizedBox(height: 16),
-            Text(
-              'No image selected',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-              ),
-            ),
+            Text('No image selected', style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            Text(
-              'Take or upload a dashboard photo',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
+            Text('Take or upload a dashboard photo',
+                style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
           ],
         ),
       ),
@@ -223,38 +232,36 @@ class _CameraPageState extends State<CameraPage> {
 
   Widget _buildImagePreview(ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
-      elevation: 1,
-      color: colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      elevation: 4,
+      shadowColor: colorScheme.primary.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: Image.file(
-          _image!,
-          height: 200,
-          width: double.infinity,
-          fit: BoxFit.cover,
-        ),
+        child: Image.file(_image!, height: 200, width: double.infinity, fit: BoxFit.cover),
       ),
     );
   }
 
   Widget _buildProcessingIndicator(ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
-      elevation: 1,
-      color: colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      elevation: 4,
+      shadowColor: colorScheme.primary.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 30),
         child: Column(
           children: [
-            CircularProgressIndicator(
-              color: colorScheme.primary,
-              strokeWidth: 3,
-            ),
+            CircularProgressIndicator(color: colorScheme.primary, strokeWidth: 3),
             const SizedBox(height: 20),
             Text(
               "Analyzing dashboard...",
@@ -272,12 +279,13 @@ class _CameraPageState extends State<CameraPage> {
   Widget _buildResultsCard(ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final issuesList = problems.split(',');
-    
+
     return Card(
-      elevation: 1,
-      color: colorScheme.surface,
+      elevation: 4,
+      shadowColor: colorScheme.primary.withOpacity(0.4),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -310,9 +318,7 @@ class _CameraPageState extends State<CameraPage> {
                   Expanded(
                     child: Text(
                       'We recommend consulting a mechanic for these issues.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                      ),
+                      style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
                     ),
                   ),
                 ],
@@ -326,20 +332,30 @@ class _CameraPageState extends State<CameraPage> {
 
   Widget _buildIssueItem(String issue, ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colorScheme.error.withOpacity(0.8), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.error.withOpacity(0.4),
+            blurRadius: 6,
+            spreadRadius: 1,
+          ),
+        ],
+        color: colorScheme.surface.withOpacity(0.1),
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.warning_amber, size: 16.0, color: colorScheme.error),
-          const SizedBox(width: 8),
+          Icon(Icons.warning_amber_rounded, size: 20.0, color: colorScheme.error),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               issue,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-              ),
+              style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
             ),
           ),
         ],
@@ -352,7 +368,6 @@ class _CameraPageState extends State<CameraPage> {
 
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
-      // Submit button
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -361,19 +376,20 @@ class _CameraPageState extends State<CameraPage> {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () => _pickImage(ImageSource.camera),
-                  icon: Icon(
-                    Icons.camera_alt,
-                    color: colorScheme.onPrimary,
+                  icon: const Icon(
+                    Icons.camera_alt_rounded,
                     size: 20,
                   ),
-                  label: const Text('Take Photo'),
+                  label: const Text('Camera'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
+                    backgroundColor: colorScheme.primaryContainer,
+                    foregroundColor: colorScheme.onSurface,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
+                      side: BorderSide(color: colorScheme.primary.withOpacity(0.5)),
                     ),
+                    elevation: 3,
                   ),
                 ),
               ),
@@ -381,7 +397,7 @@ class _CameraPageState extends State<CameraPage> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () => _pickImage(ImageSource.gallery),
-                  icon: const Icon(Icons.photo_library),
+                  icon: const Icon(Icons.photo_library_rounded),
                   label: const Text('Gallery'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: colorScheme.primary,
@@ -395,20 +411,23 @@ class _CameraPageState extends State<CameraPage> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          ElevatedButton(
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
             onPressed: _checkImage,
+            icon: const Icon(Icons.send_rounded),
+            label: const Text(
+              'Submit',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(100),
               ),
-            ),
-            child: const Text(
-              'Check Image',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              elevation: 4,
+              shadowColor: colorScheme.primary.withOpacity(0.5),
             ),
           ),
         ],

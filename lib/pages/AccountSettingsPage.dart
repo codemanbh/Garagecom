@@ -97,10 +97,18 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.onSurfaceVariant.withOpacity(0.2),
+          color: colorScheme.primary.withOpacity(0.2),
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.primary.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -157,14 +165,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           filled: true,
           fillColor: theme.colorScheme.surfaceContainerLow,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: colorScheme.primary, width: 2),
           ),
         ),
@@ -266,7 +274,18 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerLow.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: colorScheme.primary.withOpacity(0.2),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.primary.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,7 +314,18 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerLow.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: colorScheme.primary.withOpacity(0.2),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.primary.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,12 +354,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     isEditMode = true;
                   });
                 },
-                icon: const Icon(Icons.edit , color: Colors.white,),
+                icon: const Icon(Icons.edit, color: Colors.white,),
                 label: const Text('Edit Profile'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: colorScheme.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: colorScheme.onPrimary,
+                  elevation: 4,
+                  shadowColor: colorScheme.primary.withOpacity(0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
@@ -432,12 +464,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               const SizedBox(height: 30),
               ElevatedButton.icon(
                 onPressed: saveChanges,
-                icon: const Icon(Icons.save ,color: Colors.white,),
+                icon: const Icon(Icons.save, color: Colors.white,),
                 label: const Text('Save Changes'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: colorScheme.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: colorScheme.onPrimary,
+                  elevation: 4,
+                  shadowColor: colorScheme.primary.withOpacity(0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
