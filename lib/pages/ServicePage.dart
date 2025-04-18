@@ -15,21 +15,23 @@ class _ServicePageState extends State<ServicePage> {
   final ServiceParts serviceParts = ServiceParts();
   int currentCarIndex = 0;
 
-  // Sample cars data - replace with your actual data source
   final List<Map<String, dynamic>> userCars = [
     {
+      'id': 0,
       'name': 'Toyota Camry',
       'year': '2019',
       'icon': Icons.directions_car,
       'color': Colors.blue,
     },
     {
+      'id': 1,
       'name': 'Honda Accord',
       'year': '2020',
       'icon': Icons.time_to_leave,
       'color': Colors.red,
     },
     {
+      'id': 2,
       'name': 'Tesla Model 3',
       'year': '2022',
       'icon': Icons.electric_car,
@@ -38,7 +40,11 @@ class _ServicePageState extends State<ServicePage> {
   ];
 
   void goToAddPartPage() {
-    Navigator.of(context).pushNamed('/AddPartPage');
+    final currentCarId = userCars[currentCarIndex]['id'];
+    Navigator.of(context).pushNamed(
+      '/AddPartPage',
+      arguments: currentCarId,
+    );
   }
 
   void goToPartDetailsPage(CarPart part) {
@@ -51,9 +57,13 @@ class _ServicePageState extends State<ServicePage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<CarPart> carParts = serviceParts.parts;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final currentCarId = userCars[currentCarIndex]['id'];
+
+    final List<CarPart> carParts = serviceParts.parts
+        .where((part) => part.carId == currentCarId)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -69,7 +79,6 @@ class _ServicePageState extends State<ServicePage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Car selection carousel - reduced height by a small amount
             Container(
               height: 190,
               decoration: BoxDecoration(
@@ -100,7 +109,6 @@ class _ServicePageState extends State<ServicePage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Car image - reduced height slightly
                         Container(
                           height: 90,
                           width: 500,
@@ -113,16 +121,12 @@ class _ServicePageState extends State<ServicePage> {
                               'assets/Made with insMind-car-icon-3657902_1280.png',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
-                                print('Error loading image: $error');
-                                return Container(
-                                  
-                                );
+                                return Container();
                               },
                             ),
                           ),
                         ),
                         const SizedBox(height: 14),
-                        // Car name and year
                         Text(
                           car['name'] ?? 'Unknown Car',
                           style: theme.textTheme.titleMedium?.copyWith(
@@ -142,8 +146,6 @@ class _ServicePageState extends State<ServicePage> {
                 },
               ),
             ),
-
-            // Page indicator dots - reduced padding
             Padding(
               padding: const EdgeInsets.all(6.0),
               child: Row(
@@ -164,8 +166,6 @@ class _ServicePageState extends State<ServicePage> {
                 ),
               ),
             ),
-
-            // Maintenance schedule title
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Row(
@@ -184,8 +184,6 @@ class _ServicePageState extends State<ServicePage> {
                 ],
               ),
             ),
-
-            // Parts list
             Expanded(
               child: carParts.isEmpty
                   ? Center(
@@ -238,7 +236,6 @@ class _ServicePageState extends State<ServicePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Part name
                                   Row(
                                     children: [
                                       Icon(
@@ -255,8 +252,6 @@ class _ServicePageState extends State<ServicePage> {
                                     ],
                                   ),
                                   const SizedBox(height: 16.0),
-
-                                  // Last Replaced Date with Icon
                                   _buildInfoRow(
                                     Icons.calendar_today,
                                     'Last Replaced:',
@@ -265,8 +260,6 @@ class _ServicePageState extends State<ServicePage> {
                                     theme,
                                   ),
                                   const SizedBox(height: 8.0),
-
-                                  // Next Replaced Date with Icon
                                   _buildInfoRow(
                                     Icons.calendar_month,
                                     'Next Replacement:',
@@ -275,8 +268,6 @@ class _ServicePageState extends State<ServicePage> {
                                     theme,
                                   ),
                                   const SizedBox(height: 8.0),
-
-                                  // Replacement Interval with Icon
                                   _buildInfoRow(
                                     Icons.schedule,
                                     'Interval:',
@@ -285,8 +276,6 @@ class _ServicePageState extends State<ServicePage> {
                                     theme,
                                   ),
                                   const SizedBox(height: 16.0),
-
-                                  // Progress Indicator
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -310,7 +299,7 @@ class _ServicePageState extends State<ServicePage> {
                                             ),
                                             child: Text(
                                               '${(part.lifespanProgress! * 100).toStringAsFixed(0)}%',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 12,
@@ -352,7 +341,8 @@ class _ServicePageState extends State<ServicePage> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value, Color iconColor, ThemeData theme) {
+  Widget _buildInfoRow(
+      IconData icon, String label, String value, Color iconColor, ThemeData theme) {
     return Row(
       children: [
         Icon(icon, size: 16.0, color: iconColor),
@@ -377,19 +367,13 @@ class _ServicePageState extends State<ServicePage> {
     );
   }
 
-  // Helper function to determine progress bar color
   Color _getProgressColor(double? progress) {
     if (progress == null) return Colors.grey;
-    if (progress > 0.75) {
-      return Colors.green;
-    } else if (progress > 0.5) {
-      return Colors.orange;
-    } else {
-      return Colors.red;
-    }
+    if (progress > 0.75) return Colors.green;
+    if (progress > 0.5) return Colors.orange;
+    return Colors.red;
   }
 
-  // Helper function to get appropriate icon for part
   IconData _getPartIcon(String partName) {
     final lowerName = partName.toLowerCase();
     if (lowerName.contains('oil')) return Icons.opacity;
@@ -398,7 +382,6 @@ class _ServicePageState extends State<ServicePage> {
     if (lowerName.contains('tire') || lowerName.contains('wheel')) return Icons.tire_repair;
     if (lowerName.contains('battery')) return Icons.battery_full;
     if (lowerName.contains('light') || lowerName.contains('bulb')) return Icons.lightbulb;
-    // Default icon
     return Icons.build;
   }
 }

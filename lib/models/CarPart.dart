@@ -13,6 +13,7 @@ class CarPart {
   String? notes;
   String? warrantyExpiryDate;
   String? storeLocation;
+  final int carId; // Car identifier
 
   CarPart({
     this.partName,
@@ -26,7 +27,8 @@ class CarPart {
     this.lifespanProgress,
     this.notes,
     this.warrantyExpiryDate,
-    this.storeLocation, required int carId,
+    this.storeLocation, 
+    required this.carId,
   });
 
   int? get replacementIntervalMonths => null;
