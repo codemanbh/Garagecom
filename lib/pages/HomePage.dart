@@ -14,13 +14,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late PostsManager _postsManager;
+  late List<Post> posts;
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    PostsManager pm = PostsManager();
+    _postsManager = PostsManager();
+    _loadPosts();
   }
-
-  List<Post> posts = PostsManager.posts;
+  
+  Future<void> _loadPosts() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    await _postsManager.fetchPosts();
+    
+    setState(() {
+      posts = PostsManager.posts;
+      _isLoading = false;
+    });
+  }
 
   void upvote(int index) {
     setState(() {
@@ -48,7 +64,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: PostSearchDelegate(PostsManager.posts),
+                delegate: PostSearchDelegate(posts),
               );
             },
             icon: const Icon(Icons.search)
@@ -130,54 +146,64 @@ class _HomePageState extends State<HomePage> {
           ),
 
           Expanded(
-            child: posts.isEmpty 
+            child: _isLoading
             ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.post_add,
-                      size: 64,
-                      color: colorScheme.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No Posts Available',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Select categories or check back later',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                child: CircularProgressIndicator(
+                  color: colorScheme.primary,
                 ),
               )
-            : ListView.builder(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  final post = posts[index];
-                  return PostCard(
-                    post: post,
-                    onUpvote: () => upvote(index),
-                    onDownvote: () => downvote(index),
-                  );
-                },
-              ),
+            : posts.isEmpty 
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.post_add,
+                        size: 64,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No Posts Available',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Select categories or check back later',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadPosts,
+                  color: colorScheme.primary,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      final post = posts[index];
+                      return PostCard(
+                        post: post,
+                        onUpvote: () => upvote(index),
+                        onDownvote: () => downvote(index),
+                      );
+                    },
+                  ),
+                ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add navigation to create post page
+          Navigator.pushNamed(context, '/createPostPage');
         },
         backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,

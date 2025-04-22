@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/CustomNavBar.dart';
 import '../managers/CarInfo.dart';
+import '../models/UserData.dart' as models;
 
 class AccountSettingsPage extends StatefulWidget {
   const AccountSettingsPage({super.key});
@@ -13,17 +14,29 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   // Car info manager
   final CarInfo carInfo = CarInfo();
   
+  // List of cars
+  List<models.Car> userCars = [];
+  
+  // Currently selected car for editing
+  models.Car? currentEditingCar;
+  
   // Sample user data
-  final Map<String, String> userData = {
+  final Map<String, dynamic> userData = {
     'fullName': 'John Doe',
     'email': 'john.doe@example.com',
     'phone': '+1 123 456 7890',
     'bio': 'Car enthusiast with 5+ years experience in mechanics.',
-    'carBrand': 'Toyota',
-    'carName': 'My Ride',
-    'carModel': 'Camry',
-    'carYear': '2019',
-    'mileage': '45,000 km',
+    'cars': [
+      {
+        'id': '1',
+        'brand': 'Toyota',
+        'model': 'Camry',
+        'year': '2019',
+        'nickname': 'My Ride',
+        'mileage': '45,000 km',
+        'isDefault': true,
+      },
+    ],
   };
 
   bool isEditMode = false;
@@ -53,13 +66,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     bioController = TextEditingController(text: userData['bio']);
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
-    carNameController = TextEditingController(text: userData['carName']);
-    mileageController = TextEditingController(text: userData['mileage']);
+    carNameController = TextEditingController();
+    mileageController = TextEditingController();
     
-    // Initialize selected values
-    selectedCarBrand = userData['carBrand'];
-    selectedCarModel = userData['carModel'];
-    selectedCarYear = userData['carYear'];
+    // Initialize user cars from userData
+    userCars = (userData['cars'] as List<dynamic>)
+        .map((carMap) => models.Car.fromMap(carMap as Map<String, dynamic>))
+        .toList();
   }
   
   @override
@@ -77,23 +90,25 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 
   void saveChanges() {
-    // Here you would update the user data in your database
+    // Save personal information
+    userData['fullName'] = nameController.text;
+    userData['email'] = emailController.text;
+    userData['phone'] = phoneController.text;
+    userData['bio'] = bioController.text;
+    
+    // Save cars information
+    userData['cars'] = userCars.map((car) => car.toMap()).toList();
+    
+    // Save car changes if we're editing a car
+    if (currentEditingCar != null) {
+      saveCarChanges();
+    }
+    
+    // Exit edit mode
     setState(() {
-      userData['fullName'] = nameController.text;
-      userData['email'] = emailController.text;
-      userData['phone'] = phoneController.text;
-      userData['bio'] = bioController.text;
-      userData['carBrand'] = selectedCarBrand ?? userData['carBrand'] ?? '';
-      userData['carModel'] = selectedCarModel ?? userData['carModel'] ?? '';
-      userData['carYear'] = selectedCarYear ?? userData['carYear'] ?? '';
-      userData['carName'] = carNameController.text;
-      userData['mileage'] = mileageController.text;
-      
-      // Exit edit mode
       isEditMode = false;
     });
     
-    // Show a confirmation
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Profile updated successfully!'),
@@ -103,19 +118,145 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     );
   }
   
-  Widget buildInfoItem(String label, String value, IconData icon) {
+  void addNewCar() {
+    final newCar = models.Car(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      brand: '',
+      model: '',
+      year: '',
+      nickname: '',
+      mileage: '',
+      isDefault: userCars.isEmpty, // First car is default
+    );
+    
+    setState(() {
+      currentEditingCar = newCar;
+      userCars.add(newCar);
+      
+      // Initialize controllers for the new car
+      selectedCarBrand = newCar.brand.isNotEmpty ? newCar.brand : null;
+      selectedCarModel = newCar.model.isNotEmpty ? newCar.model : null;
+      selectedCarYear = newCar.year.isNotEmpty ? newCar.year : null;
+      carNameController.text = newCar.nickname;
+      mileageController.text = newCar.mileage;
+    });
+  }
+  
+  void editCar(models.Car car) {
+    setState(() {
+      currentEditingCar = car;
+      
+      // Initialize controllers with car data
+      selectedCarBrand = car.brand.isNotEmpty ? car.brand : null;
+      selectedCarModel = car.model.isNotEmpty ? car.model : null;
+      selectedCarYear = car.year.isNotEmpty ? car.year : null;
+      carNameController.text = car.nickname;
+      mileageController.text = car.mileage;
+    });
+  }
+  
+  void deleteCar(models.Car car) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Deletion'),
+        content: Text('Are you sure you want to delete "${car.nickname.isNotEmpty ? car.nickname : "${car.brand} ${car.model}"}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                userCars.remove(car);
+                
+                // If we deleted the default car, make another one default
+                if (car.isDefault && userCars.isNotEmpty) {
+                  userCars[0].isDefault = true;
+                }
+                
+                // Clear current editing car if it was the deleted one
+                if (currentEditingCar == car) {
+                  currentEditingCar = null;
+                }
+              });
+              
+              Navigator.pop(context);
+              
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Car removed successfully'),
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                ),
+              );
+            },
+            child: Text(
+              'Delete',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void setAsDefaultCar(models.Car car) {
+    setState(() {
+      // Remove default status from all cars
+      for (final c in userCars) {
+        c.isDefault = false;
+      }
+      
+      // Set this car as default
+      car.isDefault = true;
+    });
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${car.nickname.isNotEmpty ? car.nickname : "${car.brand} ${car.model}"} set as default car'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
+    );
+  }
+  
+  void saveCarChanges() {
+    if (currentEditingCar != null) {
+      setState(() {
+        currentEditingCar!.brand = selectedCarBrand ?? '';
+        currentEditingCar!.model = selectedCarModel ?? '';
+        currentEditingCar!.year = selectedCarYear ?? '';
+        currentEditingCar!.nickname = carNameController.text;
+        currentEditingCar!.mileage = mileageController.text;
+        
+        currentEditingCar = null;
+      });
+    }
+  }
+  
+  Widget buildCarCard(models.Car car) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
+    final String carString = carInfo.formatCarDisplay(
+      brand: car.brand,
+      model: car.model,
+      year: car.year,
+      nickname: car.nickname,
+    );
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.primary.withOpacity(0.2),
-          width: 1,
+          color: car.isDefault 
+            ? colorScheme.primary 
+            : colorScheme.primary.withOpacity(0.2),
+          width: car.isDefault ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -125,119 +266,349 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: colorScheme.primary),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: car.isDefault 
+                ? colorScheme.primary.withOpacity(0.1) 
+                : Colors.transparent,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(11),
+              ),
+            ),
+            child: Row(
               children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colorScheme.onSurfaceVariant,
+                Icon(
+                  Icons.directions_car,
+                  color: car.isDefault 
+                    ? colorScheme.primary 
+                    : colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    carString,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: colorScheme.onSurface,
+                if (car.isDefault)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      'Default',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
+          
+          const Divider(height: 1),
+          
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (car.nickname.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.label_outline,
+                        size: 18,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Nickname: ${car.nickname}',
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                if (car.mileage.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.speed,
+                        size: 18,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Mileage: ${car.mileage}',
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+          
+          if (isEditMode)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: Row(
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => editCar(car),
+                    icon: const Icon(Icons.edit, size: 16),
+                    label: const Text('Edit'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  
+                  OutlinedButton.icon(
+                    onPressed: () => deleteCar(car),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      size: 16,
+                      color: colorScheme.error,
+                    ),
+                    label: Text(
+                      'Delete',
+                      style: TextStyle(color: colorScheme.error),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                  const Spacer(),
+                  
+                  if (!car.isDefault)
+                    TextButton(
+                      onPressed: () => setAsDefaultCar(car),
+                      child: Text(
+                        'Set as Default',
+                        style: TextStyle(color: colorScheme.primary),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                ],
+              ),
+            ),
         ],
       ),
     );
   }
-
-  Widget buildEditableField({
-    required String label,
-    required IconData icon,
-    required TextEditingController controller,
-    bool obscureText = false,
-    int maxLines = 1,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
+  
+  Widget buildCarEditForm() {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscureText,
-        maxLines: maxLines,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon, color: colorScheme.primary),
-          filled: true,
-          fillColor: theme.colorScheme.surfaceContainerLow,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.primary, width: 2),
-          ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.primary.withOpacity(0.3),
+          width: 1,
         ),
       ),
-    );
-  }
-
-  Widget buildDropdown<T>({
-    required String label,
-    required IconData icon,
-    required T? value,
-    required List<T> items,
-    required void Function(T?) onChanged,
-    String? Function(T?)? validator,
-    required String Function(T item) itemDisplayName,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: DropdownButtonFormField<T>(
-        value: value,
-        items: items.map((T item) {
-          return DropdownMenuItem<T>(
-            value: item,
-            child: Text(itemDisplayName(item)),
-          );
-        }).toList(),
-        onChanged: onChanged,
-        validator: validator,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon, color: colorScheme.primary),
-          filled: true,
-          fillColor: theme.colorScheme.surfaceContainerLow,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            currentEditingCar?.id.isEmpty == true ? 'Add New Car' : 'Edit Car',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+          const SizedBox(height: 16),
+          
+          buildDropdown<String>(
+            label: 'Car Brand',
+            icon: Icons.directions_car,
+            value: selectedCarBrand,
+            items: carInfo.carBrands,
+            onChanged: (newValue) {
+              setState(() {
+                selectedCarBrand = newValue;
+                selectedCarModel = null;
+              });
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please select a car brand';
+              }
+              return null;
+            },
+            itemDisplayName: (item) => item,
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: colorScheme.primary, width: 2),
+          
+          if (selectedCarBrand != null)
+            buildDropdown<String>(
+              label: 'Car Model',
+              icon: Icons.model_training,
+              value: selectedCarModel,
+              items: carInfo.getModelsForBrand(selectedCarBrand!),
+              onChanged: (newValue) {
+                setState(() {
+                  selectedCarModel = newValue;
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a car model';
+                }
+                return null;
+              },
+              itemDisplayName: (item) => item,
+            ),
+          
+          buildDropdown<String>(
+            label: 'Car Year',
+            icon: Icons.calendar_today,
+            value: selectedCarYear,
+            items: carInfo.getCarYears(),
+            onChanged: (newValue) {
+              setState(() {
+                selectedCarYear = newValue;
+              });
+            },
+            validator: (value) {
+              return null;
+            },
+            itemDisplayName: (item) => item,
           ),
-        ),
+          
+          buildEditableField(
+            label: 'Car Nickname (Optional)',
+            icon: Icons.car_repair,
+            controller: carNameController,
+          ),
+          
+          buildEditableField(
+            label: 'Mileage (Optional)',
+            icon: Icons.speed,
+            controller: mileageController,
+            keyboardType: TextInputType.number,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Row(
+            children: [
+              Checkbox(
+                value: currentEditingCar?.isDefault ?? false,
+                onChanged: (value) {
+                  if (currentEditingCar != null && value == true) {
+                    setState(() {
+                      for (final car in userCars) {
+                        car.isDefault = false;
+                      }
+                      currentEditingCar!.isDefault = true;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Set as default car',
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    if (currentEditingCar != null && 
+                        (currentEditingCar!.brand.isEmpty || 
+                         currentEditingCar!.model.isEmpty)) {
+                      userCars.remove(currentEditingCar);
+                    }
+                    currentEditingCar = null;
+                  });
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: colorScheme.error),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  if (selectedCarBrand != null && selectedCarModel != null) {
+                    saveCarChanges();
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Car saved successfully'),
+                        backgroundColor: colorScheme.primary,
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Please select both car brand and model'),
+                        backgroundColor: colorScheme.error,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Save Car'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -246,21 +617,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
-    // Get car string for display
-    String getCarString() {
-      final brand = userData['carBrand'];
-      final model = userData['carModel'];
-      final year = userData['carYear'];
-      final nickname = userData['carName'];
-      
-      return carInfo.formatCarDisplay(
-        brand: brand,
-        model: model,
-        year: year,
-        nickname: nickname,
-      );
-    }
     
     return Scaffold(
       appBar: AppBar(
@@ -272,20 +628,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               setState(() {
                 isEditMode = !isEditMode;
                 if (!isEditMode) {
-                  // Reset controllers to original values if cancelling edit
                   nameController.text = userData['fullName'] ?? '';
                   emailController.text = userData['email'] ?? '';
                   phoneController.text = userData['phone'] ?? '';
                   bioController.text = userData['bio'] ?? '';
-                  carNameController.text = userData['carName'] ?? '';
-                  mileageController.text = userData['mileage'] ?? '';
                   passwordController.clear();
                   confirmPasswordController.clear();
-                  
-                  // Reset selected values
-                  selectedCarBrand = userData['carBrand'];
-                  selectedCarModel = userData['carModel'];
-                  selectedCarYear = userData['carYear'];
+                  currentEditingCar = null;
                 }
               });
             },
@@ -298,7 +647,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            // User Avatar
             Stack(
               alignment: Alignment.bottomRight,
               children: [
@@ -327,7 +675,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               ],
             ),
             const SizedBox(height: 16),
-            // User name as a title
             Text(
               userData['fullName'] ?? 'User',
               style: TextStyle(
@@ -345,9 +692,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             ),
             const SizedBox(height: 32),
             
-            // Different views depending on edit mode
             if (!isEditMode) ...[
-              // View mode - display information
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -388,6 +733,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 ),
               ),
               const SizedBox(height: 24),
+              
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -409,24 +755,67 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Text(
-                        'Car Information',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'My Cars',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
-                      ),
+                        Text(
+                          '${userCars.length} ${userCars.length == 1 ? 'car' : 'cars'}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
-                    buildInfoItem('Car', getCarString(), Icons.directions_car),
-                    buildInfoItem('Car Nickname', userData['carName'] ?? '', Icons.car_repair),
-                    buildInfoItem('Mileage', userData['mileage'] ?? '', Icons.speed),
+                    const SizedBox(height: 16),
+                    
+                    userCars.isEmpty
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.directions_car_outlined,
+                                    size: 48,
+                                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'No cars added yet',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Add your cars to enhance your experience',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Column(
+                            children: userCars.map((car) => buildCarCard(car)).toList(),
+                          ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              
               ElevatedButton.icon(
                 onPressed: () {
                   setState(() {
@@ -447,7 +836,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 ),
               ),
             ] else ...[
-              // Edit mode - show editable fields
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: Text(
@@ -487,91 +875,79 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  'Car Information',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Cars',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: currentEditingCar == null ? addNewCar : null,
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add Car'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primaryContainer,
+                        foregroundColor: colorScheme.onPrimaryContainer,
+                        disabledBackgroundColor: colorScheme.surfaceVariant,
+                        disabledForegroundColor: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              if (currentEditingCar != null)
+                buildCarEditForm()
+              else if (userCars.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: colorScheme.primary.withOpacity(0.2),
+                      width: 1,
+                    ),
                   ),
-                ),
-              ),
-              
-              // Car Brand Dropdown
-              buildDropdown<String>(
-                label: 'Car Brand',
-                icon: Icons.directions_car,
-                value: selectedCarBrand,
-                items: carInfo.carBrands,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedCarBrand = newValue;
-                    // Reset model when brand changes
-                    selectedCarModel = null;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a car brand';
-                  }
-                  return null;
-                },
-                itemDisplayName: (item) => item,
-              ),
-              
-              // Car Model Dropdown (dependent on selected brand)
-              if (selectedCarBrand != null)
-                buildDropdown<String>(
-                  label: 'Car Model',
-                  icon: Icons.model_training,
-                  value: selectedCarModel,
-                  items: carInfo.getModelsForBrand(selectedCarBrand!),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedCarModel = newValue;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a car model';
-                    }
-                    return null;
-                  },
-                  itemDisplayName: (item) => item,
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.directions_car_outlined,
+                        size: 48,
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No cars added yet',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: addNewCar,
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Your First Car'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Column(
+                  children: userCars.map((car) => buildCarCard(car)).toList(),
                 ),
               
-              // Car Year Dropdown
-              buildDropdown<String>(
-                label: 'Car Year',
-                icon: Icons.calendar_today,
-                value: selectedCarYear,
-                items: carInfo.getCarYears(),
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedCarYear = newValue;
-                  });
-                },
-                validator: (value) {
-                  return null; // Year is optional
-                },
-                itemDisplayName: (item) => item,
-              ),
-              
-              // Car Nickname
-              buildEditableField(
-                label: 'Car Nickname',
-                icon: Icons.car_repair,
-                controller: carNameController,
-              ),
-              
-              // Mileage
-              buildEditableField(
-                label: 'Mileage',
-                icon: Icons.speed,
-                controller: mileageController,
-                keyboardType: TextInputType.number,
-              ),
-
               const SizedBox(height: 16),
               const Divider(),
               const SizedBox(height: 16),
@@ -622,6 +998,197 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         ),
       ),
       bottomNavigationBar: const CustomNavBar(),
+    );
+  }
+
+  // Widget to build an info item in view mode
+  Widget buildInfoItem(String label, String value, IconData icon) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            size: 20,
+            color: colorScheme.primary.withOpacity(0.7),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget to build an editable text field
+  Widget buildEditableField({
+    required String label,
+    required IconData icon,
+    required TextEditingController controller,
+    bool obscureText = false,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.outline.withOpacity(0.5),
+                width: 1,
+              ),
+            ),
+            child: TextFormField(
+              controller: controller,
+              obscureText: obscureText,
+              maxLines: maxLines,
+              keyboardType: keyboardType,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 16,
+              ),
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  icon,
+                  color: colorScheme.primary.withOpacity(0.7),
+                  size: 20,
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16, 
+                  vertical: 14,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget to build a dropdown
+  Widget buildDropdown<T>({
+    required String label,
+    required IconData icon,
+    required T? value,
+    required List<T> items,
+    required Function(T?) onChanged,
+    required String Function(T) itemDisplayName,
+    required String? Function(T?) validator,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.outline.withOpacity(0.5),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButtonFormField<T>(
+                value: value,
+                icon: Icon(Icons.arrow_drop_down, color: colorScheme.primary),
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    icon,
+                    color: colorScheme.primary.withOpacity(0.7),
+                    size: 20,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                isExpanded: true,
+                hint: Text(
+                  'Select $label',
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  ),
+                ),
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                  fontSize: 16,
+                ),
+                dropdownColor: colorScheme.surfaceContainerHigh,
+                validator: validator,
+                items: items.map((T item) {
+                  return DropdownMenuItem<T>(
+                    value: item,
+                    child: Text(
+                      itemDisplayName(item),
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
+                        fontSize: 16,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -37,13 +37,6 @@ class PostsManager {
     //   posts = x;
     // }
 
-    // Load the JSON file from the assets
-    // final String jsonString =
-    // await rootBundle.loadString('assets/data/posts.json');
-    // Decode the JSON data
-    // List<dynamic> p = json.decode(jsonString)['posts'];
-    // print(posts);
-
     List<Map<String, dynamic>> postsMap = [
       {
         "id": 1,
@@ -51,7 +44,6 @@ class PostsManager {
         "title": "I have a weird sound in my Accord car engine",
         "content":
             "I've been hearing a strange ticking noise coming from my engine. Has anyone experienced this before?",
-        "image": "https://example.com/images/accord-engine.jpg"
       },
       {
         "id": 2,
@@ -75,14 +67,13 @@ class PostsManager {
         "title": "Upgrading my exhaust system!",
         "content":
             "Thinking of installing a performance exhaust on my Mustang. Any suggestions?",
-        "image": "https://example.com/images/mustang-exhaust.jpg"
       },
       {
         "id": 5,
         "autherUsername": "VTECUnleashed",
         "title": "Strange smell from the AC",
         "content":
-            "Whenever I turn on my AC, there’s a moldy smell. How can I fix this?",
+            "Whenever I turn on my AC, there's a moldy smell. How can I fix this?",
         "image": "https://example.com/images/car-ac.jpg"
       },
       {
@@ -127,17 +118,14 @@ class PostsManager {
       }
     ];
 
-    List<dynamic> x = postsMap
-        .map((x) => Post(
-            postID: x['id'],
-            title: x['title'],
-            numOfVotes: 0,
-            autherUsername: x['autherUsername'],
-            imageUrl: x['image'],
-            description: x['content']))
-        .toList();
-
-    posts = x as List<Post>;
+    // Create new post objects from the map data
+    posts = postsMap.map((x) => Post(
+        postID: x['id'],
+        title: x['title'],
+        numOfVotes: 0,
+        autherUsername: x['autherUsername'],
+        imageUrl: x.containsKey('image') ? x['image'] : '',
+        description: x['content'])).toList();
 
     return true;
   }

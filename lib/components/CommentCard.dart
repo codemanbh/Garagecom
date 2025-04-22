@@ -123,16 +123,19 @@ class _CommentCardState extends State<CommentCard> {
             
             // Comment actions
             const SizedBox(height: 8),
+            
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // Upvote button
                     IconButton(
                       onPressed: widget.onUpvote,
                       icon: Icon(
                         Icons.arrow_upward_rounded,
-                        size: 18,
+                        size: 20,
                         color: colorScheme.primary,
                       ),
                       style: IconButton.styleFrom(
@@ -142,26 +145,46 @@ class _CommentCardState extends State<CommentCard> {
                       ),
                       tooltip: 'Upvote',
                     ),
+                    
+                    // Combined vote count
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: (widget.upvotes - widget.downvotes) > 0 
+                          ? colorScheme.primary.withOpacity(0.1)
+                          : (widget.upvotes - widget.downvotes) < 0
+                            ? colorScheme.error.withOpacity(0.1)
+                            : colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: (widget.upvotes - widget.downvotes) > 0 
+                            ? colorScheme.primary.withOpacity(0.5)
+                            : (widget.upvotes - widget.downvotes) < 0
+                              ? colorScheme.error.withOpacity(0.5)
+                              : colorScheme.outline.withOpacity(0.3),
+                          width: 1,
+                        ),
                       ),
                       child: Text(
-                        widget.upvotes.toString(),
+                        '${widget.upvotes - widget.downvotes}',
                         style: TextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: colorScheme.primary,
+                          color: (widget.upvotes - widget.downvotes) > 0
+                            ? colorScheme.primary
+                            : (widget.upvotes - widget.downvotes) < 0
+                              ? colorScheme.error
+                              : colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
+                    
+                    // Downvote button
                     IconButton(
                       onPressed: widget.onDownvote,
                       icon: Icon(
                         Icons.arrow_downward_rounded,
-                        size: 18,
+                        size: 20,
                         color: colorScheme.error,
                       ),
                       style: IconButton.styleFrom(
@@ -171,23 +194,9 @@ class _CommentCardState extends State<CommentCard> {
                       ),
                       tooltip: 'Downvote',
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: colorScheme.error.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        widget.downvotes.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: colorScheme.error,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
+                const Spacer(),
                 TextButton.icon(
                   onPressed: widget.onReply,
                   icon: Icon(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../components/CommentCard.dart';
 
 class CommentPage extends StatefulWidget {
@@ -114,6 +115,39 @@ class _CommentPageState extends State<CommentPage> {
         });
         commentController.clear();
       });
+    }
+  }
+
+  void _sharePost() async {
+    final String postContent = 
+        "Check out this discussion from GarageCom:\n\n"
+        "${widget.postTitle}\n\n"
+        "${widget.questionBody}\n\n"
+        "Join the conversation with ${comments.length} comments!";
+    
+    try {
+      // Show loading indicator
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Preparing to share...'),
+          duration: Duration(milliseconds: 500),
+        ),
+      );
+
+      // Use the share_plus package to open the native share dialog
+      await Share.share(
+        postContent,
+        subject: widget.postTitle,
+      );
+    } catch (e) {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not share: ${e.toString()}'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     }
   }
 
@@ -249,84 +283,75 @@ class _CommentPageState extends State<CommentPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Updated vote counter to match the HomePage style
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    OutlinedButton.icon(
+                    // Upvote button
+                    IconButton(
                       onPressed: upvotePost,
                       icon: Icon(
                         Icons.arrow_upward_rounded,
-                        size: 20,
                         color: colorScheme.primary,
+                        size: 28,
                       ),
-                      label: Row(
-                        children: [
-                          const Text('Upvote'),
-                          const SizedBox(width: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              postUpvotes.toString(),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                        ],
+                      tooltip: 'Upvote',
+                    ),
+                    
+                    // Combined vote count
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: postVotes > 0 
+                          ? colorScheme.primary.withOpacity(0.1)
+                          : postVotes < 0
+                            ? colorScheme.error.withOpacity(0.1)
+                            : colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: postVotes > 0 
+                            ? colorScheme.primary.withOpacity(0.5)
+                            : postVotes < 0
+                              ? colorScheme.error.withOpacity(0.5)
+                              : colorScheme.outline.withOpacity(0.3),
+                          width: 1,
+                        ),
                       ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: colorScheme.primary,
-                        side: BorderSide(color: colorScheme.primary),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
+                      child: Text(
+                        postVotes.toString(),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: postVotes > 0
+                            ? colorScheme.primary
+                            : postVotes < 0
+                              ? colorScheme.error
+                              : colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    OutlinedButton.icon(
+                    
+                    // Downvote button
+                    IconButton(
                       onPressed: downvotePost,
                       icon: Icon(
                         Icons.arrow_downward_rounded,
-                        size: 20,
                         color: colorScheme.error,
+                        size: 28,
                       ),
-                      label: Row(
-                        children: [
-                          const Text('Downvote'),
-                          const SizedBox(width: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: colorScheme.error.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              postDownvotes.toString(),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: colorScheme.error,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: colorScheme.error,
-                        side: BorderSide(color: colorScheme.error),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                      ),
+                      tooltip: 'Downvote',
                     ),
+                    const Spacer(),
+                    
+                     IconButton(
+                    onPressed: _sharePost,
+                    icon: Icon(
+                      Icons.share_outlined,
+                      size: 25,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    tooltip: 'Share',
+                  ),
                   ],
                 ),
               ],

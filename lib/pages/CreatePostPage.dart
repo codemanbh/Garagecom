@@ -37,17 +37,17 @@ class _CreatePostPageState extends State<CreatePostPage> {
     final String title = _titleController.text.trim();
     final String description = _descriptionController.text.trim();
 
-    if (title.isEmpty || description.isEmpty || _selectedImage == null) {
+    if (title.isEmpty || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Please complete all fields and select an image')),
+            content: Text('Please provide a title and description')),
       );
       return;
     }
 
     print('Title: $title');
     print('Description: $description');
-    print('Image Path: ${_selectedImage!.path}');
+    print('Image Path: ${_selectedImage?.path ?? "No image selected"}');
     print('Allow Comments: $_allowComments');
 
     _titleController.clear();

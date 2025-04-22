@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/Post.dart';
 import '../pages/CommentPage.dart';
 
@@ -29,10 +30,47 @@ class PostCard extends StatelessWidget {
     );
   }
 
+  // Share function to handle sharing post content
+  void _sharePost(BuildContext context) async {
+    final String postContent = 
+        "Check out this post from GarageCom:\n\n"
+        "${post.title}\n\n"
+        "${post.description}\n\n"
+        "Posted by: ${post.autherUsername}";
+    
+    try {
+      // Show loading indicator
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Preparing to share...'),
+          duration: Duration(milliseconds: 500),
+        ),
+      );
+
+      // Use the share_plus package to open the native share dialog
+      await Share.share(
+        postContent,
+        subject: post.title,
+      );
+    } catch (e) {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not share: ${e.toString()}'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    
+    // Check if image is non-empty and non-null
+    final bool hasImage = post.imageUrl != null && post.imageUrl!.isNotEmpty;
     
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -125,7 +163,7 @@ class PostCard extends StatelessWidget {
             
             // Post content
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              padding: EdgeInsets.fromLTRB(16, 8, 16, hasImage ? 12 : 16),
               child: Text(
                 post.description,
                 style: TextStyle(
@@ -137,8 +175,8 @@ class PostCard extends StatelessWidget {
               ),
             ),
             
-            // Post image (if available)
-            if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
+            // Post image (only if available)
+            if (hasImage)
               Container(
                 height: 200,
                 width: double.infinity,
@@ -210,27 +248,28 @@ class PostCard extends StatelessWidget {
                         ),
                         tooltip: 'Upvote',
                       ),
+                      
                       Text(
                         post.numOfVotes.toString(),
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: post.numOfVotes > 0
-                              ? colorScheme.primary
-                              : post.numOfVotes < 0
-                                  ? colorScheme.error
-                                  : colorScheme.onSurfaceVariant,
+                            ? colorScheme.primary
+                            : post.numOfVotes < 0
+                              ? colorScheme.error
+                              : colorScheme.onSurfaceVariant,
                         ),
                       ),
-          IconButton(
-            onPressed: onDownvote,
-            icon: Icon(
-              Icons.arrow_downward_rounded,
-              color: colorScheme.error,
-              size: 22,
-            ),
-            tooltip: 'Downvote',
-          ),
+                      IconButton(
+                        onPressed: onDownvote,
+                        icon: Icon(
+                          Icons.arrow_downward_rounded,
+                          color: colorScheme.error,
+                          size: 22,
+                        ),
+                        tooltip: 'Downvote',
+                      ),
                     ],
                   ),
                   
@@ -256,11 +295,9 @@ class PostCard extends StatelessWidget {
                     ),
                   ),
                   
-                  // Share button
+                  // Share button with functionality
                   IconButton(
-                    onPressed: () {
-                      // Share functionality
-                    },
+                    onPressed: () => _sharePost(context),
                     icon: Icon(
                       Icons.share_outlined,
                       size: 20,
