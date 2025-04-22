@@ -1,61 +1,217 @@
 import 'package:flutter/material.dart';
-import '../components/VoteButtons.dart';
 
 class CommentCard extends StatefulWidget {
-  const CommentCard({super.key});
+  final String username;
+  final String content;
+  final String timeAgo;
+  final int upvotes;
+  final int downvotes;
+  final VoidCallback onUpvote;
+  final VoidCallback onDownvote;
+  final VoidCallback onReply;
+
+  const CommentCard({
+    super.key,
+    required this.username,
+    required this.content,
+    required this.timeAgo,
+    required this.upvotes,
+    required this.downvotes,
+    required this.onUpvote,
+    required this.onDownvote,
+    required this.onReply,
+  });
 
   @override
   State<CommentCard> createState() => _CommentCardState();
 }
 
 class _CommentCardState extends State<CommentCard> {
-  String username = 'accord master';
-  String content = "I don't know, maybe you should take your car to the garage";
-  String wasPostedBefore = '2 days ago';
-
-  TextStyle usernameStyle = const TextStyle(fontSize: 16);
-  TextStyle contentStyle = const TextStyle(fontSize: 16);
-  TextStyle wasPostedBeforeStyle =
-      const TextStyle(fontSize: 16, color: Color.fromARGB(201, 255, 255, 255));
-
-  SizedBox smallSpace = const SizedBox(
-    height: 7,
-  );
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        // crossAxisAlignment: CrossAxisAlignment.st,
-        children: [
-          // left
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      color: colorScheme.surface,
+      shadowColor: colorScheme.primary.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.primary.withOpacity(0.1), width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Comment header with user info
+            Row(
               children: [
-                Text(
-                  '@$username',
-                  style: usernameStyle,
+                CircleAvatar(
+                  radius: 14,
+                  backgroundColor: colorScheme.primaryContainer,
+                  child: Text(
+                    widget.username.isNotEmpty 
+                        ? widget.username[0].toUpperCase()
+                        : "?",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 ),
-                smallSpace,
-                Text(
-                  content,
-                  style: contentStyle,
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '@${widget.username}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      widget.timeAgo,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-                smallSpace,
-                Text(
-                  wasPostedBefore,
-                  style: wasPostedBeforeStyle,
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: (widget.upvotes - widget.downvotes) > 0
+                        ? colorScheme.primary.withOpacity(0.1)
+                        : (widget.upvotes - widget.downvotes) < 0
+                            ? colorScheme.error.withOpacity(0.1)
+                            : colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${widget.upvotes - widget.downvotes}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: (widget.upvotes - widget.downvotes) > 0
+                          ? colorScheme.primary
+                          : (widget.upvotes - widget.downvotes) < 0
+                              ? colorScheme.error
+                              : colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-          // right
-          const VoteButtons(size: 'small'),
-        ],
+            
+            // Comment content
+            const SizedBox(height: 8),
+            Text(
+              widget.content,
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 14,
+              ),
+            ),
+            
+            // Comment actions
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: widget.onUpvote,
+                      icon: Icon(
+                        Icons.arrow_upward_rounded,
+                        size: 18,
+                        color: colorScheme.primary,
+                      ),
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        minimumSize: const Size(36, 36),
+                        padding: EdgeInsets.zero,
+                      ),
+                      tooltip: 'Upvote',
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        widget.upvotes.toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: widget.onDownvote,
+                      icon: Icon(
+                        Icons.arrow_downward_rounded,
+                        size: 18,
+                        color: colorScheme.error,
+                      ),
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        minimumSize: const Size(36, 36),
+                        padding: EdgeInsets.zero,
+                      ),
+                      tooltip: 'Downvote',
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: colorScheme.error.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        widget.downvotes.toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton.icon(
+                  onPressed: widget.onReply,
+                  icon: Icon(
+                    Icons.reply,
+                    size: 16,
+                    color: colorScheme.secondary,
+                  ),
+                  label: Text(
+                    'Reply',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.secondary,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

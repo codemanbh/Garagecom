@@ -2,39 +2,27 @@ import 'package:flutter/material.dart';
 import '../models/Post.dart';
 import '../pages/CommentPage.dart';
 
-class PostCard extends StatefulWidget {
+class PostCard extends StatelessWidget {
   final Post post;
   final VoidCallback onUpvote;
   final VoidCallback onDownvote;
 
-  const PostCard({super.key, 
+  const PostCard({
+    super.key, 
     required this.post,
     required this.onUpvote,
     required this.onDownvote,
   });
 
-  @override
-  State<PostCard> createState() => _PostCardState();
-}
-
-class _PostCardState extends State<PostCard> {
-  late Post post;
-
-  @override
-  void initState() {
-    super.initState();
-    post = widget.post;
-  }
-
   void navigateToCommentPage(
-      BuildContext context, String title, String? imageUrl) {
+      BuildContext context, String title, String? imageUrl, String description, int votes) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CommentPage(
           postTitle: title,
-          questionBody: post.description,
-          initialVotes: post.numOfVotes,
+          questionBody: description,
+          initialVotes: votes,
           imageUrl: imageUrl,
         ),
       ),
@@ -43,53 +31,248 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Card(
-      color: Colors.red,
-      margin: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          // if (post.imageUrl != null) // Display image if URL is provided
-          //   Image.network(
-          //     post.imageUrl!,
-          //     width: double.infinity,
-          //     height: 150,
-          //     fit: BoxFit.cover,
-          //   ),
-          ListTile(
-            title: Row(
-              children: [
-                const CircleAvatar(backgroundColor: Colors.white, radius: 13),
-                const SizedBox(
-                  width: 10,
-                ),
-                Text(post.autherUsername ?? "asd"),
-              ],
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      elevation: 4,
+      color: colorScheme.surface,
+      shadowColor: colorScheme.primary.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+      ),
+      child: InkWell(
+        onTap: () => navigateToCommentPage(
+          context, 
+          post.title, 
+          post.imageUrl, 
+          post.description,
+          post.numOfVotes
+        ),
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Author header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: colorScheme.primaryContainer,
+                    child: Text(
+                      post.autherUsername.isNotEmpty
+                          ? post.autherUsername[0].toUpperCase()
+                          : "?",
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          post.autherUsername,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        Text(
+                          "Posted 2 days ago", // Replace with actual date
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: colorScheme.onSurfaceVariant,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      // Show post options
+                    },
+                  ),
+                ],
+              ),
             ),
-            subtitle: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-              child: Text(post.description),
-            ),
-            trailing: Column(
-              // mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-
-              children: [
-                IconButton(
-                  onPressed: widget.onUpvote,
-                  icon: const Icon(Icons.arrow_upward),
+            
+            // Post title
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                post.title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
                 ),
-                Text(post.numOfVotes.toString()),
-                IconButton(
-                  onPressed: widget.onDownvote,
-                  icon: const Icon(Icons.arrow_downward),
-                ),
-              ],
+              ),
             ),
-            onTap: () =>
-                navigateToCommentPage(context, post.title, post.imageUrl),
+            
+            // Post content
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: Text(
+                post.description,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            
+            // Post image (if available)
+            if (post.imageUrl != null && post.imageUrl!.isNotEmpty)
+              Container(
+                height: 200,
+                width: double.infinity,
+                margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: colorScheme.surfaceVariant,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    post.imageUrl!,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded / 
+                                loadingProgress.expectedTotalBytes!
+                              : null,
+                          color: colorScheme.primary,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        alignment: Alignment.center,
+                        color: colorScheme.surfaceVariant,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.broken_image_rounded,
+                              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                              size: 36,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Image not available",
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            
+            // Action buttons
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  // Votes section
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: onUpvote,
+                        icon: Icon(
+                          Icons.arrow_upward_rounded,
+                          color: colorScheme.primary,
+                          size: 22,
+                        ),
+                        tooltip: 'Upvote',
+                      ),
+                      Text(
+                        post.numOfVotes.toString(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: post.numOfVotes > 0
+                              ? colorScheme.primary
+                              : post.numOfVotes < 0
+                                  ? colorScheme.error
+                                  : colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+          IconButton(
+            onPressed: onDownvote,
+            icon: Icon(
+              Icons.arrow_downward_rounded,
+              color: colorScheme.error,
+              size: 22,
+            ),
+            tooltip: 'Downvote',
           ),
-        ],
+                    ],
+                  ),
+                  
+                  // Comment button
+                  TextButton.icon(
+                    onPressed: () => navigateToCommentPage(
+                      context, 
+                      post.title, 
+                      post.imageUrl, 
+                      post.description,
+                      post.numOfVotes
+                    ),
+                    icon: Icon(
+                      Icons.comment_outlined,
+                      size: 20,
+                      color: colorScheme.secondary,
+                    ),
+                    label: Text(
+                      'Comments',
+                      style: TextStyle(
+                        color: colorScheme.secondary,
+                      ),
+                    ),
+                  ),
+                  
+                  // Share button
+                  IconButton(
+                    onPressed: () {
+                      // Share functionality
+                    },
+                    icon: Icon(
+                      Icons.share_outlined,
+                      size: 20,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    tooltip: 'Share',
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../components/CustomNavBar.dart';
+import '../managers/CarInfo.dart';
 
 class AccountSettingsPage extends StatefulWidget {
   const AccountSettingsPage({super.key});
@@ -9,18 +10,28 @@ class AccountSettingsPage extends StatefulWidget {
 }
 
 class _AccountSettingsPageState extends State<AccountSettingsPage> {
-  // Sample user data - this would come from your user profile/database
+  // Car info manager
+  final CarInfo carInfo = CarInfo();
+  
+  // Sample user data
   final Map<String, String> userData = {
     'fullName': 'John Doe',
     'email': 'john.doe@example.com',
     'phone': '+1 123 456 7890',
     'bio': 'Car enthusiast with 5+ years experience in mechanics.',
+    'carBrand': 'Toyota',
     'carName': 'My Ride',
-    'carModel': 'Toyota Camry 2019',
+    'carModel': 'Camry',
+    'carYear': '2019',
     'mileage': '45,000 km',
   };
 
   bool isEditMode = false;
+  
+  // Selected car brand, model, and year
+  String? selectedCarBrand;
+  String? selectedCarModel;
+  String? selectedCarYear;
   
   // Controllers for editing text fields
   late TextEditingController nameController;
@@ -30,7 +41,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   late TextEditingController passwordController;
   late TextEditingController confirmPasswordController;
   late TextEditingController carNameController;
-  late TextEditingController carModelController;
   late TextEditingController mileageController;
   
   @override
@@ -44,8 +54,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     passwordController = TextEditingController();
     confirmPasswordController = TextEditingController();
     carNameController = TextEditingController(text: userData['carName']);
-    carModelController = TextEditingController(text: userData['carModel']);
     mileageController = TextEditingController(text: userData['mileage']);
+    
+    // Initialize selected values
+    selectedCarBrand = userData['carBrand'];
+    selectedCarModel = userData['carModel'];
+    selectedCarYear = userData['carYear'];
   }
   
   @override
@@ -58,7 +72,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     passwordController.dispose();
     confirmPasswordController.dispose();
     carNameController.dispose();
-    carModelController.dispose();
     mileageController.dispose();
     super.dispose();
   }
@@ -70,8 +83,10 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       userData['email'] = emailController.text;
       userData['phone'] = phoneController.text;
       userData['bio'] = bioController.text;
+      userData['carBrand'] = selectedCarBrand ?? userData['carBrand'] ?? '';
+      userData['carModel'] = selectedCarModel ?? userData['carModel'] ?? '';
+      userData['carYear'] = selectedCarYear ?? userData['carYear'] ?? '';
       userData['carName'] = carNameController.text;
-      userData['carModel'] = carModelController.text;
       userData['mileage'] = mileageController.text;
       
       // Exit edit mode
@@ -149,6 +164,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     required TextEditingController controller,
     bool obscureText = false,
     int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -159,6 +175,52 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         controller: controller,
         obscureText: obscureText,
         maxLines: maxLines,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: colorScheme.primary),
+          filled: true,
+          fillColor: theme.colorScheme.surfaceContainerLow,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: colorScheme.primary, width: 2),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildDropdown<T>({
+    required String label,
+    required IconData icon,
+    required T? value,
+    required List<T> items,
+    required void Function(T?) onChanged,
+    String? Function(T?)? validator,
+    required String Function(T item) itemDisplayName,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: DropdownButtonFormField<T>(
+        value: value,
+        items: items.map((T item) {
+          return DropdownMenuItem<T>(
+            value: item,
+            child: Text(itemDisplayName(item)),
+          );
+        }).toList(),
+        onChanged: onChanged,
+        validator: validator,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon, color: colorScheme.primary),
@@ -185,6 +247,21 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     
+    // Get car string for display
+    String getCarString() {
+      final brand = userData['carBrand'];
+      final model = userData['carModel'];
+      final year = userData['carYear'];
+      final nickname = userData['carName'];
+      
+      return carInfo.formatCarDisplay(
+        brand: brand,
+        model: model,
+        year: year,
+        nickname: nickname,
+      );
+    }
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account Settings'),
@@ -201,10 +278,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                   phoneController.text = userData['phone'] ?? '';
                   bioController.text = userData['bio'] ?? '';
                   carNameController.text = userData['carName'] ?? '';
-                  carModelController.text = userData['carModel'] ?? '';
                   mileageController.text = userData['mileage'] ?? '';
                   passwordController.clear();
                   confirmPasswordController.clear();
+                  
+                  // Reset selected values
+                  selectedCarBrand = userData['carBrand'];
+                  selectedCarModel = userData['carModel'];
+                  selectedCarYear = userData['carYear'];
                 }
               });
             },
@@ -229,8 +310,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     size: 80,
                     color: colorScheme.onPrimaryContainer,
                   ),
-                  // If you have user avatar, use this instead:
-                  // backgroundImage: AssetImage('assets/images/avatar.png'),
                 ),
                 if (isEditMode)
                   Container(
@@ -341,8 +420,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                         ),
                       ),
                     ),
-                    buildInfoItem('Car Name', userData['carName'] ?? '', Icons.car_repair),
-                    buildInfoItem('Car Model', userData['carModel'] ?? '', Icons.car_repair_sharp),
+                    buildInfoItem('Car', getCarString(), Icons.directions_car),
+                    buildInfoItem('Car Nickname', userData['carName'] ?? '', Icons.car_repair),
                     buildInfoItem('Mileage', userData['mileage'] ?? '', Icons.speed),
                   ],
                 ),
@@ -417,20 +496,80 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                   ),
                 ),
               ),
+              
+              // Car Brand Dropdown
+              buildDropdown<String>(
+                label: 'Car Brand',
+                icon: Icons.directions_car,
+                value: selectedCarBrand,
+                items: carInfo.carBrands,
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedCarBrand = newValue;
+                    // Reset model when brand changes
+                    selectedCarModel = null;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a car brand';
+                  }
+                  return null;
+                },
+                itemDisplayName: (item) => item,
+              ),
+              
+              // Car Model Dropdown (dependent on selected brand)
+              if (selectedCarBrand != null)
+                buildDropdown<String>(
+                  label: 'Car Model',
+                  icon: Icons.model_training,
+                  value: selectedCarModel,
+                  items: carInfo.getModelsForBrand(selectedCarBrand!),
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedCarModel = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a car model';
+                    }
+                    return null;
+                  },
+                  itemDisplayName: (item) => item,
+                ),
+              
+              // Car Year Dropdown
+              buildDropdown<String>(
+                label: 'Car Year',
+                icon: Icons.calendar_today,
+                value: selectedCarYear,
+                items: carInfo.getCarYears(),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedCarYear = newValue;
+                  });
+                },
+                validator: (value) {
+                  return null; // Year is optional
+                },
+                itemDisplayName: (item) => item,
+              ),
+              
+              // Car Nickname
               buildEditableField(
-                label: 'Car Name',
+                label: 'Car Nickname',
                 icon: Icons.car_repair,
                 controller: carNameController,
               ),
-              buildEditableField(
-                label: 'Car Model',
-                icon: Icons.car_repair_sharp,
-                controller: carModelController,
-              ),
+              
+              // Mileage
               buildEditableField(
                 label: 'Mileage',
                 icon: Icons.speed,
                 controller: mileageController,
+                keyboardType: TextInputType.number,
               ),
 
               const SizedBox(height: 16),

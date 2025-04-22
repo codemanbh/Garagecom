@@ -295,54 +295,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: colorScheme.primary.withOpacity(0.3), width: 1),
       ),
-      child: Container(
-        height: 200,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              colorScheme.surface,
-              colorScheme.primaryContainer.withOpacity(0.5),
-            ],
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.2),
-                shape: BoxShape.circle,
-                border: Border.all(color: colorScheme.primary, width: 2),
-              ),
-              child: Icon(
-                Icons.add_a_photo,
-                size: 48,
-                color: colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Add an image',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Take or upload a photo for your post',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
+      
     );
   }
 

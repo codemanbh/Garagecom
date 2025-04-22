@@ -25,7 +25,7 @@ class _ServicePageState extends State<ServicePage> {
     },
     {
       'id': 1,
-      'name': 'Honda Accord',
+      'name': 'HAccord',
       'year': '2020',
       'icon': Icons.time_to_leave,
       'color': Colors.red,

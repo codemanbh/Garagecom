@@ -3,8 +3,6 @@ import '../components/CustomNavBar.dart';
 import '../components/PostCard.dart';
 import '../models/Post.dart';
 import '../managers/PostsManager.dart';
-import '../components/PostWidget.dart';
-import '../components/CategoriesSection.dart';
 import '../searchDelegates/PostSearchDelegate.dart';
 import '../components/CategoriesDialog.dart';
 
@@ -40,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -60,7 +58,6 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: const CustomNavBar(),
       body: Column(
         children: [
-          // Categories section - compact design
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -131,8 +128,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          
-          // Posts list with consistent styling
+
           Expanded(
             child: posts.isEmpty 
             ? Center(
@@ -169,25 +165,10 @@ class _HomePageState extends State<HomePage> {
                 itemCount: posts.length,
                 itemBuilder: (context, index) {
                   final post = posts[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    elevation: 4,
-                    color: colorScheme.surface,
-                    shadowColor: colorScheme.primary.withOpacity(0.4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
-                    ),
-                    child: PostWidget(
-                      accountId: post.accountId.toString(),
-                      accountName: post.autherUsername,
-                      postTitle: post.title,
-                      postContent: post.description,
-                      numOfVotes: post.numOfVotes,
-                      postId: post.postID.toString(),
-                      upvote: () => upvote(index),
-                      downvote: () => downvote(index),
-                    ),
+                  return PostCard(
+                    post: post,
+                    onUpvote: () => upvote(index),
+                    onDownvote: () => downvote(index),
                   );
                 },
               ),
@@ -199,7 +180,12 @@ class _HomePageState extends State<HomePage> {
           // Add navigation to create post page
         },
         backgroundColor: colorScheme.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Icon(Icons.add),
       ),
     );
   }
