@@ -219,8 +219,31 @@ class _SignupPageState extends State<SignupPage> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
-                  
+                onPressed: () async {
+                  print('Sign Up button pressed');
+                  Map<String, dynamic> data =  {
+                    'Firstname': firstnameController.text,
+                    'Lastname': lastnameController.text,
+                    'Email': emailController.text,
+                    'Username': usernameController.text,
+                    'PhoneNumber': phoneController.text,
+                    'Password': passwordController.text,
+                  };
+                  Map<String,dynamic> response = await ApiHelper.post("api/Registration/register", data);
+                  print(response);
+                  print(response["succeeded"]);
+                  if(response["succeeded"] as bool == true) {
+                    String token = response["parameters"]["Token"];
+                    int userId = response["parameters"]["UserID"];
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    await prefs.setString("token", token);
+                    await prefs.setInt("userId", userId);
+                    Navigator.of(context).pushNamed('/homePage');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('There was an error ')),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
