@@ -171,7 +171,6 @@ class _SignupPageState extends State<SignupPage> {
                     borderSide: BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
-                obscureText: true,
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -220,7 +219,36 @@ class _SignupPageState extends State<SignupPage> {
               const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
-                  
+                  Map<String, dynamic> data = {
+                    'Firstname': firstnameController.text,
+                    'Lastname': lastnameController.text,
+                    'Email': emailController.text,
+                    'Username': usernameController.text,
+                    'Phone': phoneController.text,
+                    'Password': passwordController.text,
+                  };
+                  ApiHelper.post('api/Registration/register', data).then((response) {
+
+                    if (response['Succeeded'] == true) {
+                      
+                      String token = response['Message'];
+                      SharedPreferences.getInstance().then((prefs) {
+                        prefs.setString('jwt_token', token);
+                      });
+                      // Handle successful signup
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    } else {
+                      // Handle error
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(response['message'])),
+                      );
+                    }
+                  }).catchError((error) {
+                    // Handle network error
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Network error: $error')),
+                    );
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
