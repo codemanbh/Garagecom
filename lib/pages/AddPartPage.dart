@@ -16,14 +16,28 @@ class _AddPartPageState extends State<AddPartPage> {
   TextEditingController partReplacedDistanceController = TextEditingController();
   TextEditingController partLifetimeDistanceController = TextEditingController();
   TextEditingController partLifetimeTimeController = TextEditingController();
-  
+  TextEditingController intervalValueController = TextEditingController();
+
   // Date controllers
   DateTime? replacementDate;
   DateTime? nextServiceDate;
-  
+
   // Dropdown selection
   String? selectedPartType;
-  
+  String selectedIntervalUnit = 'Months';
+
+  // Preset values for different interval units
+  final Map<String, List<String>> presetIntervalValues = {
+    'Days': ['7', '14', '30', '60', '90'],
+    'Weeks': ['1', '2', '4', '6', '8', '12'],
+    'Months': ['1', '3', '6', '9', '12', '18', '24'],
+    'Years': ['1', '2', '3', '4', '5'],
+    'Kilometers': ['1000', '5000', '10000', '15000', '20000', '30000', '50000'],
+  };
+
+  // Currently selected preset value
+  String? selectedIntervalValue;
+
   // List of common car parts for dropdown
   final List<String> commonParts = [
     'Oil Filter',
@@ -45,11 +59,16 @@ class _AddPartPageState extends State<AddPartPage> {
     'Other (Custom)'
   ];
 
+  final List<String> intervalUnits = ['Days', 'Weeks', 'Months', 'Years', 'Kilometers'];
+
   @override
   void initState() {
     super.initState();
     replacementDate = DateTime.now(); // Default to today
     nextServiceDate = DateTime.now().add(const Duration(days: 180)); // Default to 6 months from now
+    selectedIntervalUnit = 'Months';
+    selectedIntervalValue = '3'; // Default to 3 months
+    intervalValueController.text = selectedIntervalValue!;
   }
 
   Future<void> _selectReplacementDate(BuildContext context) async {
@@ -71,7 +90,7 @@ class _AddPartPageState extends State<AddPartPage> {
         );
       },
     );
-    
+
     if (picked != null && picked != replacementDate) {
       setState(() {
         replacementDate = picked;
@@ -98,18 +117,18 @@ class _AddPartPageState extends State<AddPartPage> {
         );
       },
     );
-    
+
     if (picked != null && picked != nextServiceDate) {
       setState(() {
         nextServiceDate = picked;
       });
     }
   }
-  
+
   // Get the icon for the selected part
   IconData _getPartIcon(String? partName) {
     if (partName == null) return Icons.build;
-    
+
     final lowerName = partName.toLowerCase();
     if (lowerName.contains('oil')) return Icons.opacity;
     if (lowerName.contains('filter')) return Icons.filter_alt;
@@ -123,10 +142,39 @@ class _AddPartPageState extends State<AddPartPage> {
     return Icons.build;
   }
 
+  void _handleIntervalUnitChange(String? newUnit) {
+    if (newUnit == null) return;
+
+    setState(() {
+      selectedIntervalUnit = newUnit;
+      // Reset the selected value when changing units
+      selectedIntervalValue = presetIntervalValues[newUnit]?[0];
+      intervalValueController.text = selectedIntervalValue ?? '';
+    });
+  }
+
   void handleSave() {
     if (_formKey.currentState!.validate()) {
-      // Create the part object and save it
-      // You can pass the data back to the previous screen
+      // Format the interval with the selected value and unit
+      final String formattedInterval = selectedIntervalValue != null && selectedIntervalUnit != null
+          ? '$selectedIntervalValue $selectedIntervalUnit'
+          : '';
+          
+      // Pass the data back to the previous screen
+      // You can create a CarPart object here with all the collected data
+      // For example:
+      /*
+      final part = CarPart(
+        partName: partNameController.text,
+        lastReplacedDate: replacementDate != null ? DateFormat('MMM dd, yyyy').format(replacementDate!) : null,
+        nextReplacedDate: nextServiceDate != null ? DateFormat('MMM dd, yyyy').format(nextServiceDate!) : null,
+        replacementInterval: formattedInterval,
+        carId: currentCarId, // Get this from your navigation arguments
+        // other properties
+      );
+      Navigator.of(context).pop(part);
+      */
+      
       Navigator.of(context).pop();
     }
   }
@@ -214,7 +262,7 @@ class _AddPartPageState extends State<AddPartPage> {
                         ],
                       ),
                     ),
-                    
+
                     // Part selection dropdown
                     Text(
                       'Part Information',
@@ -225,7 +273,7 @@ class _AddPartPageState extends State<AddPartPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     Container(
                       decoration: BoxDecoration(
                         color: colorScheme.surface,
@@ -287,9 +335,9 @@ class _AddPartPageState extends State<AddPartPage> {
                         },
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Custom part name field (visible if "Other" is selected)
                     if (selectedPartType == 'Other (Custom)')
                       Container(
@@ -328,7 +376,7 @@ class _AddPartPageState extends State<AddPartPage> {
                           },
                         ),
                       ),
-                      
+
                     // Replacement date picker
                     const SizedBox(height: 24),
                     Text(
@@ -340,7 +388,7 @@ class _AddPartPageState extends State<AddPartPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
@@ -367,7 +415,7 @@ class _AddPartPageState extends State<AddPartPage> {
                           ),
                         ),
                         subtitle: Text(
-                          replacementDate != null 
+                          replacementDate != null
                               ? DateFormat('MMM dd, yyyy').format(replacementDate!)
                               : 'Select Date',
                           style: TextStyle(
@@ -389,7 +437,7 @@ class _AddPartPageState extends State<AddPartPage> {
                         onTap: () => _selectReplacementDate(context),
                       ),
                     ),
-                    
+
                     // Mileage at replacement
                     Container(
                       margin: const EdgeInsets.only(bottom: 16),
@@ -429,7 +477,7 @@ class _AddPartPageState extends State<AddPartPage> {
                         },
                       ),
                     ),
-                    
+
                     // Service schedule section
                     const SizedBox(height: 24),
                     Text(
@@ -441,7 +489,7 @@ class _AddPartPageState extends State<AddPartPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Next service date picker
                     Container(
                       margin: const EdgeInsets.only(bottom: 16),
@@ -469,7 +517,7 @@ class _AddPartPageState extends State<AddPartPage> {
                           ),
                         ),
                         subtitle: Text(
-                          nextServiceDate != null 
+                          nextServiceDate != null
                               ? DateFormat('MMM dd, yyyy').format(nextServiceDate!)
                               : 'Select Date',
                           style: TextStyle(
@@ -491,10 +539,21 @@ class _AddPartPageState extends State<AddPartPage> {
                         onTap: () => _selectNextServiceDate(context),
                       ),
                     ),
-                    
-                    // Service interval distance
+
+                    // Service interval with dropdown for unit selection
+                    const SizedBox(height: 24),
+                    Text(
+                      'Service Interval',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     Container(
                       margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
@@ -510,68 +569,78 @@ class _AddPartPageState extends State<AddPartPage> {
                           ),
                         ],
                       ),
-                      child: TextFormField(
-                        controller: partLifetimeDistanceController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        decoration: InputDecoration(
-                          labelText: 'Service Interval (km)',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Service Interval',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                          prefixIcon: Icon(Icons.sync, color: colorScheme.primary),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter the service interval distance';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    
-                    // Service interval time
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 24),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: DropdownButtonFormField<String>(
+                                  value: selectedIntervalValue,
+                                  decoration: InputDecoration(
+                                    labelText: 'Value',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    prefixIcon: Icon(Icons.sync, color: colorScheme.primary),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                  ),
+                                  items: presetIntervalValues[selectedIntervalUnit]?.map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList() ?? [],
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedIntervalValue = newValue;
+                                      intervalValueController.text = newValue ?? '';
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please select a value';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 2,
+                                child: DropdownButtonFormField<String>(
+                                  value: selectedIntervalUnit,
+                                  decoration: InputDecoration(
+                                    labelText: 'Unit',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                  ),
+                                  items: intervalUnits.map((String unit) {
+                                    return DropdownMenuItem<String>(
+                                      value: unit,
+                                      child: Text(unit),
+                                    );
+                                  }).toList(),
+                                  onChanged: _handleIntervalUnitChange,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      child: TextFormField(
-                        controller: partLifetimeTimeController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        decoration: InputDecoration(
-                          labelText: 'Service Interval (months)',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: Icon(Icons.access_time, color: colorScheme.primary),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter the service interval time';
-                          }
-                          return null;
-                        },
-                      ),
                     ),
-                    
+
                     // Save button
                     Center(
                       child: ElevatedButton.icon(

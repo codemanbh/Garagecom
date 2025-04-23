@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/helpers/apiHelper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -8,15 +10,23 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController firstnameController = TextEditingController();
+   final TextEditingController lastnameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+    final TextEditingController phoneController = TextEditingController();
+
+
 
   @override
   void dispose() {
-    nameController.dispose();
+    firstnameController.dispose();
+    lastnameController.dispose();
     emailController.dispose();
+    usernameController.dispose();
+    phoneController.dispose();  
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -55,9 +65,31 @@ class _SignupPageState extends State<SignupPage> {
                 height: 40,
               ),
               TextFormField(
-                controller: nameController,
+                controller: firstnameController,
                 decoration: InputDecoration(
-                  labelText: 'Full Name',
+                  labelText: 'First Name',
+                  prefixIcon: Icon(Icons.person, color: colorScheme.primary),
+                  filled: true,
+                  fillColor: theme.colorScheme.surfaceContainerLow,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                  ),
+                ),
+                keyboardType: TextInputType.name,
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: lastnameController,
+                decoration: InputDecoration(
+                  labelText: 'Last Name',
                   prefixIcon: Icon(Icons.person, color: colorScheme.primary),
                   filled: true,
                   fillColor: theme.colorScheme.surfaceContainerLow,
@@ -96,6 +128,50 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                 ),
                 keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  prefixIcon: Icon(Icons.person_outline, color: colorScheme.primary),
+                  filled: true,
+                  fillColor: theme.colorScheme.surfaceContainerLow,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                  ),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: phoneController,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  prefixIcon: Icon(Icons.phone, color: colorScheme.primary),
+                  filled: true,
+                  fillColor: theme.colorScheme.surfaceContainerLow,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                  ),
+                ),
+                obscureText: true,
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -144,8 +220,7 @@ class _SignupPageState extends State<SignupPage> {
               const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
-                  // Implement sign up logic here
-                  print('Sign up button pressed');
+                  
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),

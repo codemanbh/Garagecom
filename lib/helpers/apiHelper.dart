@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ApiHelper {
+class  ApiHelper {
   late Dio dio;
-  String mainDomain = 'https://localhost:5294';
+  static String mainDomain = 'https://localhost:5294';
 
-  Future<Dio> Client() async {
+  static Future<Dio> Client() async {
     Dio client = Dio();
 
     final prefs = await SharedPreferences.getInstance();
@@ -23,11 +23,22 @@ class ApiHelper {
     return client;
   }
 
-  Future<Map<String, dynamic>> get(
+  static Future<Map<String, dynamic>> get(
       String path, Map<String, dynamic> data) async {
     Dio client = await Client();
 
-    final response = await dio.get(
+    final response = await client.get(
+      path,
+      queryParameters: data,
+    );
+
+    return response.data;
+  }
+  static Future<Map<String, dynamic>> post(
+      String path, Map<String, dynamic> data) async {
+    Dio client = await Client();
+
+    final response = await client.post(
       path,
       queryParameters: data,
     );
