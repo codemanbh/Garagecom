@@ -30,12 +30,44 @@ class _HomePageState extends State<HomePage> {
       _isLoading = true;
     });
     
-    await _postsManager.fetchPosts();
-    
-    setState(() {
-      posts = PostsManager.posts;
-      _isLoading = false;
-    });
+    try {
+      final success = await _postsManager.fetchPosts();
+      
+      if (success) {
+        setState(() {
+          posts = List.from(PostsManager.posts); // Create a copy
+          _isLoading = false;
+        });
+        
+        print('HomePage loaded ${posts.length} posts successfully');
+      } else {
+        setState(() {
+          posts = [];
+          _isLoading = false;
+        });
+        
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load posts'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error in _loadPosts: $e');
+      setState(() {
+        _isLoading = false;
+      });
+      
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: ${e.toString()}'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
   }
 
   void upvote(int index) {

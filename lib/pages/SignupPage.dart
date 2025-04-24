@@ -221,12 +221,12 @@ class _SignupPageState extends State<SignupPage> {
                 onPressed: () async {
                   print('Sign Up button pressed');
                   Map<String, dynamic> data =  {
-                    'Firstname': firstnameController.text,
-                    'Lastname': lastnameController.text,
-                    'Email': emailController.text,
-                    'Username': usernameController.text,
-                    'PhoneNumber': phoneController.text,
-                    'Password': passwordController.text,
+                    'firstName': firstnameController.text,
+                    'lastName': lastnameController.text,
+                    'email': emailController.text,
+                    'userName': usernameController.text,
+                    'phoneNumber': phoneController.text,
+                    'password': passwordController.text,
                   };
                   Map<String,dynamic> response = await ApiHelper.post("api/Registration/register", data);
                   print(response);

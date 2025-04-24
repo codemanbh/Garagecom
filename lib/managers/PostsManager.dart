@@ -1,8 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:garagecom/models/Category.dart';
 import '../models/Post.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import '../data/posts.dart';
+import 'package:garagecom/helpers/apiHelper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PostsManager {
   static List<Post> posts = [];
@@ -23,20 +26,73 @@ class PostsManager {
   }
 
   Future<bool> fetchPosts() async {
-    // final response = await _dio.get('http://192.168.243.1:3000/api/posts');
-    // print('asdasd');
-    // if (response.statusCode == 200) {
-    //   List<dynamic> posts = response.data['posts'];
-    //   List<Post> x = posts
-    //       .map((x) => Post(
-    //           title: x['title'],
-    //           numOfVotes: 0,
-    //           imageUrl: 'https://example.com/image2.jpg'))
-    //       .toList();
+    try {
+      // Fetch posts from API
+      Map<String, dynamic> response = await ApiHelper.get(
+        'api/Posts/GetPosts', 
+        {'categoryId': 1}
+      );
+      
+      print('API Response received');
+      
+      // Check if the API call was successful
+      if (response.containsKey('succeeded') && response['succeeded'] == true) {
+        print('API call successful');
+        
+        // Check if we have the Posts array in the parameters
+        if (response.containsKey('parameters') && 
+            response['parameters'] != null &&
+            response['parameters'].containsKey('Posts')) {
+          
+          List<dynamic> postsData = response['parameters']['Posts'];
+          print('Found ${postsData.length} posts in API response');
+          
+          // Clear existing posts
+          posts.clear();
+          
+          // Map API data to Post objects
+          for (var postData in postsData) {
+            Post post = Post(
+              postID: postData['postID'] ?? 0,
+              title: postData['title'] ?? 'No Title',
+              description: postData['description'] ?? 'No Content',
+              autherUsername: postData['userName'], // Using userID as placeholder
+              imageUrl: postData['attachment'] != null && postData['attachment'].isNotEmpty 
+                  ? postData['attachment'] 
+                  : null,
+              numOfVotes: postData['votes'] != null ? postData['votes'].length : 0,
+              createdIn: postData['createdIn'] ?? '',
+              categoryName: postData['postCategory'] != null ? postData['postCategory']['title'] : '',
+            );
+            
+            posts.add(post);
+          }
+          
+          print('Successfully parsed ${posts.length} posts from API');
+          return true;
+        } else {
+          print('No Posts array found in parameters');
+        }
+      } else {
+        // API call failed or returned an error
+        String errorMessage = response['message'] ?? 'Unknown error';
+        print('API call failed: $errorMessage');
+      }
+      
+      // If we get here, something went wrong with the API response
+      // Fall back to local data
+      return _loadFallbackPosts();
+      
+    } catch (e) {
+      print('Error fetching posts: $e');
+      return _loadFallbackPosts();
+    }
+  }
 
-    //   posts = x;
-    // }
-
+  // Helper method to load fallback posts
+  Future<bool> _loadFallbackPosts() async {
+    print('Loading fallback posts...');
+    
     List<Map<String, dynamic>> postsMap = [
       {
         "id": 1,
@@ -53,80 +109,26 @@ class PostsManager {
             "I'm looking for durable off-road tires for my Jeep Wrangler. Any recommendations?",
         "image": "https://example.com/images/jeep-tires.jpg"
       },
-      {
-        "id": 3,
-        "autherUsername": "BoostedDaily",
-        "title": "Check engine light keeps turning on!",
-        "content":
-            "My check engine light keeps coming on and off. What could be the issue?",
-        "image": "https://example.com/images/check-engine.jpg"
-      },
-      {
-        "id": 4,
-        "autherUsername": "TurboAccord2.0",
-        "title": "Upgrading my exhaust system!",
-        "content":
-            "Thinking of installing a performance exhaust on my Mustang. Any suggestions?",
-      },
-      {
-        "id": 5,
-        "autherUsername": "VTECUnleashed",
-        "title": "Strange smell from the AC",
-        "content":
-            "Whenever I turn on my AC, there's a moldy smell. How can I fix this?",
-        "image": "https://example.com/images/car-ac.jpg"
-      },
-      {
-        "id": 6,
-        "autherUsername": "SportModeKing",
-        "title": "Is ceramic coating worth it?",
-        "content":
-            "Thinking of getting ceramic coating for my car. Does it really help protect the paint?",
-        "image": "https://example.com/images/ceramic-coating.jpg"
-      },
-      {
-        "id": 7,
-        "autherUsername": "VTECUnleashed",
-        "title": "Best budget-friendly dash cams?",
-        "content":
-            "Looking for a reliable but affordable dash cam. Any recommendations?",
-        "image": "https://example.com/images/dash-cam.jpg"
-      },
-      {
-        "id": 8,
-        "autherUsername": "GlitchHorizon",
-        "title": "Car battery draining overnight",
-        "content":
-            "I keep waking up to a dead battery. What could be causing this?",
-        "image": "https://example.com/images/car-battery.jpg"
-      },
-      {
-        "id": 9,
-        "autherUsername": "EcoModeRider",
-        "title": "DIY oil change guide",
-        "content":
-            "Just changed my own oil for the first time! Here's a step-by-step guide.",
-        "image": "https://example.com/images/oil-change.jpg"
-      },
-      {
-        "id": 10,
-        "autherUsername": "BoostedDaily",
-        "title": "Loud squeaking when braking",
-        "content":
-            "My brakes make a loud squeaking noise when I stop. Should I replace the pads?",
-        "image": "https://example.com/images/brake-noise.jpg"
-      }
+      // Rest of your fallback posts...
     ];
 
+    // Clear existing posts
+    posts.clear();
+    
     // Create new post objects from the map data
-    posts = postsMap.map((x) => Post(
-        postID: x['id'],
-        title: x['title'],
+    for (var postMap in postsMap) {
+      Post post = Post(
+        postID: postMap['id'],
+        title: postMap['title'],
         numOfVotes: 0,
-        autherUsername: x['autherUsername'],
-        imageUrl: x.containsKey('image') ? x['image'] : '',
-        description: x['content'])).toList();
+        autherUsername: postMap['autherUsername'],
+        imageUrl: postMap.containsKey('image') ? postMap['image'] : null,
+        description: postMap['content'],
+      );
+      posts.add(post);
+    }
 
+    print('Loaded ${posts.length} fallback posts');
     return true;
   }
 }

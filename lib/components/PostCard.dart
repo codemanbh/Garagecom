@@ -125,7 +125,7 @@ class PostCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "Posted 2 days ago", // Replace with actual date
+                          post.getFormattedDate(), // Use the formatted date method
                           style: TextStyle(
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
@@ -147,6 +147,25 @@ class PostCard extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Category chip
+            if (post.categoryName != null && post.categoryName!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Chip(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  backgroundColor: colorScheme.secondaryContainer,
+                  label: Text(
+                    post.categoryName!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colorScheme.onSecondaryContainer,
+                    ),
+                  ),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                ),
+              ),
             
             // Post title
             Padding(
