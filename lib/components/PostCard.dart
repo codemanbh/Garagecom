@@ -16,7 +16,7 @@ class PostCard extends StatelessWidget {
   });
 
   void navigateToCommentPage(
-      BuildContext context, String title, String? imageUrl, String description, int votes) {
+      BuildContext context, String title, String? imageUrl, String description, int votes, int postID) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -25,6 +25,7 @@ class PostCard extends StatelessWidget {
           questionBody: description,
           initialVotes: votes,
           imageUrl: imageUrl,
+          postID: postID,
         ),
       ),
     );
@@ -87,7 +88,8 @@ class PostCard extends StatelessWidget {
           post.title, 
           post.imageUrl, 
           post.description,
-          post.numOfVotes
+          post.numOfVotes,
+          post.postID // Assuming post.postID exists
         ),
         borderRadius: BorderRadius.circular(12),
         child: Column(
@@ -125,7 +127,7 @@ class PostCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          post.getFormattedDate(), // Use the formatted date method
+                          "Posted 2 days ago", // Replace with actual date
                           style: TextStyle(
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
@@ -147,25 +149,6 @@ class PostCard extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Category chip
-            if (post.categoryName != null && post.categoryName!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: Chip(
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  backgroundColor: colorScheme.secondaryContainer,
-                  label: Text(
-                    post.categoryName!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colorScheme.onSecondaryContainer,
-                    ),
-                  ),
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                ),
-              ),
             
             // Post title
             Padding(
@@ -299,7 +282,8 @@ class PostCard extends StatelessWidget {
                       post.title, 
                       post.imageUrl, 
                       post.description,
-                      post.numOfVotes
+                      post.numOfVotes,
+                      post.postID // Assuming post.postID exists
                     ),
                     icon: Icon(
                       Icons.comment_outlined,

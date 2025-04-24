@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../components/CommentCard.dart';
+import '../models/Comment.dart';
+import '../managers/CommentsManager.dart';
 
 class CommentPage extends StatefulWidget {
   final String postTitle;
   final String questionBody;
   final int initialVotes;
   final String? imageUrl;
+  final int postID; // Add post ID to fetch related comments
 
   const CommentPage({
     super.key,
@@ -14,6 +17,7 @@ class CommentPage extends StatefulWidget {
     required this.questionBody,
     required this.initialVotes,
     this.imageUrl,
+    required this.postID,
   });
 
   @override
@@ -26,39 +30,16 @@ class _CommentPageState extends State<CommentPage> {
   int postDownvotes = 0;
   int postVotes = 0;
   String? imageUrl = '';
-
-  final List<Map<String, dynamic>> comments = [
-    {
-      'username': 'mechanic_pro',
-      'text': 'This is a very helpful question!',
-      'timeAgo': '3 hours ago',
-      'votes': 3,
-      'upvotes': 5,
-      'downvotes': 2
-    },
-    {
-      'username': 'car_enthusiast',
-      'text': 'I have the same query as well.',
-      'timeAgo': '1 day ago',
-      'votes': 1,
-      'upvotes': 2,
-      'downvotes': 1
-    },
-    {
-      'username': 'honda_expert',
-      'text': 'I recommend taking it to a certified mechanic. Could be serious if left unchecked.',
-      'timeAgo': '2 days ago',
-      'votes': 2,
-      'upvotes': 3,
-      'downvotes': 1
-    },
-  ];
+  
+  List<Comment> comments = [];
+  bool _isLoading = true;
+  
   final TextEditingController commentController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Initialize with some default values based on initial votes
+    // Initialize post votes
     postVotes = widget.initialVotes;
     if (postVotes > 0) {
       postUpvotes = postVotes;
@@ -71,6 +52,53 @@ class _CommentPageState extends State<CommentPage> {
       postDownvotes = 0;
     }
     imageUrl = widget.imageUrl;
+    
+    // Load comments when the page initializes
+    _loadComments();
+  }
+  
+  // Function to load comments from the database
+  Future<void> _loadComments() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      final success = await CommentsManager.fetchComments(widget.postID);
+      
+      if (success) {
+        setState(() {
+          comments = List.from(CommentsManager.comments); // Create a copy
+          _isLoading = false;
+        });
+        
+        print('Loaded ${comments.length} comments for post ${widget.postID}');
+      } else {
+        setState(() {
+          comments = [];
+          _isLoading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load comments'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error loading comments: $e');
+      setState(() {
+        _isLoading = false;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: ${e.toString()}'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
   }
 
   void upvotePost() {
@@ -87,34 +115,68 @@ class _CommentPageState extends State<CommentPage> {
     });
   }
 
-  void upvoteComment(int index) {
+  void upvoteComment(Comment comment) {
     setState(() {
-      comments[index]['upvotes']++;
-      comments[index]['votes'] = comments[index]['upvotes'] - comments[index]['downvotes'];
+      comment.upvotes++;
     });
   }
 
-  void downvoteComment(int index) {
+  void downvoteComment(Comment comment) {
     setState(() {
-      comments[index]['downvotes']++;
-      comments[index]['votes'] = comments[index]['upvotes'] - comments[index]['downvotes'];
+      comment.downvotes++;
     });
   }
 
-  void addComment() {
-    final newComment = commentController.text.trim();
-    if (newComment.isNotEmpty) {
-      setState(() {
-        comments.insert(0, {
-          'username': 'you',
-          'text': newComment,
-          'timeAgo': 'just now',
-          'votes': 0,
-          'upvotes': 0,
-          'downvotes': 0
+  // Add a comment to the database
+  Future<void> addComment() async {
+    final newCommentText = commentController.text.trim();
+    if (newCommentText.isEmpty) return;
+    
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      final success = await CommentsManager.addComment(widget.postID, newCommentText);
+      
+      if (success) {
+        // Refresh comments from server
+        setState(() {
+          comments = List.from(CommentsManager.comments);
+          commentController.clear();
+          _isLoading = false;
         });
-        commentController.clear();
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Comment added successfully'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to add comment'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error adding comment: $e');
+      setState(() {
+        _isLoading = false;
       });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: ${e.toString()}'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     }
   }
 
@@ -283,11 +345,9 @@ class _CommentPageState extends State<CommentPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Updated vote counter to match the HomePage style
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Upvote button
                     IconButton(
                       onPressed: upvotePost,
                       icon: Icon(
@@ -297,8 +357,6 @@ class _CommentPageState extends State<CommentPage> {
                       ),
                       tooltip: 'Upvote',
                     ),
-                    
-                    // Combined vote count
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
@@ -330,8 +388,6 @@ class _CommentPageState extends State<CommentPage> {
                         ),
                       ),
                     ),
-                    
-                    // Downvote button
                     IconButton(
                       onPressed: downvotePost,
                       icon: Icon(
@@ -342,16 +398,15 @@ class _CommentPageState extends State<CommentPage> {
                       tooltip: 'Downvote',
                     ),
                     const Spacer(),
-                    
-                     IconButton(
-                    onPressed: _sharePost,
-                    icon: Icon(
-                      Icons.share_outlined,
-                      size: 25,
-                      color: colorScheme.onSurfaceVariant,
+                    IconButton(
+                      onPressed: _sharePost,
+                      icon: Icon(
+                        Icons.share_outlined,
+                        size: 25,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      tooltip: 'Share',
                     ),
-                    tooltip: 'Share',
-                  ),
                   ],
                 ),
               ],
@@ -384,158 +439,170 @@ class _CommentPageState extends State<CommentPage> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    buildPostHeader(theme, colorScheme),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.comment,
-                            size: 20,
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Comments',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '${comments.length}',
-                              style: TextStyle(
-                                color: colorScheme.onPrimaryContainer,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const Spacer(),
-                          TextButton.icon(
-                            onPressed: () {
-                              setState(() {});
-                            },
-                            icon: Icon(
-                              Icons.refresh,
-                              size: 16,
+            child: RefreshIndicator(
+              onRefresh: _loadComments,
+              color: colorScheme.primary,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildPostHeader(theme, colorScheme),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.comment,
+                              size: 20,
                               color: colorScheme.primary,
                             ),
-                            label: Text(
-                              'Refresh',
+                            const SizedBox(width: 8),
+                            Text(
+                              'Comments',
                               style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${comments.length}',
+                                style: TextStyle(
+                                  color: colorScheme.onPrimaryContainer,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            TextButton.icon(
+                              onPressed: _loadComments,
+                              icon: Icon(
+                                Icons.refresh,
+                                size: 16,
                                 color: colorScheme.primary,
                               ),
-                            ),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    comments.isEmpty
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 24.0),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.primaryContainer.withOpacity(0.2),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.comment_outlined,
-                                      size: 40,
-                                      color: colorScheme.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'No comments yet',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Be the first to comment on this post',
-                                    style: TextStyle(
-                                      color: colorScheme.onSurfaceVariant,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 24),
-                                  OutlinedButton.icon(
-                                    onPressed: () {
-                                      FocusScope.of(context).requestFocus(FocusNode());
-                                      commentController.clear();
-                                    },
-                                    icon: Icon(
-                                      Icons.add_comment,
-                                      size: 18,
-                                      color: colorScheme.primary,
-                                    ),
-                                    label: Text(
-                                      'Add Comment',
-                                      style: TextStyle(
-                                        color: colorScheme.primary,
-                                      ),
-                                    ),
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: colorScheme.primary,
-                                      side: BorderSide(color: colorScheme.primary),
-                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(100),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              label: Text(
+                                'Refresh',
+                                style: TextStyle(
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                             ),
-                          )
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: comments.length,
-                            itemBuilder: (context, index) {
-                              final comment = comments[index];
-                              return CommentCard(
-                                username: comment['username'],
-                                content: comment['text'],
-                                timeAgo: comment['timeAgo'] ?? 'just now',
-                                upvotes: comment['upvotes'] ?? 0,
-                                downvotes: comment['downvotes'] ?? 0,
-                                onUpvote: () => upvoteComment(index),
-                                onDownvote: () => downvoteComment(index),
-                                onReply: () {
-                                  // Reply functionality
-                                },
-                              );
-                            },
+                          ],
+                        ),
+                      ),
+                      if (_isLoading)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: CircularProgressIndicator(
+                              color: colorScheme.primary,
+                            ),
                           ),
-                    const SizedBox(height: 16),
-                  ],
+                        )
+                      else if (comments.isEmpty)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24.0),
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primaryContainer.withOpacity(0.2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.comment_outlined,
+                                    size: 40,
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No comments yet',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Be the first to comment on this post',
+                                  style: TextStyle(
+                                    color: colorScheme.onSurfaceVariant,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                OutlinedButton.icon(
+                                  onPressed: () {
+                                    FocusScope.of(context).requestFocus(FocusNode());
+                                  },
+                                  icon: Icon(
+                                    Icons.add_comment,
+                                    size: 18,
+                                    color: colorScheme.primary,
+                                  ),
+                                  label: Text(
+                                    'Add Comment',
+                                    style: TextStyle(
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: colorScheme.primary,
+                                    side: BorderSide(color: colorScheme.primary),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: comments.length,
+                          itemBuilder: (context, index) {
+                            final comment = comments[index];
+                            return CommentCard(
+                              username: comment.getUsernameDisplay(),
+                              content: comment.text,
+                              timeAgo: comment.getFormattedDate(),
+                              upvotes: comment.upvotes,
+                              downvotes: comment.downvotes,
+                              onUpvote: () => upvoteComment(comment),
+                              onDownvote: () => downvoteComment(comment),
+                              onReply: () {
+                                // Reply functionality
+                              },
+                            );
+                          },
+                        ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
             ),
