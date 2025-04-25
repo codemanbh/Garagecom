@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -47,47 +48,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
     return dio;
   }
-  static FormData mapToFormData(Map<String, dynamic> data) {
-  final formData = FormData();
 
-  data.forEach((key, value) {
-    if (value is File) {
-      // single file
-      formData.files.add(MapEntry(
-        key,
-        MultipartFile.fromFileSync(
-          value.path,
-          filename: value.path.split(Platform.pathSeparator).last,
-        ),
-      ));
 
-    } else if (value is List<File>) {
-      // multiple files under same key
-      for (final file in value) {
-        formData.files.add(MapEntry(
-          key,
-          MultipartFile.fromFileSync(
-            file.path,
-            filename: file.path.split(Platform.pathSeparator).last,
-          ),
-        ));
-      }
-
-    } else if (value is List) {
-      // list of primitives (int, String, etc.)
-      for (final element in value) {
-        formData.fields.add(MapEntry(key, element.toString()));
-      }
-
-    } else if (value != null) {
-      // single primitive or stringifiable object
-      formData.fields.add(MapEntry(key, value.toString()));
-    }
-    // if value is null → skip
-  });
-
-  return formData;
-}
 
   static Future<Map<String, dynamic>> get(
       String path, Map<String, dynamic> data) async {
@@ -109,6 +71,38 @@ import 'package:shared_preferences/shared_preferences.dart';
     }
   }
 
+  static Future<Image> _image(String imageName, String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = await prefs.getString('token');
+    String fullImageUrl =  '$mainDomain$path/?filename=$imageName';
+    print(fullImageUrl);
+    Map<String, String> headers = {};
+    if(token != null) {
+      headers = {
+        "Authorization": token
+      };
+    }
+    return Image.network(fullImageUrl, headers: headers,);
+  }
+
+  static FutureBuilder<Image> image(String imageName, String path){
+
+    return FutureBuilder<Image>(
+    future: ApiHelper._image(imageName, path),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return const Icon(Icons.error);
+        } else if (snapshot.hasData) {
+          return snapshot.data!;
+        } else {
+          return const SizedBox(); // fallback
+        }
+      },
+    );
+  } 
+
   static Future<Map<String, dynamic>> post(
       String path, Map<String, dynamic> data) async {
     try {
@@ -119,7 +113,7 @@ import 'package:shared_preferences/shared_preferences.dart';
       // Try using data in body instead of queryParameters
       final response = await client.post(
         path,
-        data: mapToFormData(data), // Use data for POST body
+        data: data, // Use data for POST body
       );
 
       _handleResponse(response);
@@ -163,5 +157,26 @@ import 'package:shared_preferences/shared_preferences.dart';
         'message': 'Unable to connect to the internet: $e'
       };
     }
+  }
+
+  static Future<Map<String,dynamic>> uploadImage(File image, String path) async{
+  
+    Dio client = await Client();
+    client.options.headers['Content-Type'] = 'multipart/form-data';
+    FormData formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(image.path, contentType: DioMediaType.parse("image/jpg"),filename: image.path.split('/').last),
+    });
+    try {
+      final response = await client.post(
+        path,
+        data: formData,
+      );
+     
+      return response.data;
+    } catch (e) {
+      print('Image upload error: $e');
+      return {'error': e.toString()};
+    }
+
   }
 }

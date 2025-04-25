@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:garagecom/helpers/apiHelper.dart';
 import '../models/Api.dart';
 import '../data/symbols.dart';
 
@@ -54,11 +57,9 @@ class _TestPageState extends State<TestPage> {
                     Text(symbols[index]['recommended_fix'], style: stl()),
                   ],
                 ),
-                leading: Image.network(
-                  'https://wasamotor.com/main/wp-content/uploads/2020/01/oil_lamp.png',
-                  width: 40,
-                  height: 40,
-                ),
+                leading:ApiHelper.image('Battery.jpg', 'api/Posts/GetAttachmentTest')
+                
+             
               );
             }));
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../components/CustomNavBar.dart';
@@ -56,9 +57,33 @@ class _CameraPageState extends State<CameraPage> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Post submitted successfully!')),
-    );
+    ApiHelper.uploadImage(_image!, '/api/Dashboard/GetDashboardSigns').then((response) {
+      if (response['status'] == 'success') {
+        setState(() {
+          problems = response['problems'];
+          _isProcessing = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image submitted successfully!')),
+        );
+      } else {
+        setState(() {
+          _isProcessing = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to submit image.')),
+        );
+      }
+    }).catchError((error) {
+      setState(() {
+        _isProcessing = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error submitting image: $error')),
+      );
+    });
+
+
   }
 
   @override
