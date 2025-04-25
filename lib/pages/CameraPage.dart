@@ -14,7 +14,7 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
   File? _image;
   bool _isProcessing = false;
-  String problems = '';
+  List<dynamic> problems = [];
 
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
@@ -32,7 +32,6 @@ class _CameraPageState extends State<CameraPage> {
         setState(() {
           _image = File(pickedFile.path);
           _isProcessing = false;
-          problems = 'Engine Light, Low Tire Pressure';
         });
       } else {
         setState(() {
@@ -58,9 +57,11 @@ class _CameraPageState extends State<CameraPage> {
     }
 
     ApiHelper.uploadImage(_image!, '/api/Dashboard/GetDashboardSigns').then((response) {
-      if (response['status'] == 'success') {
+      if (response['succeeded'] == true) {
         setState(() {
-          problems = response['problems'];
+          print(response);
+          print(response["parameters"]['defects']);
+          problems = List.from(response["parameters"]['defects']); 
           _isProcessing = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -303,7 +304,6 @@ class _CameraPageState extends State<CameraPage> {
 
   Widget _buildResultsCard(ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    final issuesList = problems.split(',');
 
     return Card(
       elevation: 4,
@@ -328,7 +328,7 @@ class _CameraPageState extends State<CameraPage> {
               height: 24,
               color: colorScheme.onSurfaceVariant.withOpacity(0.3),
             ),
-            ...issuesList.map((issue) => _buildIssueItem(issue.trim(), theme)),
+            ...problems.map((issue) => _buildIssueItem(issue["title"].toString().trim(), theme)),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
