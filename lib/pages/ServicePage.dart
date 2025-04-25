@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../components/CustomNavBar.dart';
 import '../models/CarPart.dart';
-import '../models/ServiceParts.dart';
 import 'PartDetailsPage.dart';
+import '../helpers/apiHelper.dart';
+import 'package:intl/intl.dart';
 
 class ServicePage extends StatefulWidget {
   const ServicePage({super.key});
@@ -12,58 +13,153 @@ class ServicePage extends StatefulWidget {
 }
 
 class _ServicePageState extends State<ServicePage> {
-  final ServiceParts serviceParts = ServiceParts();
+  bool isLoading = true;
+  List<dynamic> userCars = [];
   int currentCarIndex = 0;
 
-  final List<Map<String, dynamic>> userCars = [
-    {
-      'id': 0,
-      'name': 'Toyota Camry',
-      'year': '2019',
-      'icon': Icons.directions_car,
-      'color': Colors.blue,
-    },
-    {
-      'id': 1,
-      'name': 'HAccord',
-      'year': '2020',
-      'icon': Icons.time_to_leave,
-      'color': Colors.red,
-    },
-    {
-      'id': 2,
-      'name': 'Tesla Model 3',
-      'year': '2022',
-      'icon': Icons.electric_car,
-      'color': Colors.green,
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchUserCarsWithParts();
+  }
+
+  Future<void> fetchUserCarsWithParts() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiHelper.get('api/Cars/GetUserCars', {});
+      
+      if (response['succeeded'] == true && response['parameters'] != null) {
+        setState(() {
+          userCars = response['parameters']['UserCars'];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        // Show error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to load cars data')),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
 
   void goToAddPartPage() {
-    final currentCarId = userCars[currentCarIndex]['id'];
+    if (userCars.isEmpty) return;
+    
+    final currentCarId = userCars[currentCarIndex]['userCarID'];
     Navigator.of(context).pushNamed(
       '/AddPartPage',
       arguments: currentCarId,
-    );
+    ).then((_) {
+      // Refresh data when coming back
+      fetchUserCarsWithParts();
+    });
   }
 
-  void goToPartDetailsPage(CarPart part) {
+  void goToPartDetailsPage(dynamic part) {
+    final carPart = CarPart(
+      partName: part['part']['partName'],
+      lastReplacedDate: DateFormat('MMM dd, yyyy').format(DateTime.parse(part['createdIn'])),
+      nextReplacedDate: DateFormat('MMM dd, yyyy').format(DateTime.parse(part['nextDueDate'])),
+      replacementInterval: '${part['lifeTimeInterval']} Months',
+      lifespanProgress: calculateLifespanProgress(part['createdIn'], part['nextDueDate']),
+      carId: userCars[currentCarIndex]['userCarID'],
+    );
+    
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => PartDetailsPage(part: part),
+        builder: (context) => PartDetailsPage(part: carPart),
       ),
-    );
+    ).then((_) {
+      // Refresh data when coming back
+      fetchUserCarsWithParts();
+    });
+  }
+
+  double calculateLifespanProgress(String createdIn, String nextDueDate) {
+    final now = DateTime.now();
+    final start = DateTime.parse(createdIn);
+    final end = DateTime.parse(nextDueDate);
+    
+    final totalDuration = end.difference(start).inDays;
+    final elapsedDuration = now.difference(start).inDays;
+    
+    if (totalDuration <= 0) return 0.0;
+    
+    final progress = 1.0 - (elapsedDuration / totalDuration);
+    return progress.clamp(0.0, 1.0);
+  }
+
+  Color getProgressColor(double progress) {
+    if (progress > 0.75) return Colors.green;
+    if (progress > 0.5) return Colors.orange;
+    return Colors.red;
+  }
+
+  IconData getPartIcon(String partName) {
+    final lowerName = partName.toLowerCase();
+    if (lowerName.contains('oil')) return Icons.opacity;
+    if (lowerName.contains('filter')) return Icons.filter_alt;
+    if (lowerName.contains('brake')) return Icons.warning;
+    if (lowerName.contains('tire') || lowerName.contains('wheel')) return Icons.tire_repair;
+    if (lowerName.contains('battery')) return Icons.battery_full;
+    if (lowerName.contains('light') || lowerName.contains('bulb')) return Icons.lightbulb;
+    return Icons.build;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final currentCarId = userCars[currentCarIndex]['id'];
 
-    final List<CarPart> carParts = serviceParts.parts
-        .where((part) => part.carId == currentCarId)
-        .toList();
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Service')),
+        body: const Center(child: CircularProgressIndicator()),
+        bottomNavigationBar: const CustomNavBar(),
+      );
+    }
+
+    if (userCars.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Service')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.directions_car_outlined,
+                size: 64,
+                color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No cars found',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: const CustomNavBar(),
+      );
+    }
+
+    final currentCar = userCars[currentCarIndex];
+    final carParts = currentCar['parts'] ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -104,6 +200,10 @@ class _ServicePageState extends State<ServicePage> {
                 },
                 itemBuilder: (context, index) {
                   final car = userCars[index];
+                  final brand = car['carModel']['brand']['brandName'];
+                  final model = car['carModel']['modelName'];
+                  final year = car['year'].toString();
+                  
                   return Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: Column(
@@ -121,21 +221,25 @@ class _ServicePageState extends State<ServicePage> {
                               'assets/Made with insMind-car-icon-3657902_1280.png',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
-                                return Container();
+                                return Icon(
+                                  Icons.directions_car,
+                                  size: 64,
+                                  color: colorScheme.primary,
+                                );
                               },
                             ),
                           ),
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          car['name'] ?? 'Unknown Car',
+                          '$brand $model',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
-                          car['year'] ?? 'Unknown Year',
+                          year,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -223,6 +327,11 @@ class _ServicePageState extends State<ServicePage> {
                       itemCount: carParts.length,
                       itemBuilder: (context, index) {
                         final part = carParts[index];
+                        final partName = part['part']['partName'];
+                        final createdDate = DateTime.parse(part['createdIn']);
+                        final nextDueDate = DateTime.parse(part['nextDueDate']);
+                        final progress = calculateLifespanProgress(part['createdIn'], part['nextDueDate']);
+                        
                         return GestureDetector(
                           onTap: () => goToPartDetailsPage(part),
                           child: Card(
@@ -242,12 +351,12 @@ class _ServicePageState extends State<ServicePage> {
                                   Row(
                                     children: [
                                       Icon(
-                                        _getPartIcon(part.partName ?? ''),
+                                        getPartIcon(partName),
                                         color: colorScheme.primary,
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        part.partName ?? '',
+                                        partName,
                                         style: theme.textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -258,7 +367,7 @@ class _ServicePageState extends State<ServicePage> {
                                   _buildInfoRow(
                                     Icons.calendar_today,
                                     'Last Replaced:',
-                                    part.lastReplacedDate ?? 'N/A',
+                                    DateFormat('MMM dd, yyyy').format(createdDate),
                                     Colors.blue,
                                     theme,
                                   ),
@@ -266,7 +375,7 @@ class _ServicePageState extends State<ServicePage> {
                                   _buildInfoRow(
                                     Icons.calendar_month,
                                     'Next Replacement:',
-                                    part.nextReplacedDate ?? 'N/A',
+                                    DateFormat('MMM dd, yyyy').format(nextDueDate),
                                     Colors.red,
                                     theme,
                                   ),
@@ -274,7 +383,7 @@ class _ServicePageState extends State<ServicePage> {
                                   _buildInfoRow(
                                     Icons.schedule,
                                     'Interval:',
-                                    part.replacementInterval ?? 'N/A',
+                                    '${part['lifeTimeInterval']} Months',
                                     Colors.orange,
                                     theme,
                                   ),
@@ -297,11 +406,11 @@ class _ServicePageState extends State<ServicePage> {
                                               vertical: 4,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: _getProgressColor(part.lifespanProgress),
+                                              color: getProgressColor(progress),
                                               borderRadius: BorderRadius.circular(12),
                                             ),
                                             child: Text(
-                                              '${(part.lifespanProgress! * 100).toStringAsFixed(0)}%',
+                                              '${(progress * 100).toStringAsFixed(0)}%',
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
@@ -315,9 +424,9 @@ class _ServicePageState extends State<ServicePage> {
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(4),
                                         child: LinearProgressIndicator(
-                                          value: part.lifespanProgress,
+                                          value: progress,
                                           backgroundColor: Colors.grey[200],
-                                          color: _getProgressColor(part.lifespanProgress),
+                                          color: getProgressColor(progress),
                                           minHeight: 8,
                                         ),
                                       ),
@@ -368,23 +477,5 @@ class _ServicePageState extends State<ServicePage> {
         ),
       ],
     );
-  }
-
-  Color _getProgressColor(double? progress) {
-    if (progress == null) return Colors.grey;
-    if (progress > 0.75) return Colors.green;
-    if (progress > 0.5) return Colors.orange;
-    return Colors.red;
-  }
-
-  IconData _getPartIcon(String partName) {
-    final lowerName = partName.toLowerCase();
-    if (lowerName.contains('oil')) return Icons.opacity;
-    if (lowerName.contains('filter')) return Icons.filter_alt;
-    if (lowerName.contains('brake')) return Icons.warning;
-    if (lowerName.contains('tire') || lowerName.contains('wheel')) return Icons.tire_repair;
-    if (lowerName.contains('battery')) return Icons.battery_full;
-    if (lowerName.contains('light') || lowerName.contains('bulb')) return Icons.lightbulb;
-    return Icons.build;
   }
 }

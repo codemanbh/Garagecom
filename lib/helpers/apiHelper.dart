@@ -14,7 +14,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
     final dio = Dio(BaseOptions(
       baseUrl: mainDomain,
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'}, // Changed to JSON
+       headers: {'Content-Type': 'application/x-www-form-urlencoded'}, // Changed to JSON
+      // headers: {'Content-Type': 'multipart/form-data'}, // Changed to JSON
+
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
       // Don't throw on error status codes - let us handle them
@@ -45,6 +47,47 @@ import 'package:shared_preferences/shared_preferences.dart';
 
     return dio;
   }
+  static FormData mapToFormData(Map<String, dynamic> data) {
+  final formData = FormData();
+
+  data.forEach((key, value) {
+    if (value is File) {
+      // single file
+      formData.files.add(MapEntry(
+        key,
+        MultipartFile.fromFileSync(
+          value.path,
+          filename: value.path.split(Platform.pathSeparator).last,
+        ),
+      ));
+
+    } else if (value is List<File>) {
+      // multiple files under same key
+      for (final file in value) {
+        formData.files.add(MapEntry(
+          key,
+          MultipartFile.fromFileSync(
+            file.path,
+            filename: file.path.split(Platform.pathSeparator).last,
+          ),
+        ));
+      }
+
+    } else if (value is List) {
+      // list of primitives (int, String, etc.)
+      for (final element in value) {
+        formData.fields.add(MapEntry(key, element.toString()));
+      }
+
+    } else if (value != null) {
+      // single primitive or stringifiable object
+      formData.fields.add(MapEntry(key, value.toString()));
+    }
+    // if value is null → skip
+  });
+
+  return formData;
+}
 
   static Future<Map<String, dynamic>> get(
       String path, Map<String, dynamic> data) async {
@@ -76,7 +119,7 @@ import 'package:shared_preferences/shared_preferences.dart';
       // Try using data in body instead of queryParameters
       final response = await client.post(
         path,
-        data: data, // Use data for POST body
+        data: mapToFormData(data), // Use data for POST body
       );
 
       _handleResponse(response);

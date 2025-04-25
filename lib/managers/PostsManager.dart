@@ -34,6 +34,7 @@ class PostsManager {
       );
       
       print('API Response received');
+      print(response);
       
       // Check if the API call was successful
       if (response.containsKey('succeeded') && response['succeeded'] == true) {

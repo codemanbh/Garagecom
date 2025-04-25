@@ -1,7 +1,7 @@
 class Category {
-  late int id;
-  late String title;
+  final int id;
+  final String title;
   String? description;
 
-  Category({required id, required this.title, this.description});
+  Category({required this.id, required this.title, this.description});
 }
