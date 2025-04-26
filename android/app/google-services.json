@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "14169052617",
+    "project_id": "garagecom-3dc95",
+    "storage_bucket": "garagecom-3dc95.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14169052617:android:b08a36fa9d4d4509b34418",
+        "android_client_info": {
+          "package_name": "com.example.garagecom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSoma8Pwtc4WNeMZXLF_Ixc6l-VybwBnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

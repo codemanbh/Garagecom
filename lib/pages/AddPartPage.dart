@@ -13,8 +13,10 @@ class _AddPartPageState extends State<AddPartPage> {
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController partNameController = TextEditingController();
-  TextEditingController partReplacedDistanceController = TextEditingController();
-  TextEditingController partLifetimeDistanceController = TextEditingController();
+  TextEditingController partReplacedDistanceController =
+      TextEditingController();
+  TextEditingController partLifetimeDistanceController =
+      TextEditingController();
   TextEditingController partLifetimeTimeController = TextEditingController();
   TextEditingController intervalValueController = TextEditingController();
 
@@ -59,13 +61,20 @@ class _AddPartPageState extends State<AddPartPage> {
     'Other (Custom)'
   ];
 
-  final List<String> intervalUnits = ['Days', 'Weeks', 'Months', 'Years', 'Kilometers'];
+  final List<String> intervalUnits = [
+    'Days',
+    'Weeks',
+    'Months',
+    'Years',
+    'Kilometers'
+  ];
 
   @override
   void initState() {
     super.initState();
     replacementDate = DateTime.now(); // Default to today
-    nextServiceDate = DateTime.now().add(const Duration(days: 180)); // Default to 6 months from now
+    nextServiceDate = DateTime.now()
+        .add(const Duration(days: 180)); // Default to 6 months from now
     selectedIntervalUnit = 'Months';
     selectedIntervalValue = '3'; // Default to 3 months
     intervalValueController.text = selectedIntervalValue!;
@@ -101,7 +110,8 @@ class _AddPartPageState extends State<AddPartPage> {
   Future<void> _selectNextServiceDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: nextServiceDate ?? DateTime.now().add(const Duration(days: 180)),
+      initialDate:
+          nextServiceDate ?? DateTime.now().add(const Duration(days: 180)),
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
       builder: (context, child) {
@@ -133,9 +143,11 @@ class _AddPartPageState extends State<AddPartPage> {
     if (lowerName.contains('oil')) return Icons.opacity;
     if (lowerName.contains('filter')) return Icons.filter_alt;
     if (lowerName.contains('brake')) return Icons.warning;
-    if (lowerName.contains('tire') || lowerName.contains('wheel')) return Icons.tire_repair;
+    if (lowerName.contains('tire') || lowerName.contains('wheel'))
+      return Icons.tire_repair;
     if (lowerName.contains('battery')) return Icons.battery_full;
-    if (lowerName.contains('light') || lowerName.contains('bulb')) return Icons.lightbulb;
+    if (lowerName.contains('light') || lowerName.contains('bulb'))
+      return Icons.lightbulb;
     if (lowerName.contains('spark')) return Icons.electric_bolt;
     if (lowerName.contains('coolant')) return Icons.thermostat;
     if (lowerName.contains('wiper')) return Icons.swipe;
@@ -156,10 +168,11 @@ class _AddPartPageState extends State<AddPartPage> {
   void handleSave() {
     if (_formKey.currentState!.validate()) {
       // Format the interval with the selected value and unit
-      final String formattedInterval = selectedIntervalValue != null && selectedIntervalUnit != null
-          ? '$selectedIntervalValue $selectedIntervalUnit'
-          : '';
-          
+      final String formattedInterval =
+          selectedIntervalValue != null && selectedIntervalUnit != null
+              ? '$selectedIntervalValue $selectedIntervalUnit'
+              : '';
+
       // Pass the data back to the previous screen
       // You can create a CarPart object here with all the collected data
       // For example:
@@ -174,7 +187,7 @@ class _AddPartPageState extends State<AddPartPage> {
       );
       Navigator.of(context).pop(part);
       */
-      
+
       Navigator.of(context).pop();
     }
   }
@@ -298,19 +311,22 @@ class _AddPartPageState extends State<AddPartPage> {
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
-                          prefixIcon: Icon(
-                            _getPartIcon(selectedPartType),
-                            color: colorScheme.primary,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          // prefixIcon: Icon(
+                          //   _getPartIcon(selectedPartType),
+                          //   color: colorScheme.primary,
+                          // ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
                         ),
-                        icon: Icon(Icons.arrow_drop_down, color: colorScheme.primary),
+                        icon: Icon(Icons.arrow_drop_down,
+                            color: colorScheme.primary),
                         items: commonParts.map((String part) {
                           return DropdownMenuItem<String>(
                             value: part,
                             child: Row(
                               children: [
-                                Icon(_getPartIcon(part), size: 20, color: colorScheme.primary),
+                                Icon(_getPartIcon(part),
+                                    size: 20, color: colorScheme.primary),
                                 const SizedBox(width: 12),
                                 Text(part),
                               ],
@@ -365,8 +381,10 @@ class _AddPartPageState extends State<AddPartPage> {
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.build, color: colorScheme.primary),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            prefixIcon:
+                                Icon(Icons.build, color: colorScheme.primary),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 16),
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
@@ -416,7 +434,8 @@ class _AddPartPageState extends State<AddPartPage> {
                         ),
                         subtitle: Text(
                           replacementDate != null
-                              ? DateFormat('MMM dd, yyyy').format(replacementDate!)
+                              ? DateFormat('MMM dd, yyyy')
+                                  .format(replacementDate!)
                               : 'Select Date',
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
@@ -439,44 +458,44 @@ class _AddPartPageState extends State<AddPartPage> {
                     ),
 
                     // Mileage at replacement
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TextFormField(
-                        controller: partReplacedDistanceController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        decoration: InputDecoration(
-                          labelText: 'Mileage at Replacement (km)',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: Icon(Icons.speed, color: colorScheme.primary),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Please enter the replacement mileage';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
+                    // Container(
+                    //   margin: const EdgeInsets.only(bottom: 16),
+                    //   decoration: BoxDecoration(
+                    //     color: colorScheme.surface,
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     border: Border.all(
+                    //       color: colorScheme.primary.withOpacity(0.2),
+                    //       width: 1,
+                    //     ),
+                    //     boxShadow: [
+                    //       BoxShadow(
+                    //         color: colorScheme.primary.withOpacity(0.1),
+                    //         blurRadius: 4,
+                    //         offset: const Offset(0, 2),
+                    //       ),
+                    //     ],
+                    //   ),
+                    //   child: TextFormField(
+                    //     controller: partReplacedDistanceController,
+                    //     keyboardType: TextInputType.number,
+                    //     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    //     decoration: InputDecoration(
+                    //       labelText: 'Mileage at Replacement (km)',
+                    //       border: OutlineInputBorder(
+                    //         borderRadius: BorderRadius.circular(12),
+                    //         borderSide: BorderSide.none,
+                    //       ),
+                    //       prefixIcon: Icon(Icons.speed, color: colorScheme.primary),
+                    //       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    //     ),
+                    //     validator: (value) {
+                    //       if (value == null || value.trim().isEmpty) {
+                    //         return 'Please enter the replacement mileage';
+                    //       }
+                    //       return null;
+                    //     },
+                    //   ),
+                    // ),
 
                     // Service schedule section
                     const SizedBox(height: 24),
@@ -518,7 +537,8 @@ class _AddPartPageState extends State<AddPartPage> {
                         ),
                         subtitle: Text(
                           nextServiceDate != null
-                              ? DateFormat('MMM dd, yyyy').format(nextServiceDate!)
+                              ? DateFormat('MMM dd, yyyy')
+                                  .format(nextServiceDate!)
                               : 'Select Date',
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
@@ -553,7 +573,8 @@ class _AddPartPageState extends State<AddPartPage> {
                     const SizedBox(height: 16),
                     Container(
                       margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
@@ -591,19 +612,25 @@ class _AddPartPageState extends State<AddPartPage> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    prefixIcon: Icon(Icons.sync, color: colorScheme.primary),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                    prefixIcon: Icon(Icons.sync,
+                                        color: colorScheme.primary),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 16),
                                   ),
-                                  items: presetIntervalValues[selectedIntervalUnit]?.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList() ?? [],
+                                  items:
+                                      presetIntervalValues[selectedIntervalUnit]
+                                              ?.map((String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value),
+                                            );
+                                          }).toList() ??
+                                          [],
                                   onChanged: (String? newValue) {
                                     setState(() {
                                       selectedIntervalValue = newValue;
-                                      intervalValueController.text = newValue ?? '';
+                                      intervalValueController.text =
+                                          newValue ?? '';
                                     });
                                   },
                                   validator: (value) {
@@ -624,7 +651,8 @@ class _AddPartPageState extends State<AddPartPage> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 16),
                                   ),
                                   items: intervalUnits.map((String unit) {
                                     return DropdownMenuItem<String>(
@@ -650,7 +678,8 @@ class _AddPartPageState extends State<AddPartPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colorScheme.primary,
                           foregroundColor: colorScheme.onPrimary,
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 16),
                           elevation: 4,
                           shadowColor: colorScheme.primary.withOpacity(0.5),
                           shape: RoundedRectangleBorder(
@@ -670,4 +699,3 @@ class _AddPartPageState extends State<AddPartPage> {
     );
   }
 }
-

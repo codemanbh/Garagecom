@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
 import 'dart:convert';
+import '../helpers/notificationHelper.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -177,10 +178,15 @@ class _LoginPageState extends State<LoginPage> {
               ElevatedButton(
                 onPressed: () async {
                   print('login button pressed');
+                  String deviceToken = await notificationHelper.getNotiToken();
+
                   Map<String, dynamic> data = {
                     'userName': usernameController.text,
                     'password': passwordController.text,
+                    'deviceToken': deviceToken
                   };
+
+                  print("***********************" + data.toString());
 
                   Map<String, dynamic> response =
                       await ApiHelper.post("api/Registration/login", data);

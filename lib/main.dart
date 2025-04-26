@@ -6,6 +6,11 @@ import './theme/flutter_midnight_neon_theme.dart';
 // packages
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+// firebase
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'firebase_options.dart';
+
 // providers
 import 'package:garagecom/providers/NavProvider.dart';
 import 'package:garagecom/providers/SettingsProvider.dart';
@@ -22,9 +27,29 @@ import './pages/TestPage.dart';
 import './pages/CameraPage.dart';
 import './pages/AddPartPage.dart';
 
-void main() async {
-  await dotenv.load(fileName: 'assets/.env'); // loud the env variables
+// Background handler
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   await dotenv.load(fileName: 'assets/.env'); // loud the env variables
 
+//   await Firebase.initializeApp(
+//     options: FirebaseOptions(
+//       apiKey: dotenv.env['apiKey'] ?? '',
+//       appId: dotenv.env['appId'] ?? '',
+//       messagingSenderId: dotenv.env['messagingSenderId'] ?? '',
+//       projectId: dotenv.env['projectId'] ?? '',
+//       storageBucket: dotenv.env['storageBucket'] ?? '',
+//     ),
+//   );
+//   print('Background message: ${message.messageId}');
+// }
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: 'assets/.env'); // loud the env variables
+  print(dotenv.env);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // list of providers
   runApp(MultiProvider(
     providers: [
@@ -62,7 +87,6 @@ class MyApp extends StatelessWidget {
           '/aiPage': (context) => CameraPage(),
           '/AddPartPage': (context) => const AddPartPage(),
           '/AccountSettingsPage': (context) => const AccountSettingsPage(),
-          
         });
   }
 }
