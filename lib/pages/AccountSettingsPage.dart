@@ -20,6 +20,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   Map<String, dynamic>? userData;
   List<dynamic> userCars = [];
 
+  // Add these variables to hold API data for brands and models
+  List<dynamic> carBrands = [];
+  List<dynamic> carModels = [];
+  bool isBrandsLoading = false;
+  bool isModelsLoading = false;
+
   // Currently selected car for editing
   Map<String, dynamic>? currentEditingCar;
 
@@ -58,6 +64,9 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
     // Load user data
     loadUserData();
+
+    // Load car brands from API
+    loadBrands();
   }
 
   @override
@@ -123,7 +132,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         'userID': userData!['userID'],
         'userName': usernameController.text,
         'firstName': firstNameController.text,
-        'lastName': lastNameController.text,
+        'lastName': firstNameController.text,
         'email': emailController.text,
         'phoneNumber': phoneController.text,
       };
@@ -178,6 +187,9 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       selectedYear = DateTime.now().year;
       carNameController.text = '';
       mileageController.text = '0';
+
+      // Clear models list since no brand is selected
+      carModels = [];
     });
   }
 
@@ -193,6 +205,9 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       selectedYear = car['year'];
       carNameController.text = car['nickname'] ?? '';
       mileageController.text = car['kilos']?.toString() ?? '0';
+
+      // Load models for this brand
+      loadModels(selectedBrandId!);
     });
   }
 
@@ -228,9 +243,12 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
       // Print the whole car object for debugging
       print('Saving car: $currentEditingCar');
 
+      // Save whether this is an add or update operation before clearing the car
+      final bool isNewCar = currentEditingCar!['carID'] == 0;
+
       Map<String, dynamic> response;
 
-      if (currentEditingCar!['carID'] == 0) {
+      if (isNewCar) {
         // This is a new car
         response = await UserService.addCar(currentEditingCar!);
       } else {
@@ -249,8 +267,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              'Car successfully ${currentEditingCar!['carID'] == 0 ? 'added' : 'updated'}'),
+          content: Text('Car successfully ${isNewCar ? 'added' : 'updated'}'),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
@@ -477,10 +494,49 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 
   Future<void> loadBrands() async {
+    setState(() {
+      isBrandsLoading = true;
+      carBrands = []; // Clear existing brands
+    });
+
     try {
       final response = await UserService.getCarBrands();
-      // Handle the brands data as needed
+
+      if (response['succeeded'] == true &&
+          response['parameters'] != null &&
+          response['parameters']['Brands'] != null) {
+        final brands = response['parameters']['Brands'];
+        print('Raw brands data: $brands');
+
+        setState(() {
+          carBrands = brands;
+          isBrandsLoading = false;
+        });
+
+        print('Loaded ${carBrands.length} brands');
+
+        // Print each brand for debugging
+        for (var brand in carBrands) {
+          print('Brand ID: ${brand['brandID']}, Brand Name: ${brand['brandName']}');
+        }
+      } else {
+        setState(() {
+          isBrandsLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load car brands'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     } catch (e) {
+      setState(() {
+        isBrandsLoading = false;
+      });
+
+      print('Error loading brands: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error loading brands: ${e.toString()}'),
@@ -491,10 +547,51 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 
   Future<void> loadModels(int brandId) async {
+    setState(() {
+      isModelsLoading = true;
+      carModels = []; // Clear existing models
+      selectedModelId = null;
+      selectedModelName = null;
+    });
+
     try {
       final response = await UserService.getCarModels(brandId);
-      // Handle the models data as needed
+
+      if (response['succeeded'] == true &&
+          response['parameters'] != null &&
+          response['parameters']['Models'] != null) {
+        final models = response['parameters']['Models'];
+        print('Raw models data: $models');
+
+        setState(() {
+          carModels = models;
+          isModelsLoading = false;
+        });
+
+        print('Loaded ${carModels.length} models for brand ID $brandId');
+
+        // Print each model for debugging
+        for (var model in carModels) {
+          print('Model ID: ${model['carModelID']}, Model Name: ${model['modelName']}');
+        }
+      } else {
+        setState(() {
+          isModelsLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load car models'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     } catch (e) {
+      setState(() {
+        isModelsLoading = false;
+      });
+
+      print('Error loading models: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error loading models: ${e.toString()}'),
@@ -1065,9 +1162,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    // For simplicity, we're using the CarInfo manager in this example
-    // In a real app, you would fetch brands and models from API
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1091,54 +1185,74 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           ),
           const SizedBox(height: 16),
 
-          // Car brand selection
-          buildDropdown<String>(
-            label: 'Car Brand',
-            icon: Icons.directions_car,
-            value: selectedBrandName,
-            items: carInfo.carBrands,
-            onChanged: (newValue) {
-              setState(() {
-                selectedBrandName = newValue;
-                selectedBrandId =
-                    carInfo.carBrands.indexOf(newValue!) + 1; // Mock ID
-                selectedModelName = null;
-                selectedModelId = null;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please select a car brand';
-              }
-              return null;
-            },
-            itemDisplayName: (item) => item,
-          ),
+          // Car brand selection - using API data
+          isBrandsLoading 
+            ? const Center(child: CircularProgressIndicator())
+            : buildDropdown<Map<String, dynamic>>(
+                label: 'Car Brand',
+                icon: Icons.directions_car,
+                value: selectedBrandId != null && carBrands.isNotEmpty 
+                  ? carBrands.cast<Map<String, dynamic>>().firstWhere(
+                      (brand) => brand['brandID'] == selectedBrandId,
+                      orElse: () => <String, dynamic>{},
+                    )
+                  : null,
+                items: carBrands.cast<Map<String, dynamic>>(),
+                onChanged: (newValue) {
+                  if (newValue != null) {
+                    print('Selected brand: $newValue');
+                    setState(() {
+                      selectedBrandId = newValue['brandID'];
+                      selectedBrandName = newValue['brandName'];
+                      selectedModelId = null;
+                      selectedModelName = null;
+                      
+                      // Load models for this brand
+                      loadModels(selectedBrandId!);
+                    });
+                  }
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select a car brand';
+                  }
+                  return null;
+                },
+                itemDisplayName: (item) => item['brandName'] ?? 'Unknown Brand',
+              ),
 
-          // Car model selection
-          if (selectedBrandName != null)
-            buildDropdown<String>(
+          // Car model selection - using API data
+          buildDropdown<Map<String, dynamic>>(
               label: 'Car Model',
               icon: Icons.model_training,
-              value: selectedModelName,
-              items: carInfo.getModelsForBrand(selectedBrandName!),
-              onChanged: (newValue) {
-                setState(() {
-                  selectedModelName = newValue;
-                  selectedModelId = carInfo
-                          .getModelsForBrand(selectedBrandName!)
-                          .indexOf(newValue!) +
-                      1; // Mock ID
-                });
-              },
+              value: selectedModelId != null && carModels.isNotEmpty 
+                ? carModels.cast<Map<String, dynamic>>().firstWhere(
+                    (model) => model['carModelID'] == selectedModelId,
+                    orElse: () => <String, dynamic>{},
+                  )
+                : null,
+              items: carModels.cast<Map<String, dynamic>>(),
+              onChanged: selectedBrandId == null || isModelsLoading 
+                ? null  // Disable dropdown if no brand selected or models are loading
+                : (newValue) {
+                    if (newValue != null) {
+                      print('Selected model: $newValue');
+                      setState(() {
+                        selectedModelId = newValue['carModelID'];
+                        selectedModelName = newValue['modelName'];
+                      });
+                    }
+                  },
               validator: (value) {
-                if (value == null || value.isEmpty) {
+                if (selectedBrandId != null && value == null) {
                   return 'Please select a car model';
                 }
                 return null;
               },
-              itemDisplayName: (item) => item,
-            ),
+              itemDisplayName: (item) => item['modelName'] ?? 'Unknown Model',
+              isEnabled: selectedBrandId != null && !isModelsLoading,
+              isLoading: isModelsLoading,
+          ),
 
           // Car year selection
           buildDropdown<int>(
@@ -1155,6 +1269,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               return null;
             },
             itemDisplayName: (item) => item.toString(),
+            isEnabled: true,
+            isLoading: false,
           ),
 
           // Car nickname
@@ -1191,12 +1307,19 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               ),
               const SizedBox(width: 8),
               ElevatedButton(
-                onPressed: saveCarChanges,
+                onPressed: selectedBrandId != null &&
+                        selectedModelId != null &&
+                        selectedYear != null
+                    ? saveCarChanges
+                    : null, // Disable button if required fields are not filled
                 child: Text(
                     currentEditingCar!['carID'] == 0 ? 'Add Car' : 'Save Car'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
+                  disabledBackgroundColor: colorScheme.surfaceVariant,
+                  disabledForegroundColor:
+                      colorScheme.onSurfaceVariant.withOpacity(0.5),
                 ),
               ),
             ],
@@ -1211,9 +1334,11 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     required IconData icon,
     required T? value,
     required List<T> items,
-    required Function(T?) onChanged,
+    required Function(T?)? onChanged,
     required String Function(T) itemDisplayName,
     required String? Function(T?) validator,
+    bool isEnabled = true,
+    bool isLoading = false,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -1226,36 +1351,68 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           Text(
             label,
             style: TextStyle(
-              color: colorScheme.onSurfaceVariant,
+              color: isEnabled
+                  ? colorScheme.onSurfaceVariant
+                  : colorScheme.onSurfaceVariant.withOpacity(0.6),
             ),
           ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
+              color: isEnabled
+                  ? theme.colorScheme.surface
+                  : theme.colorScheme.surfaceVariant.withOpacity(0.5),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: colorScheme.outline,
+                color: isEnabled
+                    ? colorScheme.outline
+                    : colorScheme.outline.withOpacity(0.5),
               ),
             ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<T>(
-                value: value,
-                isExpanded: true,
-                icon: const Icon(Icons.arrow_drop_down),
-                hint: Text('Select ${label.toLowerCase()}'),
-                items: items.map((T item) {
-                  return DropdownMenuItem<T>(
-                    value: item,
-                    child: Text(itemDisplayName(item)),
-                  );
-                }).toList(),
-                onChanged: onChanged,
-              ),
-            ),
+            child: isLoading
+                ? const SizedBox(
+                    height: 48,
+                    child: Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : DropdownButtonHideUnderline(
+                    child: DropdownButton<T>(
+                      value: value,
+                      isExpanded: true,
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: isEnabled
+                            ? colorScheme.onSurfaceVariant
+                            : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      ),
+                      hint: Text(
+                        isEnabled
+                            ? 'Select ${label.toLowerCase()}'
+                            : 'Select a brand first',
+                        style: TextStyle(
+                          color: isEnabled
+                              ? colorScheme.onSurfaceVariant
+                              : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                        ),
+                      ),
+                      items: items.map((T item) {
+                        return DropdownMenuItem<T>(
+                          value: item,
+                          child: Text(itemDisplayName(item)),
+                        );
+                      }).toList(),
+                      onChanged: isEnabled ? onChanged : null,
+                      style: TextStyle(
+                        color: colorScheme.onSurface,
+                        fontSize: 16,
+                      ),
+                      dropdownColor: theme.colorScheme.surface,
+                    ),
+                  ),
           ),
-          if (validator(value) != null)
+          if (validator(value) != null && isEnabled)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
@@ -1269,5 +1426,27 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         ],
       ),
     );
+  }
+
+  // Add this utility method to help with firstWhere
+  Map<String, dynamic>? findById(List<dynamic> items, String idField, int idValue) {
+    if (items.isEmpty) return null;
+    
+    try {
+      // Create a properly-typed copy of items to avoid issues
+      final typedItems = List<Map<String, dynamic>>.from(items);
+      
+      // Find item by ID, returning empty map if not found (not null)
+      final item = typedItems.firstWhere(
+        (item) => item[idField] == idValue, 
+        orElse: () => <String, dynamic>{},
+      );
+      
+      // Only return the item if it's not empty (has keys)
+      return item.isNotEmpty ? item : null;
+    } catch (e) {
+      print('Error finding item: $e');
+      return null;
+    }
   }
 }
