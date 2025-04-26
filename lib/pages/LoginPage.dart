@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:garagecom/helpers/apiHelper.dart';
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -8,14 +11,67 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   @override
   void dispose() {
-    emailController.dispose();
+    usernameController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  int? _extractUserIdFromToken(String token) {
+    try {
+      // JWT token consists of three parts separated by dots: header.payload.signature
+      final parts = token.split('.');
+      if (parts.length != 3) return null;
+      
+      // The payload is the second part
+      final payload = parts[1];
+      
+      // Payload is base64Url encoded - decode it
+      String normalizedPayload = payload;
+      // Add padding if needed
+      while (normalizedPayload.length % 4 != 0) {
+        normalizedPayload += '=';
+      }
+      
+      // Convert the base64url to base64
+      normalizedPayload = normalizedPayload
+        .replaceAll('-', '+')
+        .replaceAll('_', '/');
+      
+      // Decode base64
+      final decodedBytes = base64Decode(normalizedPayload);
+      final decodedPayload = utf8.decode(decodedBytes);
+      
+      // Parse JSON
+      final payloadJson = jsonDecode(decodedPayload);
+      
+      // Check various common field names for user ID
+      if (payloadJson.containsKey('UserID')) {
+        return payloadJson['UserID'];
+      } else if (payloadJson.containsKey('UserId')) {
+        return payloadJson['UserId'];
+      } else if (payloadJson.containsKey('user_id')) {
+        return payloadJson['user_id'];
+      } else if (payloadJson.containsKey('sub')) {
+        // Often 'sub' (subject) is the user identifier in JWTs
+        // Try to parse it as int if possible
+        final sub = payloadJson['sub'];
+        if (sub is int) return sub;
+        if (sub is String && int.tryParse(sub) != null) {
+          return int.parse(sub);
+        }
+      }
+      
+      print('JWT payload does not contain recognizable user ID: $payloadJson');
+      return null;
+    } catch (e) {
+      print('Error extracting user ID from token: $e');
+      return null;
+    }
   }
 
   @override
@@ -73,9 +129,9 @@ class _LoginPageState extends State<LoginPage> {
                 height: 40,
               ),
               TextFormField(
-                controller: emailController,
+                controller: usernameController,
                 decoration: InputDecoration(
-                  labelText: 'Email',
+                  labelText: 'useername',
                   prefixIcon: Icon(Icons.email, color: colorScheme.primary),
                   filled: true,
                   fillColor: theme.colorScheme.surfaceContainerLow,
@@ -117,9 +173,57 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
-                  // Implement login logic here
-                  print('Login button pressed');
+                onPressed: () async {
+                  print('login button pressed');
+                  Map<String, dynamic> data = {
+                    'userName': usernameController.text,
+                    'password': passwordController.text,
+                  };
+                  
+                  Map<String, dynamic> response = await ApiHelper.post("api/Registration/login", data);
+                  print(response);
+                  print(response["succeeded"]);
+                  
+                  if (response["succeeded"] == true) {
+                    String token = response["parameters"]["Token"];
+                    
+                    // Safely handle missing UserID
+                    int? userId;
+                    if (response["parameters"].containsKey("UserID") && 
+                        response["parameters"]["UserID"] != null) {
+                      userId = response["parameters"]["UserID"];
+                    } else if (response["parameters"].containsKey("UserId") && 
+                               response["parameters"]["UserId"] != null) {
+                      // Try alternate casing of UserId
+                      userId = response["parameters"]["UserId"];
+                    } else {
+                      // Extract user ID from token if possible
+                      // JWT tokens have a payload section with user data
+                      userId = _extractUserIdFromToken(token);
+                    }
+                    
+                    // Store token and userId (if available)
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    await prefs.setString("token", token);
+                    
+                    if (userId != null) {
+                      await prefs.setInt("userId", userId);
+                    }
+                    
+                    // Navigate to home page
+                    Navigator.of(context).pushNamed('/homePage');
+                  } else {
+                    // Show more specific error message if available
+                    String errorMessage = response["message"] ?? 'Login failed. Please check your credentials.';
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(errorMessage),
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        duration: const Duration(seconds: 4),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),

@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
   class ApiHelper {
   late Dio dio;
-  static String mainDomain = 'http://10.0.2.2:5294/';
+  static String mainDomain = 'https://9bef-77-69-247-225.ngrok-free.app/';
 
   static Future<Dio> Client() async {
     final prefs = await SharedPreferences.getInstance();

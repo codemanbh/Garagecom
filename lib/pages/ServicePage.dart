@@ -58,7 +58,7 @@ class _ServicePageState extends State<ServicePage> {
   void goToAddPartPage() {
     if (userCars.isEmpty) return;
     
-    final currentCarId = userCars[currentCarIndex]['userCarID'];
+    final currentCarId = userCars[currentCarIndex]['CarID'];
     Navigator.of(context).pushNamed(
       '/AddPartPage',
       arguments: currentCarId,
