@@ -160,8 +160,9 @@ class ApiHelper {
     }
   }
 
-  static Future<Map<String, dynamic>> uploadImage(
-      File image, String path, Map<String, dynamic> options) async {
+  static Future<Map<String, dynamic>> uploadImage(File image, String path,
+      {Map<String, dynamic>? options}) async {
+    options ??= {};
     Dio client = await Client();
     client.options.headers['Content-Type'] = 'multipart/form-data';
 
