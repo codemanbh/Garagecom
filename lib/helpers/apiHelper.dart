@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-  class ApiHelper {
+class ApiHelper {
   late Dio dio;
   static String mainDomain = 'https://9bef-77-69-247-225.ngrok-free.app/';
 
@@ -15,7 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
     final dio = Dio(BaseOptions(
       baseUrl: mainDomain,
-       headers: {'Content-Type': 'application/x-www-form-urlencoded'}, // Changed to JSON
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }, // Changed to JSON
       // headers: {'Content-Type': 'multipart/form-data'}, // Changed to JSON
 
       connectTimeout: const Duration(seconds: 15),
@@ -24,7 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
       validateStatus: (status) => true,
     ));
 
-      print("token2: $token");
+    print("token2: $token");
 
     if (token != null) {
       dio.options.headers['Authorization'] = 'Bearer $token';
@@ -39,8 +41,8 @@ import 'package:shared_preferences/shared_preferences.dart';
     //   responseHeader: true,
     // ));
 
-    (dio.httpClientAdapter as DefaultHttpClientAdapter)
-        .onHttpClientCreate = (HttpClient client) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (HttpClient client) {
       client.badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
       return client;
@@ -48,8 +50,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
     return dio;
   }
-
-
 
   static Future<Map<String, dynamic>> get(
       String path, Map<String, dynamic> data) async {
@@ -74,21 +74,21 @@ import 'package:shared_preferences/shared_preferences.dart';
   static Future<Image> _image(String imageName, String path) async {
     final prefs = await SharedPreferences.getInstance();
     final token = await prefs.getString('token');
-    String fullImageUrl =  '$mainDomain$path/?filename=$imageName';
+    String fullImageUrl = '$mainDomain$path/?filename=$imageName';
     print(fullImageUrl);
     Map<String, String> headers = {};
-    if(token != null) {
-      headers = {
-        "Authorization": token
-      };
+    if (token != null) {
+      headers = {"Authorization": token};
     }
-    return Image.network(fullImageUrl, headers: headers,);
+    return Image.network(
+      fullImageUrl,
+      headers: headers,
+    );
   }
 
-  static FutureBuilder<Image> image(String imageName, String path){
-
+  static FutureBuilder<Image> image(String imageName, String path) {
     return FutureBuilder<Image>(
-    future: ApiHelper._image(imageName, path),
+      future: ApiHelper._image(imageName, path),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -101,7 +101,7 @@ import 'package:shared_preferences/shared_preferences.dart';
         }
       },
     );
-  } 
+  }
 
   static Future<Map<String, dynamic>> post(
       String path, Map<String, dynamic> data) async {
@@ -127,12 +127,12 @@ import 'package:shared_preferences/shared_preferences.dart';
   // Helper to check response status and handle errors
   static void _handleResponse(Response response) {
     print('Response status code: ${response.statusCode}');
-    
+
     if (response.statusCode == 500) {
       print('Server Error: ${response.data}');
       throw Exception('Server error: ${response.data.toString()}');
     }
-    
+
     if (response.statusCode != 200) {
       print('Request failed with status: ${response.statusCode}');
       print('Response data: ${response.data}');
@@ -144,12 +144,13 @@ import 'package:shared_preferences/shared_preferences.dart';
   static Future<Map<String, dynamic>> testConnection() async {
     try {
       Dio dio = Dio();
-      
+
       // Try connecting to a well-known service
       final response = await dio.get('https://www.google.com');
       return {
         'status': 'success',
-        'message': 'Internet connection is working, status code: ${response.statusCode}'
+        'message':
+            'Internet connection is working, status code: ${response.statusCode}'
       };
     } catch (e) {
       return {
@@ -159,24 +160,28 @@ import 'package:shared_preferences/shared_preferences.dart';
     }
   }
 
-  static Future<Map<String,dynamic>> uploadImage(File image, String path) async{
-  
+  static Future<Map<String, dynamic>> uploadImage(
+      File image, String path, Map<String, dynamic> options) async {
     Dio client = await Client();
     client.options.headers['Content-Type'] = 'multipart/form-data';
+
     FormData formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(image.path, contentType: DioMediaType.parse("image/jpg"),filename: image.path.split('/').last),
+      'file': await MultipartFile.fromFile(image.path,
+          contentType: DioMediaType.parse("image/jpg"),
+          filename: image.path.split('/').last),
+      ...options
     });
+
     try {
       final response = await client.post(
         path,
         data: formData,
       );
-     
+
       return response.data;
     } catch (e) {
       print('Image upload error: $e');
       return {'error': e.toString()};
     }
-
   }
 }
