@@ -26,29 +26,28 @@ class _LoginPageState extends State<LoginPage> {
       // JWT token consists of three parts separated by dots: header.payload.signature
       final parts = token.split('.');
       if (parts.length != 3) return null;
-      
+
       // The payload is the second part
       final payload = parts[1];
-      
+
       // Payload is base64Url encoded - decode it
       String normalizedPayload = payload;
       // Add padding if needed
       while (normalizedPayload.length % 4 != 0) {
         normalizedPayload += '=';
       }
-      
+
       // Convert the base64url to base64
-      normalizedPayload = normalizedPayload
-        .replaceAll('-', '+')
-        .replaceAll('_', '/');
-      
+      normalizedPayload =
+          normalizedPayload.replaceAll('-', '+').replaceAll('_', '/');
+
       // Decode base64
       final decodedBytes = base64Decode(normalizedPayload);
       final decodedPayload = utf8.decode(decodedBytes);
-      
+
       // Parse JSON
       final payloadJson = jsonDecode(decodedPayload);
-      
+
       // Check various common field names for user ID
       if (payloadJson.containsKey('UserID')) {
         return payloadJson['UserID'];
@@ -65,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
           return int.parse(sub);
         }
       }
-      
+
       print('JWT payload does not contain recognizable user ID: $payloadJson');
       return null;
     } catch (e) {
@@ -78,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
@@ -97,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: 350,
                   margin: const EdgeInsets.only(top: 50, bottom: 20),
                   child: Image.asset(
-                    'assets/logo-raw-purple.png', 
+                    'assets/logo-raw-purple.png',
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       print('Logo loading error: $error');
@@ -106,7 +105,6 @@ class _LoginPageState extends State<LoginPage> {
                           color: colorScheme.primaryContainer,
                           shape: BoxShape.circle,
                         ),
-                        
                       );
                     },
                   ),
@@ -132,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                 controller: usernameController,
                 decoration: InputDecoration(
                   labelText: 'useername',
-                  prefixIcon: Icon(Icons.email, color: colorScheme.primary),
+                  prefixIcon: Icon(Icons.person, color: colorScheme.primary),
                   filled: true,
                   fillColor: theme.colorScheme.surfaceContainerLow,
                   border: OutlineInputBorder(
@@ -140,11 +138,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
                 keyboardType: TextInputType.emailAddress,
@@ -162,11 +162,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
                 obscureText: true,
@@ -179,21 +181,22 @@ class _LoginPageState extends State<LoginPage> {
                     'userName': usernameController.text,
                     'password': passwordController.text,
                   };
-                  
-                  Map<String, dynamic> response = await ApiHelper.post("api/Registration/login", data);
+
+                  Map<String, dynamic> response =
+                      await ApiHelper.post("api/Registration/login", data);
                   print(response);
                   print(response["succeeded"]);
-                  
+
                   if (response["succeeded"] == true) {
                     String token = response["parameters"]["Token"];
-                    
+
                     // Safely handle missing UserID
                     int? userId;
-                    if (response["parameters"].containsKey("UserID") && 
+                    if (response["parameters"].containsKey("UserID") &&
                         response["parameters"]["UserID"] != null) {
                       userId = response["parameters"]["UserID"];
-                    } else if (response["parameters"].containsKey("UserId") && 
-                               response["parameters"]["UserId"] != null) {
+                    } else if (response["parameters"].containsKey("UserId") &&
+                        response["parameters"]["UserId"] != null) {
                       // Try alternate casing of UserId
                       userId = response["parameters"]["UserId"];
                     } else {
@@ -201,21 +204,23 @@ class _LoginPageState extends State<LoginPage> {
                       // JWT tokens have a payload section with user data
                       userId = _extractUserIdFromToken(token);
                     }
-                    
+
                     // Store token and userId (if available)
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
                     await prefs.setString("token", token);
-                    
+
                     if (userId != null) {
                       await prefs.setInt("userId", userId);
                     }
-                    
+
                     // Navigate to home page
                     Navigator.of(context).pushNamed('/homePage');
                   } else {
                     // Show more specific error message if available
-                    String errorMessage = response["message"] ?? 'Login failed. Please check your credentials.';
-                    
+                    String errorMessage = response["message"] ??
+                        'Login failed. Please check your credentials.';
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(errorMessage),
@@ -226,7 +231,8 @@ class _LoginPageState extends State<LoginPage> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),
