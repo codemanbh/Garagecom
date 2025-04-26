@@ -328,7 +328,7 @@ class _CameraPageState extends State<CameraPage> {
               height: 24,
               color: colorScheme.onSurfaceVariant.withOpacity(0.3),
             ),
-            ...problems.map((issue) => _buildIssueItem(issue["title"].toString().trim(), theme)),
+            ...problems.map((issue) => _buildDetailedIssueItem(issue, theme)),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
@@ -355,32 +355,151 @@ class _CameraPageState extends State<CameraPage> {
     );
   }
 
-  Widget _buildIssueItem(String issue, ThemeData theme) {
+  Widget _buildDetailedIssueItem(dynamic issue, ThemeData theme) {
     final colorScheme = theme.colorScheme;
+    final title = issue["title"]?.toString().trim() ?? "Unknown Issue";
+    final description = issue["description"]?.toString().trim() ?? "No description available";
+    final solution = issue["solution"]?.toString().trim() ?? "No solution provided";
+    
+    // Default icon mapping based on common dashboard warning lights
+    IconData getIssueIcon(String issueTitle) {
+      final lowerTitle = issueTitle.toLowerCase();
+      if (lowerTitle.contains('battery')) return Icons.battery_alert;
+      if (lowerTitle.contains('abs')) return Icons.report_problem;
+      if (lowerTitle.contains('oil')) return Icons.oil_barrel;
+      if (lowerTitle.contains('temp') || lowerTitle.contains('temperature')) return Icons.thermostat;
+      if (lowerTitle.contains('tire') || lowerTitle.contains('pressure')) return Icons.tire_repair;
+      if (lowerTitle.contains('engine')) return Icons.car_repair;
+      if (lowerTitle.contains('belt')) return Icons.line_style;
+      if (lowerTitle.contains('fuel')) return Icons.local_gas_station;
+      if (lowerTitle.contains('light')) return Icons.lightbulb;
+      return Icons.warning_amber_rounded;
+    }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: colorScheme.error.withOpacity(0.8), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.error.withOpacity(0.4),
+            color: colorScheme.error.withOpacity(0.1),
             blurRadius: 6,
             spreadRadius: 1,
           ),
         ],
-        color: colorScheme.surface.withOpacity(0.1),
+        color: colorScheme.errorContainer.withOpacity(0.1),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.warning_amber_rounded, size: 20.0, color: colorScheme.error),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              issue,
-              style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+          // Header with title and icon
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: colorScheme.errorContainer.withOpacity(0.5),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  getIssueIcon(title),
+                  color: colorScheme.error,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onErrorContainer,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Content section
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Description section
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.description_outlined,
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Description:',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            description,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 12),
+                
+                // Solution section
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.build_outlined,
+                      color: colorScheme.primary.withOpacity(0.8),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Solution:',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            solution,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
