@@ -27,6 +27,7 @@ import './pages/TestPage.dart';
 import './pages/CameraPage.dart';
 import './pages/AddPartPage.dart';
 import './pages/MainPage.dart';
+import './pages/CommentPage.dart';
 
 // Helpers
 import './helpers/navigationHeper.dart';
@@ -73,8 +74,23 @@ class MyApp extends StatelessWidget {
         '/aiPage': (context) => CameraPage(),
         '/AddPartPage': (context) => const AddPartPage(),
         '/AccountSettingsPage': (context) => const AccountSettingsPage(),
-        '/mainPage': (context) => const MainPage()
+        '/mainPage': (context) => const MainPage(),
+        '/commentPage': (context) => CommentPage(
+          postID: ModalRoute.of(context)!.settings.arguments as int? ?? 0,
+          postTitle: '',
+          questionBody: '',
+          initialVotes: 0,
+        ),
       },
     );
   }
+}
+
+// Example usage of the suggested code change
+void navigateToCommentPage(BuildContext context, int postId) {
+  Navigator.pushNamed(
+    context, 
+    '/commentPage',
+    arguments: postId // The ID of the post to show comments for
+  );
 }
