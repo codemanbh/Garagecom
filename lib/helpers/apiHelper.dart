@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import './navigationHeper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiHelper {
   late Dio dio;
-  static String mainDomain = 'https://9bef-77-69-247-225.ngrok-free.app/';
+  static String mainDomain = 'https://584e-46-184-248-40.ngrok-free.app/';
 
   static Future<Dio> Client() async {
     final prefs = await SharedPreferences.getInstance();
@@ -32,15 +32,6 @@ class ApiHelper {
       dio.options.headers['Authorization'] = 'Bearer $token';
     }
 
-    // Add logging interceptor for debugging
-    // //dio.interceptors.add(LogInterceptor(
-    //   requestBody: true,
-    //   responseBody: true,
-    //   error: true,
-    //   requestHeader: true,
-    //   responseHeader: true,
-    // ));
-
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (HttpClient client) {
       client.badCertificateCallback =
@@ -49,6 +40,20 @@ class ApiHelper {
     };
 
     return dio;
+  }
+
+  static void handeAnAuthorized() async {
+    print('**************** un auth');
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('tocken');
+    navigatorKey.currentState?.pushReplacementNamed('/loginPage');
+    final messenger = ScaffoldMessenger.of(navigatorKey.currentContext!);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('You have been logged out.'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   static Future<Map<String, dynamic>> get(
@@ -131,6 +136,10 @@ class ApiHelper {
     if (response.statusCode == 500) {
       print('Server Error: ${response.data}');
       throw Exception('Server error: ${response.data.toString()}');
+    }
+
+    if (response.statusCode == 401) {
+      handeAnAuthorized();
     }
 
     if (response.statusCode != 200) {
