@@ -28,47 +28,50 @@ class PostsManager {
   Future<bool> fetchPosts() async {
     try {
       // Fetch posts from API
-      Map<String, dynamic> response = await ApiHelper.get(
-        'api/Posts/GetPosts', 
-        {'categoryId': 1}
-      );
-      
+      Map<String, dynamic> response =
+          await ApiHelper.get('api/Posts/GetPosts', {'categoryId': 1});
+
       print('API Response received');
       print(response);
-      
+
       // Check if the API call was successful
       if (response.containsKey('succeeded') && response['succeeded'] == true) {
         print('API call successful');
-        
+
         // Check if we have the Posts array in the parameters
-        if (response.containsKey('parameters') && 
+        if (response.containsKey('parameters') &&
             response['parameters'] != null &&
             response['parameters'].containsKey('Posts')) {
-          
           List<dynamic> postsData = response['parameters']['Posts'];
           print('Found ${postsData.length} posts in API response');
-          
+
           // Clear existing posts
           posts.clear();
-          
+
           // Map API data to Post objects
           for (var postData in postsData) {
             Post post = Post(
               postID: postData['postID'] ?? 0,
               title: postData['title'] ?? 'No Title',
               description: postData['description'] ?? 'No Content',
-              autherUsername: postData['userName'], // Using userID as placeholder
-              imageUrl: postData['attachment'] != null && postData['attachment'].isNotEmpty 
-                  ? postData['attachment'] 
+              autherUsername:
+                  postData['userName'], // Using userID as placeholder
+              imageUrl: postData['attachment'] != null &&
+                      postData['attachment'].isNotEmpty
+                  ? postData['attachment']
                   : null,
-              numOfVotes: postData['votes'] != null ? postData['votes'].length : 0,
+              numOfVotes:
+                  postData['countVotes'] != null ? postData['countVotes'] : 0,
+              voted: ['countVotes'] != null ? postData['voted'] : false,
               createdIn: postData['createdIn'] ?? '',
-              categoryName: postData['postCategory'] != null ? postData['postCategory']['title'] : '',
+              categoryName: postData['postCategory'] != null
+                  ? postData['postCategory']['title']
+                  : '',
             );
-            
+
             posts.add(post);
           }
-          
+
           print('Successfully parsed ${posts.length} posts from API');
           return true;
         } else {
@@ -79,11 +82,10 @@ class PostsManager {
         String errorMessage = response['message'] ?? 'Unknown error';
         print('API call failed: $errorMessage');
       }
-      
+
       // If we get here, something went wrong with the API response
       // Fall back to local data
       return _loadFallbackPosts();
-      
     } catch (e) {
       print('Error fetching posts: $e');
       return _loadFallbackPosts();
@@ -93,7 +95,7 @@ class PostsManager {
   // Helper method to load fallback posts
   Future<bool> _loadFallbackPosts() async {
     print('Loading fallback posts...');
-    
+
     List<Map<String, dynamic>> postsMap = [
       {
         "id": 1,
@@ -115,7 +117,7 @@ class PostsManager {
 
     // Clear existing posts
     posts.clear();
-    
+
     // Create new post objects from the map data
     for (var postMap in postsMap) {
       Post post = Post(

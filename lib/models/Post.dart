@@ -1,4 +1,5 @@
 import './Comment.dart';
+import './../helpers/apiHelper.dart';
 
 class Post {
   final int postID;
@@ -9,6 +10,8 @@ class Post {
   int numOfVotes;
   String? createdIn; // New field for created date
   String? categoryName; // New field for category name
+  int userVote = 0;
+  bool voted = false;
 
   Post({
     required this.postID,
@@ -19,14 +22,25 @@ class Post {
     this.numOfVotes = 0,
     this.createdIn,
     this.categoryName,
+    this.voted = false,
   });
 
-  void upVote() {
-    numOfVotes++;
+  void handleUpvote() {
+    if (!voted) {
+      ApiHelper.post(
+        'api/Posts/SetVote',
+        {'PostID': postID, 'value': 1},
+      );
+    }
   }
 
-  void downVote() {
-    numOfVotes--;
+  void handleDownvote() {
+    if (!voted) {
+      ApiHelper.post(
+        'api/Posts/SetVote',
+        {'PostID': postID, 'value': -1},
+      );
+    }
   }
 
   // Format the date to a more readable format

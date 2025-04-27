@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/Post.dart';
 import '../pages/CommentPage.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
-  final VoidCallback onUpvote;
-  final VoidCallback onDownvote;
 
   const PostCard({
-    super.key, 
+    super.key,
     required this.post,
-    required this.onUpvote,
-    required this.onDownvote,
   });
 
-  void navigateToCommentPage(
-      BuildContext context, String title, String? imageUrl, String description, int votes, int postID) {
+  void navigateToCommentPage(BuildContext context, String title,
+      String? imageUrl, String description, int votes, int postID) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -33,12 +30,12 @@ class PostCard extends StatelessWidget {
 
   // Share function to handle sharing post content
   void _sharePost(BuildContext context) async {
-    final String postContent = 
-        "Check out this post from GarageCom:\n\n"
+    final String postContent = "Check out this post from GarageCom:\n\n"
         "${post.title}\n\n"
         "${post.description}\n\n"
-        "Posted by: ${post.autherUsername}";
-    
+        "Posted by: ${post.autherUsername}"
+        "https:\\\\garagcom.com\\posts\\${post.postID}";
+
     try {
       // Show loading indicator
       final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -69,10 +66,10 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     // Check if image is non-empty and non-null
     final bool hasImage = post.imageUrl != null && post.imageUrl!.isNotEmpty;
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       elevation: 4,
@@ -84,13 +81,13 @@ class PostCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () => navigateToCommentPage(
-          context, 
-          post.title, 
-          post.imageUrl, 
-          post.description,
-          post.numOfVotes,
-          post.postID // Assuming post.postID exists
-        ),
+            context,
+            post.title,
+            post.imageUrl,
+            post.description,
+            post.numOfVotes,
+            post.postID // Assuming post.postID exists
+            ),
         borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +146,7 @@ class PostCard extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Post title
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -162,7 +159,7 @@ class PostCard extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Post content
             Padding(
               padding: EdgeInsets.fromLTRB(16, 8, 16, hasImage ? 12 : 16),
@@ -176,7 +173,7 @@ class PostCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            
+
             // Post image (only if available)
             if (hasImage)
               Container(
@@ -197,8 +194,8 @@ class PostCard extends StatelessWidget {
                       return Center(
                         child: CircularProgressIndicator(
                           value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded / 
-                                loadingProgress.expectedTotalBytes!
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
                               : null,
                           color: colorScheme.primary,
                         ),
@@ -213,14 +210,16 @@ class PostCard extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.broken_image_rounded,
-                              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                              color:
+                                  colorScheme.onSurfaceVariant.withOpacity(0.5),
                               size: 36,
                             ),
                             const SizedBox(height: 8),
                             Text(
                               "Image not available",
                               style: TextStyle(
-                                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                                color: colorScheme.onSurfaceVariant
+                                    .withOpacity(0.7),
                                 fontSize: 12,
                               ),
                             ),
@@ -231,7 +230,7 @@ class PostCard extends StatelessWidget {
                   ),
                 ),
               ),
-            
+
             // Action buttons
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
@@ -242,7 +241,7 @@ class PostCard extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: onUpvote,
+                        onPressed: post.handleUpvote,
                         icon: Icon(
                           Icons.arrow_upward_rounded,
                           color: colorScheme.primary,
@@ -250,21 +249,20 @@ class PostCard extends StatelessWidget {
                         ),
                         tooltip: 'Upvote',
                       ),
-                      
                       Text(
                         post.numOfVotes.toString(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: post.numOfVotes > 0
-                            ? colorScheme.primary
-                            : post.numOfVotes < 0
-                              ? colorScheme.error
-                              : colorScheme.onSurfaceVariant,
+                              ? colorScheme.primary
+                              : post.numOfVotes < 0
+                                  ? colorScheme.error
+                                  : colorScheme.onSurfaceVariant,
                         ),
                       ),
                       IconButton(
-                        onPressed: onDownvote,
+                        onPressed: post.handleDownvote,
                         icon: Icon(
                           Icons.arrow_downward_rounded,
                           color: colorScheme.error,
@@ -274,17 +272,17 @@ class PostCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
+
                   // Comment button
                   TextButton.icon(
                     onPressed: () => navigateToCommentPage(
-                      context, 
-                      post.title, 
-                      post.imageUrl, 
-                      post.description,
-                      post.numOfVotes,
-                      post.postID // Assuming post.postID exists
-                    ),
+                        context,
+                        post.title,
+                        post.imageUrl,
+                        post.description,
+                        post.numOfVotes,
+                        post.postID // Assuming post.postID exists
+                        ),
                     icon: Icon(
                       Icons.comment_outlined,
                       size: 20,
@@ -297,7 +295,7 @@ class PostCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Share button with functionality
                   IconButton(
                     onPressed: () => _sharePost(context),

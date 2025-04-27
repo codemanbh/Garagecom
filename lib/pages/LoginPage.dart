@@ -266,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
               TextButton(
                 onPressed: () {
                   // Navigate to the signup page or implement signup logic
-                  Navigator.of(context).pushNamed('/mainPage');
+                  Navigator.of(context).popAndPushNamed('/mainPage');
                 },
                 child: Text(
                   'Home page',
