@@ -118,6 +118,11 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     }
   }
 
+  void _handleLogout() {
+    ApiHelper.post('/api/Proile/Logout', {});
+    ApiHelper.handeAnAuthorized();
+  }
+
   Future<void> updateProfile() async {
     if (userData == null) return;
 
@@ -516,7 +521,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
         // Print each brand for debugging
         for (var brand in carBrands) {
-          print('Brand ID: ${brand['brandID']}, Brand Name: ${brand['brandName']}');
+          print(
+              'Brand ID: ${brand['brandID']}, Brand Name: ${brand['brandName']}');
         }
       } else {
         setState(() {
@@ -571,7 +577,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
         // Print each model for debugging
         for (var model in carModels) {
-          print('Model ID: ${model['carModelID']}, Model Name: ${model['modelName']}');
+          print(
+              'Model ID: ${model['carModelID']}, Model Name: ${model['modelName']}');
         }
       } else {
         setState(() {
@@ -733,6 +740,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                         ),
                       ),
                       const SizedBox(height: 32),
+                      ElevatedButton(
+                          onPressed: _handleLogout, child: Text('Logout')),
                       if (!isEditMode) ...[
                         Container(
                           width: double.infinity,
@@ -1184,54 +1193,55 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
           const SizedBox(height: 16),
 
           // Car brand selection - using API data
-          isBrandsLoading 
-            ? const Center(child: CircularProgressIndicator())
-            : buildDropdown<Map<String, dynamic>>(
-                label: 'Car Brand',
-                icon: Icons.directions_car,
-                value: selectedBrandId != null && carBrands.isNotEmpty 
-                  ? carBrands.cast<Map<String, dynamic>>().firstWhere(
-                      (brand) => brand['brandID'] == selectedBrandId,
-                      orElse: () => <String, dynamic>{},
-                    )
-                  : null,
-                items: carBrands.cast<Map<String, dynamic>>(),
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    print('Selected brand: $newValue');
-                    setState(() {
-                      selectedBrandId = newValue['brandID'];
-                      selectedBrandName = newValue['brandName'];
-                      selectedModelId = null;
-                      selectedModelName = null;
-                      
-                      // Load models for this brand
-                      loadModels(selectedBrandId!);
-                    });
-                  }
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select a car brand';
-                  }
-                  return null;
-                },
-                itemDisplayName: (item) => item['brandName'] ?? 'Unknown Brand',
-              ),
+          isBrandsLoading
+              ? const Center(child: CircularProgressIndicator())
+              : buildDropdown<Map<String, dynamic>>(
+                  label: 'Car Brand',
+                  icon: Icons.directions_car,
+                  value: selectedBrandId != null && carBrands.isNotEmpty
+                      ? carBrands.cast<Map<String, dynamic>>().firstWhere(
+                            (brand) => brand['brandID'] == selectedBrandId,
+                            orElse: () => <String, dynamic>{},
+                          )
+                      : null,
+                  items: carBrands.cast<Map<String, dynamic>>(),
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      print('Selected brand: $newValue');
+                      setState(() {
+                        selectedBrandId = newValue['brandID'];
+                        selectedBrandName = newValue['brandName'];
+                        selectedModelId = null;
+                        selectedModelName = null;
+
+                        // Load models for this brand
+                        loadModels(selectedBrandId!);
+                      });
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Please select a car brand';
+                    }
+                    return null;
+                  },
+                  itemDisplayName: (item) =>
+                      item['brandName'] ?? 'Unknown Brand',
+                ),
 
           // Car model selection - using API data
           buildDropdown<Map<String, dynamic>>(
-              label: 'Car Model',
-              icon: Icons.model_training,
-              value: selectedModelId != null && carModels.isNotEmpty 
+            label: 'Car Model',
+            icon: Icons.model_training,
+            value: selectedModelId != null && carModels.isNotEmpty
                 ? carModels.cast<Map<String, dynamic>>().firstWhere(
-                    (model) => model['carModelID'] == selectedModelId,
-                    orElse: () => <String, dynamic>{},
-                  )
+                      (model) => model['carModelID'] == selectedModelId,
+                      orElse: () => <String, dynamic>{},
+                    )
                 : null,
-              items: carModels.cast<Map<String, dynamic>>(),
-              onChanged: selectedBrandId == null || isModelsLoading 
-                ? null  // Disable dropdown if no brand selected or models are loading
+            items: carModels.cast<Map<String, dynamic>>(),
+            onChanged: selectedBrandId == null || isModelsLoading
+                ? null // Disable dropdown if no brand selected or models are loading
                 : (newValue) {
                     if (newValue != null) {
                       print('Selected model: $newValue');
@@ -1241,15 +1251,15 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                       });
                     }
                   },
-              validator: (value) {
-                if (selectedBrandId != null && value == null) {
-                  return 'Please select a car model';
-                }
-                return null;
-              },
-              itemDisplayName: (item) => item['modelName'] ?? 'Unknown Model',
-              isEnabled: selectedBrandId != null && !isModelsLoading,
-              isLoading: isModelsLoading,
+            validator: (value) {
+              if (selectedBrandId != null && value == null) {
+                return 'Please select a car model';
+              }
+              return null;
+            },
+            itemDisplayName: (item) => item['modelName'] ?? 'Unknown Model',
+            isEnabled: selectedBrandId != null && !isModelsLoading,
+            isLoading: isModelsLoading,
           ),
 
           // Car year selection
@@ -1427,19 +1437,20 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 
   // Add this utility method to help with firstWhere
-  Map<String, dynamic>? findById(List<dynamic> items, String idField, int idValue) {
+  Map<String, dynamic>? findById(
+      List<dynamic> items, String idField, int idValue) {
     if (items.isEmpty) return null;
-    
+
     try {
       // Create a properly-typed copy of items to avoid issues
       final typedItems = List<Map<String, dynamic>>.from(items);
-      
+
       // Find item by ID, returning empty map if not found (not null)
       final item = typedItems.firstWhere(
-        (item) => item[idField] == idValue, 
+        (item) => item[idField] == idValue,
         orElse: () => <String, dynamic>{},
       );
-      
+
       // Only return the item if it's not empty (has keys)
       return item.isNotEmpty ? item : null;
     } catch (e) {
