@@ -71,13 +71,14 @@ class CommentsManager {
       // Prepare comment data for API
       Map<String, dynamic> commentData = {
         'postId': postId,
-        'parentId': -1, // Top-level comment
         'text': text,
       };
       
+      print('Sending comment to API: $commentData');
+      
       // Call API to add comment
       Map<String, dynamic> response = await ApiHelper.post(
-        'api/Comments/AddComment', 
+        'api/Posts/SetComment', 
         commentData
       );
       

@@ -130,8 +130,17 @@ class _CommentPageState extends State<CommentPage> {
   // Add a comment to the database
   Future<void> addComment() async {
     final newCommentText = commentController.text.trim();
-    if (newCommentText.isEmpty) return;
+    if (newCommentText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Comment cannot be empty'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
     
+    // Show loading state
     setState(() {
       _isLoading = true;
     });
@@ -669,19 +678,29 @@ class _CommentPageState extends State<CommentPage> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                FloatingActionButton.small(
-                  onPressed: addComment,
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.send_rounded,
-                    size: 20,
-                  ),
-                ),
+                _isLoading 
+                  ? Container(
+                      width: 40,
+                      height: 40,
+                      padding: const EdgeInsets.all(8),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: colorScheme.primary,
+                      ),
+                    )
+                  : FloatingActionButton.small(
+                      onPressed: addComment,
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.send_rounded,
+                        size: 20,
+                      ),
+                    ),
               ],
             ),
           ),
