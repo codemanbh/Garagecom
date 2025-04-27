@@ -165,9 +165,23 @@ class _AddPartPageState extends State<AddPartPage> {
               ? '$selectedIntervalValue $selectedIntervalUnit'
               : '';
 
-      Map<String, dynamic> response = await ApiHelper.post(
-          '/api/Cars/SetCarPart',
-          {"carId": 1, "partId": 1, "lifeTimeInterval": 3, "notes": ""});
+      // partNameController
+      // partReplacedDistanceController
+      // partLifetimeDistanceController
+      // partLifetimeTimeController
+      // intervalValueController
+
+      Map<String, dynamic> data = {
+        "carId": 3,
+        "partId": partNameController.text,
+        "lifeTimeInterval": intervalValueController.text,
+        "notes": "this note is empty and it shoun't be"
+      };
+
+      print(data);
+
+      Map<String, dynamic> response =
+          await ApiHelper.post('/api/Cars/SetCarPart', data);
 
       // Pass the data back to the previous screen
       // You can create a CarPart object here with all the collected data
