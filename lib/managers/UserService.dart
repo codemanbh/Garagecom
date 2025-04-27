@@ -111,15 +111,39 @@ class UserService {
     }
   }
 
-  // Get all car brands
+  // Get all car brands and models to extract unique brands
   static Future<Map<String, dynamic>> getCarBrands() async {
     try {
-      final response = await ApiHelper.get('api/Cars/GetBrands', {});
+      final response = await ApiHelper.get('api/Cars/GetCarModels', {});
       
       if (response['succeeded'] == true && 
-          response['parameters'] != null) {
+          response['parameters'] != null &&
+          response['parameters']['CarModels'] != null) {
         
-        return response;
+        // Get the CarModels array
+        List<dynamic> carModels = response['parameters']['CarModels'];
+        
+        // Extract unique brands
+        Set<int> brandIdSet = {};
+        List<Map<String, dynamic>> uniqueBrands = [];
+        
+        for (var model in carModels) {
+          if (model['brand'] != null) {
+            int brandId = model['brand']['brandID'];
+            if (!brandIdSet.contains(brandId)) {
+              brandIdSet.add(brandId);
+              uniqueBrands.add(model['brand']);
+            }
+          }
+        }
+        
+        // Create a response similar to what the loadBrands method expects
+        return {
+          'succeeded': true,
+          'parameters': {
+            'Brands': uniqueBrands
+          }
+        };
       } else {
         throw Exception('Failed to load car brands: ${response['message'] ?? "Unknown error"}');
       }
@@ -131,12 +155,25 @@ class UserService {
   // Get models for a specific brand
   static Future<Map<String, dynamic>> getCarModels(int brandId) async {
     try {
-      final response = await ApiHelper.get('api/Cars/GetModelsByBrand', {'brandID': brandId});
+      final response = await ApiHelper.get('api/Cars/GetCarModels', {});
       
       if (response['succeeded'] == true && 
-          response['parameters'] != null) {
+          response['parameters'] != null &&
+          response['parameters']['CarModels'] != null) {
         
-        return response;
+        // Get all car models and filter by the selected brand ID
+        List<dynamic> allModels = response['parameters']['CarModels'];
+        List<dynamic> brandModels = allModels
+            .where((model) => model['brand'] != null && model['brand']['brandID'] == brandId)
+            .toList();
+        
+        // Create a response similar to what the loadModels method expects
+        return {
+          'succeeded': true,
+          'parameters': {
+            'Models': brandModels
+          }
+        };
       } else {
         throw Exception('Failed to load car models: ${response['message'] ?? "Unknown error"}');
       }
