@@ -62,7 +62,8 @@ class PostsManager {
                   : null,
               numOfVotes:
                   postData['countVotes'] != null ? postData['countVotes'] : 0,
-              voted: ['countVotes'] != null ? postData['voted'] : false,
+              voteValue:
+                  postData['voteValue'] != null ? postData['voteValue'] : 0,
               createdIn: postData['createdIn'] ?? '',
               categoryName: postData['postCategory'] != null
                   ? postData['postCategory']['title']

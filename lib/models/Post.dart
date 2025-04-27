@@ -11,7 +11,7 @@ class Post {
   String? createdIn; // New field for created date
   String? categoryName; // New field for category name
   int userVote = 0;
-  bool voted = false;
+  int voteValue = 0;
 
   Post({
     required this.postID,
@@ -22,11 +22,11 @@ class Post {
     this.numOfVotes = 0,
     this.createdIn,
     this.categoryName,
-    this.voted = false,
+    this.voteValue = 0,
   });
 
   void handleUpvote() {
-    if (!voted) {
+    if (voteValue != 0) {
       ApiHelper.post(
         'api/Posts/SetVote',
         {'PostID': postID, 'value': 1},
@@ -35,7 +35,7 @@ class Post {
   }
 
   void handleDownvote() {
-    if (!voted) {
+    if (voteValue != 0) {
       ApiHelper.post(
         'api/Posts/SetVote',
         {'PostID': postID, 'value': -1},

@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:intl/intl.dart';
 
 class AddPartPage extends StatefulWidget {
@@ -41,33 +43,8 @@ class _AddPartPageState extends State<AddPartPage> {
   String? selectedIntervalValue;
 
   // List of common car parts for dropdown
-  final List<String> commonParts = [
-    'Oil Filter',
-    'Air Filter',
-    'Fuel Filter',
-    'Brake Pads',
-    'Brake Discs',
-    'Engine Oil',
-    'Transmission Fluid',
-    'Spark Plugs',
-    'Battery',
-    'Alternator',
-    'Water Pump',
-    'Timing Belt',
-    'Tires',
-    'Windshield Wipers',
-    'Coolant',
-    'Power Steering Fluid',
-    'Other (Custom)'
-  ];
-
-  final List<String> intervalUnits = [
-    'Days',
-    'Weeks',
-    'Months',
-    'Years',
-    'Kilometers'
-  ];
+  List<Map<String, dynamic>> partTypes = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -78,6 +55,20 @@ class _AddPartPageState extends State<AddPartPage> {
     selectedIntervalUnit = 'Months';
     selectedIntervalValue = '3'; // Default to 3 months
     intervalValueController.text = selectedIntervalValue!;
+    getPartTypes();
+  }
+
+  void getPartTypes() async {
+    Map<String, dynamic> response =
+        await ApiHelper.get('/api/Cars/GetParts', {});
+    print('parts--------------------------------------');
+    print(response['parameters']['Parts']);
+
+    partTypes = List.from(response['parameters']['Parts']);
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _selectReplacementDate(BuildContext context) async {
@@ -136,22 +127,23 @@ class _AddPartPageState extends State<AddPartPage> {
   }
 
   // Get the icon for the selected part
-  IconData _getPartIcon(String? partName) {
-    if (partName == null) return Icons.build;
+  IconData _getPartIcon(int partID) {
+    // if (partName == null) return Icons.build;
 
-    final lowerName = partName.toLowerCase();
-    if (lowerName.contains('oil')) return Icons.opacity;
-    if (lowerName.contains('filter')) return Icons.filter_alt;
-    if (lowerName.contains('brake')) return Icons.warning;
-    if (lowerName.contains('tire') || lowerName.contains('wheel'))
-      return Icons.tire_repair;
-    if (lowerName.contains('battery')) return Icons.battery_full;
-    if (lowerName.contains('light') || lowerName.contains('bulb'))
-      return Icons.lightbulb;
-    if (lowerName.contains('spark')) return Icons.electric_bolt;
-    if (lowerName.contains('coolant')) return Icons.thermostat;
-    if (lowerName.contains('wiper')) return Icons.swipe;
-    return Icons.build;
+    // final lowerName = partName.toLowerCase();
+    // if (lowerName.contains('oil')) return Icons.opacity;
+    // if (lowerName.contains('filter')) return Icons.filter_alt;
+    // if (lowerName.contains('brake')) return Icons.warning;
+    // if (lowerName.contains('tire') || lowerName.contains('wheel'))
+    //   return Icons.tire_repair;
+    // if (lowerName.contains('battery')) return Icons.battery_full;
+    // if (lowerName.contains('light') || lowerName.contains('bulb'))
+    //   return Icons.lightbulb;
+    // if (lowerName.contains('spark')) return Icons.electric_bolt;
+    // if (lowerName.contains('coolant')) return Icons.thermostat;
+    // if (lowerName.contains('wiper')) return Icons.swipe;
+    // return Icons.build;
+    return Icons.car_crash;
   }
 
   void _handleIntervalUnitChange(String? newUnit) {
@@ -165,13 +157,17 @@ class _AddPartPageState extends State<AddPartPage> {
     });
   }
 
-  void handleSave() {
+  void handleSave() async {
     if (_formKey.currentState!.validate()) {
       // Format the interval with the selected value and unit
       final String formattedInterval =
           selectedIntervalValue != null && selectedIntervalUnit != null
               ? '$selectedIntervalValue $selectedIntervalUnit'
               : '';
+
+      Map<String, dynamic> response = await ApiHelper.post(
+          '/api/Cars/SetCarPart',
+          {"carId": 1, "partId": 1, "lifeTimeInterval": 3, "notes": ""});
 
       // Pass the data back to the previous screen
       // You can create a CarPart object here with all the collected data
@@ -202,500 +198,447 @@ class _AddPartPageState extends State<AddPartPage> {
         title: const Text('Add New Part'),
         elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          color: theme.scaffoldBackgroundColor,
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header section
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 24),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
+      body: _isLoading
+          ? CircularProgressIndicator()
+          : Container(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+              ),
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Header section
                           Container(
-                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: 24),
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: colorScheme.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
+                              color:
+                                  colorScheme.primaryContainer.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
-                            child: Icon(
-                              Icons.handyman_rounded,
-                              color: colorScheme.primary,
-                              size: 28,
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.handyman_rounded,
+                                    color: colorScheme.primary,
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Add Car Part',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Track maintenance for your vehicle components',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
+
+                          // Part selection dropdown
+                          Text(
+                            'Part Information',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: DropdownButtonFormField<String>(
+                              value: selectedPartType,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedPartType = newValue;
+                                  partNameController.text = newValue ?? '';
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Select Part Type',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                // prefixIcon: Icon(
+                                //   _getPartIcon(selectedPartType),
+                                //   color: colorScheme.primary,
+                                // ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 16),
+                              ),
+                              icon: Icon(Icons.arrow_drop_down,
+                                  color: colorScheme.primary),
+                              items: partTypes.map((Map<String, dynamic> part) {
+                                return DropdownMenuItem<String>(
+                                  value: part['partID'].toString(),
+                                  child: Row(
+                                    children: [
+                                      Icon(_getPartIcon(part['partID']),
+                                          size: 20, color: colorScheme.primary),
+                                      const SizedBox(width: 12),
+                                      Text(part['partName']),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please select a part type';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Custom part name field (visible if "Other" is selected)
+                          if (selectedPartType == 'Other (Custom)')
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: colorScheme.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: colorScheme.primary.withOpacity(0.2),
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: colorScheme.primary.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: TextFormField(
+                                controller: partNameController,
+                                decoration: InputDecoration(
+                                  labelText: 'Custom Part Name',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  prefixIcon: Icon(Icons.build,
+                                      color: colorScheme.primary),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 16),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Please enter a part name';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+
+                          // Replacement date picker
+                          const SizedBox(height: 24),
+                          Text(
+                            'Service History',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              title: Text(
+                                'Last Replacement Date',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              subtitle: Text(
+                                replacementDate != null
+                                    ? DateFormat('MMM dd, yyyy')
+                                        .format(replacementDate!)
+                                    : 'Select Date',
+                                style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              leading: Icon(
+                                Icons.calendar_today,
+                                color: colorScheme.primary,
+                              ),
+                              trailing: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 16,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onTap: () => _selectReplacementDate(context),
+                            ),
+                          ),
+
+                          // Mileage at replacement
+                          // Container(
+                          //   margin: const EdgeInsets.only(bottom: 16),
+                          //   decoration: BoxDecoration(
+                          //     color: colorScheme.surface,
+                          //     borderRadius: BorderRadius.circular(12),
+                          //     border: Border.all(
+                          //       color: colorScheme.primary.withOpacity(0.2),
+                          //       width: 1,
+                          //     ),
+                          //     boxShadow: [
+                          //       BoxShadow(
+                          //         color: colorScheme.primary.withOpacity(0.1),
+                          //         blurRadius: 4,
+                          //         offset: const Offset(0, 2),
+                          //       ),
+                          //     ],
+                          //   ),
+                          //   child: TextFormField(
+                          //     controller: partReplacedDistanceController,
+                          //     keyboardType: TextInputType.number,
+                          //     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          //     decoration: InputDecoration(
+                          //       labelText: 'Mileage at Replacement (km)',
+                          //       border: OutlineInputBorder(
+                          //         borderRadius: BorderRadius.circular(12),
+                          //         borderSide: BorderSide.none,
+                          //       ),
+                          //       prefixIcon: Icon(Icons.speed, color: colorScheme.primary),
+                          //       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          //     ),
+                          //     validator: (value) {
+                          //       if (value == null || value.trim().isEmpty) {
+                          //         return 'Please enter the replacement mileage';
+                          //       }
+                          //       return null;
+                          //     },
+                          //   ),
+                          // ),
+
+                          // Service schedule section
+                          const SizedBox(height: 24),
+                          Text(
+                            'Service Schedule',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Next service date picker
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              title: Text(
+                                'Next Service Date',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              subtitle: Text(
+                                nextServiceDate != null
+                                    ? DateFormat('MMM dd, yyyy')
+                                        .format(nextServiceDate!)
+                                    : 'Select Date',
+                                style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              leading: Icon(
+                                Icons.event,
+                                color: colorScheme.primary,
+                              ),
+                              trailing: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 16,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onTap: () => _selectNextServiceDate(context),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+                          Text(
+                            'Service Interval',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Add Car Part',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Track maintenance for your vehicle components',
+                                  'Service Interval (Months)',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: colorScheme.onSurfaceVariant,
                                   ),
                                 ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 3,
+                                        child: TextFormField(
+                                          controller: intervalValueController,
+                                          keyboardType: TextInputType.number,
+                                        )),
+                                    const SizedBox(width: 8),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
 
-                    // Part selection dropdown
-                    Text(
-                      'Part Information',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: DropdownButtonFormField<String>(
-                        value: selectedPartType,
-                        decoration: InputDecoration(
-                          labelText: 'Select Part Type',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          // prefixIcon: Icon(
-                          //   _getPartIcon(selectedPartType),
-                          //   color: colorScheme.primary,
-                          // ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
-                        ),
-                        icon: Icon(Icons.arrow_drop_down,
-                            color: colorScheme.primary),
-                        items: commonParts.map((String part) {
-                          return DropdownMenuItem<String>(
-                            value: part,
-                            child: Row(
-                              children: [
-                                Icon(_getPartIcon(part),
-                                    size: 20, color: colorScheme.primary),
-                                const SizedBox(width: 12),
-                                Text(part),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedPartType = newValue;
-                            if (newValue != 'Other (Custom)') {
-                              partNameController.text = newValue ?? '';
-                            } else {
-                              partNameController.text = '';
-                            }
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select a part type';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Custom part name field (visible if "Other" is selected)
-                    if (selectedPartType == 'Other (Custom)')
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: colorScheme.primary.withOpacity(0.2),
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: colorScheme.primary.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: TextFormField(
-                          controller: partNameController,
-                          decoration: InputDecoration(
-                            labelText: 'Custom Part Name',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            prefixIcon:
-                                Icon(Icons.build, color: colorScheme.primary),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 16),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Please enter a part name';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-
-                    // Replacement date picker
-                    const SizedBox(height: 24),
-                    Text(
-                      'Service History',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          'Last Replacement Date',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        subtitle: Text(
-                          replacementDate != null
-                              ? DateFormat('MMM dd, yyyy')
-                                  .format(replacementDate!)
-                              : 'Select Date',
-                          style: TextStyle(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        leading: Icon(
-                          Icons.calendar_today,
-                          color: colorScheme.primary,
-                        ),
-                        trailing: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onTap: () => _selectReplacementDate(context),
-                      ),
-                    ),
-
-                    // Mileage at replacement
-                    // Container(
-                    //   margin: const EdgeInsets.only(bottom: 16),
-                    //   decoration: BoxDecoration(
-                    //     color: colorScheme.surface,
-                    //     borderRadius: BorderRadius.circular(12),
-                    //     border: Border.all(
-                    //       color: colorScheme.primary.withOpacity(0.2),
-                    //       width: 1,
-                    //     ),
-                    //     boxShadow: [
-                    //       BoxShadow(
-                    //         color: colorScheme.primary.withOpacity(0.1),
-                    //         blurRadius: 4,
-                    //         offset: const Offset(0, 2),
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   child: TextFormField(
-                    //     controller: partReplacedDistanceController,
-                    //     keyboardType: TextInputType.number,
-                    //     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    //     decoration: InputDecoration(
-                    //       labelText: 'Mileage at Replacement (km)',
-                    //       border: OutlineInputBorder(
-                    //         borderRadius: BorderRadius.circular(12),
-                    //         borderSide: BorderSide.none,
-                    //       ),
-                    //       prefixIcon: Icon(Icons.speed, color: colorScheme.primary),
-                    //       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    //     ),
-                    //     validator: (value) {
-                    //       if (value == null || value.trim().isEmpty) {
-                    //         return 'Please enter the replacement mileage';
-                    //       }
-                    //       return null;
-                    //     },
-                    //   ),
-                    // ),
-
-                    // Service schedule section
-                    const SizedBox(height: 24),
-                    Text(
-                      'Service Schedule',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Next service date picker
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          'Next Service Date',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        subtitle: Text(
-                          nextServiceDate != null
-                              ? DateFormat('MMM dd, yyyy')
-                                  .format(nextServiceDate!)
-                              : 'Select Date',
-                          style: TextStyle(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        leading: Icon(
-                          Icons.event,
-                          color: colorScheme.primary,
-                        ),
-                        trailing: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        onTap: () => _selectNextServiceDate(context),
-                      ),
-                    ),
-
-                    // Service interval with dropdown for unit selection
-                    const SizedBox(height: 24),
-                    Text(
-                      'Service Interval',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Service Interval',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: DropdownButtonFormField<String>(
-                                  value: selectedIntervalValue,
-                                  decoration: InputDecoration(
-                                    labelText: 'Value',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    prefixIcon: Icon(Icons.sync,
-                                        color: colorScheme.primary),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 16),
-                                  ),
-                                  items:
-                                      presetIntervalValues[selectedIntervalUnit]
-                                              ?.map((String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList() ??
-                                          [],
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      selectedIntervalValue = newValue;
-                                      intervalValueController.text =
-                                          newValue ?? '';
-                                    });
-                                  },
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please select a value';
-                                    }
-                                    return null;
-                                  },
+                          // Save button
+                          Center(
+                            child: ElevatedButton.icon(
+                              onPressed: handleSave,
+                              icon: const Icon(Icons.save),
+                              label: const Text('Save Part'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onPrimary,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 32, vertical: 16),
+                                elevation: 4,
+                                shadowColor:
+                                    colorScheme.primary.withOpacity(0.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                flex: 2,
-                                child: DropdownButtonFormField<String>(
-                                  value: selectedIntervalUnit,
-                                  decoration: InputDecoration(
-                                    labelText: 'Unit',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 16),
-                                  ),
-                                  items: intervalUnits.map((String unit) {
-                                    return DropdownMenuItem<String>(
-                                      value: unit,
-                                      child: Text(unit),
-                                    );
-                                  }).toList(),
-                                  onChanged: _handleIntervalUnitChange,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),
-
-                    // Save button
-                    Center(
-                      child: ElevatedButton.icon(
-                        onPressed: handleSave,
-                        icon: const Icon(Icons.save),
-                        label: const Text('Save Part'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          elevation: 4,
-                          shadowColor: colorScheme.primary.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
