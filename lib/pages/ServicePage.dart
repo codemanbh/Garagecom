@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../components/CustomNavBar.dart';
 import '../models/CarPart.dart';
 import 'PartDetailsPage.dart';
 import '../helpers/apiHelper.dart';
@@ -30,7 +29,7 @@ class _ServicePageState extends State<ServicePage> {
 
     try {
       final response = await ApiHelper.get('api/Cars/GetUserCars', {});
-      
+
       if (response['succeeded'] == true && response['parameters'] != null) {
         setState(() {
           userCars = response['parameters']['UserCars'];
@@ -57,12 +56,14 @@ class _ServicePageState extends State<ServicePage> {
 
   void goToAddPartPage() {
     if (userCars.isEmpty) return;
-    
+
     final currentCarId = userCars[currentCarIndex]['CarID'];
-    Navigator.of(context).pushNamed(
+    Navigator.of(context)
+        .pushNamed(
       '/AddPartPage',
       arguments: currentCarId,
-    ).then((_) {
+    )
+        .then((_) {
       // Refresh data when coming back
       fetchUserCarsWithParts();
     });
@@ -71,18 +72,23 @@ class _ServicePageState extends State<ServicePage> {
   void goToPartDetailsPage(dynamic part) {
     final carPart = CarPart(
       partName: part['part']['partName'],
-      lastReplacedDate: DateFormat('MMM dd, yyyy').format(DateTime.parse(part['createdIn'])),
-      nextReplacedDate: DateFormat('MMM dd, yyyy').format(DateTime.parse(part['nextDueDate'])),
+      lastReplacedDate:
+          DateFormat('MMM dd, yyyy').format(DateTime.parse(part['createdIn'])),
+      nextReplacedDate: DateFormat('MMM dd, yyyy')
+          .format(DateTime.parse(part['nextDueDate'])),
       replacementInterval: '${part['lifeTimeInterval']} Months',
-      lifespanProgress: calculateLifespanProgress(part['createdIn'], part['nextDueDate']),
+      lifespanProgress:
+          calculateLifespanProgress(part['createdIn'], part['nextDueDate']),
       carId: userCars[currentCarIndex]['userCarID'],
     );
-    
-    Navigator.of(context).push(
+
+    Navigator.of(context)
+        .push(
       MaterialPageRoute(
         builder: (context) => PartDetailsPage(part: carPart),
       ),
-    ).then((_) {
+    )
+        .then((_) {
       // Refresh data when coming back
       fetchUserCarsWithParts();
     });
@@ -92,12 +98,12 @@ class _ServicePageState extends State<ServicePage> {
     final now = DateTime.now();
     final start = DateTime.parse(createdIn);
     final end = DateTime.parse(nextDueDate);
-    
+
     final totalDuration = end.difference(start).inDays;
     final elapsedDuration = now.difference(start).inDays;
-    
+
     if (totalDuration <= 0) return 0.0;
-    
+
     final progress = 1.0 - (elapsedDuration / totalDuration);
     return progress.clamp(0.0, 1.0);
   }
@@ -113,9 +119,11 @@ class _ServicePageState extends State<ServicePage> {
     if (lowerName.contains('oil')) return Icons.opacity;
     if (lowerName.contains('filter')) return Icons.filter_alt;
     if (lowerName.contains('brake')) return Icons.warning;
-    if (lowerName.contains('tire') || lowerName.contains('wheel')) return Icons.tire_repair;
+    if (lowerName.contains('tire') || lowerName.contains('wheel'))
+      return Icons.tire_repair;
     if (lowerName.contains('battery')) return Icons.battery_full;
-    if (lowerName.contains('light') || lowerName.contains('bulb')) return Icons.lightbulb;
+    if (lowerName.contains('light') || lowerName.contains('bulb'))
+      return Icons.lightbulb;
     return Icons.build;
   }
 
@@ -128,7 +136,6 @@ class _ServicePageState extends State<ServicePage> {
       return Scaffold(
         appBar: AppBar(title: const Text('Service')),
         body: const Center(child: CircularProgressIndicator()),
-        bottomNavigationBar: const CustomNavBar(),
       );
     }
 
@@ -154,7 +161,6 @@ class _ServicePageState extends State<ServicePage> {
             ],
           ),
         ),
-        bottomNavigationBar: const CustomNavBar(),
       );
     }
 
@@ -203,7 +209,7 @@ class _ServicePageState extends State<ServicePage> {
                   final brand = car['carModel']['brand']['brandName'];
                   final model = car['carModel']['modelName'];
                   final year = car['year'].toString();
-                  
+
                   return Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: Column(
@@ -297,7 +303,8 @@ class _ServicePageState extends State<ServicePage> {
                           Icon(
                             Icons.handyman_outlined,
                             size: 64,
-                            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                            color:
+                                colorScheme.onSurfaceVariant.withOpacity(0.5),
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -330,8 +337,9 @@ class _ServicePageState extends State<ServicePage> {
                         final partName = part['part']['partName'];
                         final createdDate = DateTime.parse(part['createdIn']);
                         final nextDueDate = DateTime.parse(part['nextDueDate']);
-                        final progress = calculateLifespanProgress(part['createdIn'], part['nextDueDate']);
-                        
+                        final progress = calculateLifespanProgress(
+                            part['createdIn'], part['nextDueDate']);
+
                         return GestureDetector(
                           onTap: () => goToPartDetailsPage(part),
                           child: Card(
@@ -341,7 +349,9 @@ class _ServicePageState extends State<ServicePage> {
                             shadowColor: colorScheme.primary.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+                              side: BorderSide(
+                                  color: colorScheme.primary.withOpacity(0.2),
+                                  width: 1),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
@@ -357,7 +367,8 @@ class _ServicePageState extends State<ServicePage> {
                                       const SizedBox(width: 8),
                                       Text(
                                         partName,
-                                        style: theme.textTheme.titleMedium?.copyWith(
+                                        style: theme.textTheme.titleMedium
+                                            ?.copyWith(
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -367,7 +378,8 @@ class _ServicePageState extends State<ServicePage> {
                                   _buildInfoRow(
                                     Icons.calendar_today,
                                     'Last Replaced:',
-                                    DateFormat('MMM dd, yyyy').format(createdDate),
+                                    DateFormat('MMM dd, yyyy')
+                                        .format(createdDate),
                                     Colors.blue,
                                     theme,
                                   ),
@@ -375,7 +387,8 @@ class _ServicePageState extends State<ServicePage> {
                                   _buildInfoRow(
                                     Icons.calendar_month,
                                     'Next Replacement:',
-                                    DateFormat('MMM dd, yyyy').format(nextDueDate),
+                                    DateFormat('MMM dd, yyyy')
+                                        .format(nextDueDate),
                                     Colors.red,
                                     theme,
                                   ),
@@ -389,14 +402,17 @@ class _ServicePageState extends State<ServicePage> {
                                   ),
                                   const SizedBox(height: 16.0),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
                                             'Lifespan Remaining',
-                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                            style: theme.textTheme.bodyMedium
+                                                ?.copyWith(
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -407,7 +423,8 @@ class _ServicePageState extends State<ServicePage> {
                                             ),
                                             decoration: BoxDecoration(
                                               color: getProgressColor(progress),
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                             child: Text(
                                               '${(progress * 100).toStringAsFixed(0)}%',
@@ -449,12 +466,11 @@ class _ServicePageState extends State<ServicePage> {
         foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: const CustomNavBar(),
     );
   }
 
-  Widget _buildInfoRow(
-      IconData icon, String label, String value, Color iconColor, ThemeData theme) {
+  Widget _buildInfoRow(IconData icon, String label, String value,
+      Color iconColor, ThemeData theme) {
     return Row(
       children: [
         Icon(icon, size: 16.0, color: iconColor),

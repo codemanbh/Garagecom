@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../components/CustomNavBar.dart';
 import '../managers/CarInfo.dart';
 import '../models/UserData.dart';
 import '../managers/UserService.dart';
@@ -982,7 +981,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     ],
                   ),
                 ),
-      bottomNavigationBar: const CustomNavBar(),
     );
   }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import '../components/CustomNavBar.dart';
 import '../components/CategoriesDialog.dart';
 import '../managers/CategoryManager.dart';
 import '../helpers/apiHelper.dart';
@@ -30,7 +29,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
-    
+
     try {
       final XFile? image = await picker.pickImage(source: source);
       if (image != null) {
@@ -51,16 +50,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
     if (title.isEmpty || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please provide a title and description')),
+        const SnackBar(content: Text('Please provide a title and description')),
       );
       return;
     }
 
     if (CategoryManager.selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please select a category for your post')),
+        const SnackBar(content: Text('Please select a category for your post')),
       );
       return;
     }
@@ -83,7 +80,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
         'title': title,
         'description': description,
         'allowComments': _allowComments,
-        'postCategoryID': CategoryManager.selectedCategoryId,  // Use 'postCategoryID' instead of 'categoryId'
+        'postCategoryID': CategoryManager
+            .selectedCategoryId, // Use 'postCategoryID' instead of 'categoryId'
       };
 
       print('Post data: $postData');
@@ -94,7 +92,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       } else {
         // Make regular API call for text-only post
         final response = await ApiHelper.post('api/Posts/Setpost', postData);
-        
+
         print('API Response: $response');
         _handlePostResponse(response);
       }
@@ -103,7 +101,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       setState(() {
         _isLoading = false;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${e.toString()}'),
@@ -117,19 +115,20 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Future<void> _submitPostWithImage(String title, String description) async {
     try {
       print('Creating post with image');
-      
+
       // Create a FormData object with the correct field name for the category ID
       FormData formData = FormData.fromMap({
         'title': title,
         'description': description,
         'allowComments': _allowComments,
-        'postCategoryID': CategoryManager.selectedCategoryId,  // Use the correct field name here too
+        'postCategoryID': CategoryManager
+            .selectedCategoryId, // Use the correct field name here too
       });
 
       // Add the image file
       String fileName = _selectedImage!.path.split('/').last;
       print('Image file name: $fileName');
-      
+
       formData.files.add(
         MapEntry(
           'attachment',
@@ -142,12 +141,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
       // Get the Dio client
       Dio client = await ApiHelper.Client();
-      
+
       // Set content type for multipart request
       client.options.headers['Content-Type'] = 'multipart/form-data';
-      
+
       print('Making API call to api/Posts/Setpost with image');
-      
+
       // Make the API call using the same correct endpoint
       final response = await client.post(
         'api/Posts/Setpost',
@@ -156,16 +155,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
       print('API Response status: ${response.statusCode}');
       print('API Response data: ${response.data}');
-      
+
       // Handle the response
       _handlePostResponse(response.data);
-      
     } catch (e) {
       print('Exception in _submitPostWithImage: $e');
       setState(() {
         _isLoading = false;
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error uploading image: ${e.toString()}'),
@@ -205,7 +203,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to create post: ${response['message'] ?? 'Unknown error'}'),
+          content: Text(
+              'Failed to create post: ${response['message'] ?? 'Unknown error'}'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -219,7 +218,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
     return Scaffold(
       backgroundColor: colorScheme.background,
-      bottomNavigationBar: const CustomNavBar(),
       appBar: AppBar(
         title: const Row(
           children: [
@@ -250,12 +248,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Column(
                 children: [
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
@@ -292,15 +292,18 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 ),
                               ),
                               Text(
-                                CategoryManager.getSelectedCategoryName() ?? 'Select a category for your post',
+                                CategoryManager.getSelectedCategoryName() ??
+                                    'Select a category for your post',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: CategoryManager.selectedCategoryId != null
-                                      ? colorScheme.primary
-                                      : colorScheme.onSurfaceVariant,
-                                  fontWeight: CategoryManager.selectedCategoryId != null
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
+                                  color:
+                                      CategoryManager.selectedCategoryId != null
+                                          ? colorScheme.primary
+                                          : colorScheme.onSurfaceVariant,
+                                  fontWeight:
+                                      CategoryManager.selectedCategoryId != null
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
                                 ),
                               ),
                             ],
@@ -313,7 +316,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             setState(() {});
                           },
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
                             backgroundColor: colorScheme.primary,
                             foregroundColor: Colors.white,
                             elevation: 3,
@@ -336,7 +340,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 16),
-                          
+
                           // Title Input with icon
                           Card(
                             elevation: 4,
@@ -344,27 +348,31 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             shadowColor: colorScheme.primary.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+                              side: BorderSide(
+                                  color: colorScheme.primary.withOpacity(0.2),
+                                  width: 1),
                             ),
                             child: ListTile(
-                              leading: Icon(Icons.title, color: colorScheme.primary),
+                              leading:
+                                  Icon(Icons.title, color: colorScheme.primary),
                               title: TextField(
                                 controller: _titleController,
                                 style: TextStyle(
-                                  fontSize: 18, 
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: colorScheme.onSurface,
                                 ),
                                 decoration: InputDecoration(
                                   hintText: 'Post Title',
-                                  hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                                  hintStyle: TextStyle(
+                                      color: colorScheme.onSurfaceVariant),
                                   border: InputBorder.none,
                                 ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // Description Input with icon
                           Card(
                             elevation: 4,
@@ -372,12 +380,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             shadowColor: colorScheme.primary.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+                              side: BorderSide(
+                                  color: colorScheme.primary.withOpacity(0.2),
+                                  width: 1),
                             ),
                             child: Column(
                               children: [
                                 ListTile(
-                                  leading: Icon(Icons.description, color: colorScheme.primary),
+                                  leading: Icon(Icons.description,
+                                      color: colorScheme.primary),
                                   title: Text(
                                     'Description',
                                     style: TextStyle(
@@ -387,7 +398,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 8.0),
                                   child: TextField(
                                     controller: _descriptionController,
                                     maxLines: 4,
@@ -396,14 +408,20 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                       color: colorScheme.onSurface,
                                     ),
                                     decoration: InputDecoration(
-                                      hintText: 'Write details about your post...',
-                                      hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                                      hintText:
+                                          'Write details about your post...',
+                                      hintStyle: TextStyle(
+                                          color: colorScheme.onSurfaceVariant),
                                       border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: colorScheme.primary.withOpacity(0.5)),
+                                        borderSide: BorderSide(
+                                            color: colorScheme.primary
+                                                .withOpacity(0.5)),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                                        borderSide: BorderSide(
+                                            color: colorScheme.primary,
+                                            width: 2),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       contentPadding: const EdgeInsets.all(12),
@@ -415,14 +433,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // Image preview or placeholder
-                          _selectedImage != null 
-                              ? _buildImagePreview(theme) 
+                          _selectedImage != null
+                              ? _buildImagePreview(theme)
                               : _buildImagePlaceholder(theme),
-                          
+
                           const SizedBox(height: 16),
-                          
+
                           // Allow Comments Toggle
                           Card(
                             elevation: 4,
@@ -430,7 +448,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             shadowColor: colorScheme.primary.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+                              side: BorderSide(
+                                  color: colorScheme.primary.withOpacity(0.2),
+                                  width: 1),
                             ),
                             child: SwitchListTile(
                               title: Text(
@@ -441,17 +461,26 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 ),
                               ),
                               subtitle: Text(
-                                _allowComments ? 'Users can comment on this post' : 'Comments are disabled',
-                                style: TextStyle(color: colorScheme.onSurfaceVariant),
+                                _allowComments
+                                    ? 'Users can comment on this post'
+                                    : 'Comments are disabled',
+                                style: TextStyle(
+                                    color: colorScheme.onSurfaceVariant),
                               ),
                               secondary: Icon(
-                                _allowComments ? Icons.chat_bubble_outline : Icons.block,
-                                color: _allowComments ? colorScheme.primary : colorScheme.error,
+                                _allowComments
+                                    ? Icons.chat_bubble_outline
+                                    : Icons.block,
+                                color: _allowComments
+                                    ? colorScheme.primary
+                                    : colorScheme.error,
                               ),
                               value: _allowComments,
                               activeColor: colorScheme.primary,
-                              activeTrackColor: colorScheme.primary.withOpacity(0.3),
-                              inactiveTrackColor: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                              activeTrackColor:
+                                  colorScheme.primary.withOpacity(0.3),
+                              inactiveTrackColor:
+                                  colorScheme.onSurfaceVariant.withOpacity(0.3),
                               inactiveThumbColor: colorScheme.onSurfaceVariant,
                               onChanged: (value) {
                                 setState(() {
@@ -464,14 +493,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       ),
                     ),
                   ),
-                  
+
                   // Bottom action bar
                   _buildBottomActionBar(theme),
                 ],
               ),
             ),
           ),
-          
+
           // Loading overlay
           if (_isLoading)
             Container(
@@ -489,7 +518,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   Widget _buildInstructionStep(String number, String text, ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -529,7 +558,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   Widget _buildImagePlaceholder(ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
       elevation: 4,
       color: colorScheme.surface,
@@ -538,13 +567,12 @@ class _CreatePostPageState extends State<CreatePostPage> {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: colorScheme.primary.withOpacity(0.3), width: 1),
       ),
-      
     );
   }
 
   Widget _buildImagePreview(ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return Card(
       elevation: 4,
       color: colorScheme.surface,
@@ -575,7 +603,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                constraints:
+                    const BoxConstraints.tightFor(width: 36, height: 36),
                 icon: const Icon(Icons.close, size: 20),
                 color: colorScheme.error,
                 onPressed: () {
@@ -639,7 +668,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
       padding: const EdgeInsets.only(top: 16, bottom: 8),
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+          top:
+              BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
         ),
       ),
       child: Column(
@@ -661,7 +691,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
-                      side: BorderSide(color: colorScheme.primary.withOpacity(0.5)),
+                      side: BorderSide(
+                          color: colorScheme.primary.withOpacity(0.5)),
                     ),
                     elevation: 3,
                   ),

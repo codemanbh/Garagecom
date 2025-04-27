@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../components/CustomNavBar.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -51,17 +50,19 @@ class _CameraPageState extends State<CameraPage> {
   void _checkImage() {
     if (_image == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an image before submitting.')),
+        const SnackBar(
+            content: Text('Please select an image before submitting.')),
       );
       return;
     }
 
-    ApiHelper.uploadImage(_image!, '/api/Dashboard/GetDashboardSigns').then((response) {
+    ApiHelper.uploadImage(_image!, '/api/Dashboard/GetDashboardSigns')
+        .then((response) {
       if (response['succeeded'] == true) {
         setState(() {
           print(response);
           print(response["parameters"]['defects']);
-          problems = List.from(response["parameters"]['defects']); 
+          problems = List.from(response["parameters"]['defects']);
           _isProcessing = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -83,8 +84,6 @@ class _CameraPageState extends State<CameraPage> {
         SnackBar(content: Text('Error submitting image: $error')),
       );
     });
-
-
   }
 
   @override
@@ -94,9 +93,9 @@ class _CameraPageState extends State<CameraPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard Analysis', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Dashboard Analysis',
+            style: TextStyle(fontWeight: FontWeight.bold)),
       ),
-      bottomNavigationBar: const CustomNavBar(),
       body: Stack(
         children: [
           Positioned.fill(
@@ -109,7 +108,8 @@ class _CameraPageState extends State<CameraPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Column(
               children: [
                 Expanded(
@@ -120,7 +120,9 @@ class _CameraPageState extends State<CameraPage> {
                       const SizedBox(height: 16),
                       _buildInstructionsCard(theme),
                       const SizedBox(height: 16),
-                      _image != null ? _buildImagePreview(theme) : _buildImagePlaceholder(theme),
+                      _image != null
+                          ? _buildImagePreview(theme)
+                          : _buildImagePlaceholder(theme),
                       const SizedBox(height: 16),
                       if (_isProcessing)
                         _buildProcessingIndicator(theme)
@@ -198,9 +200,12 @@ class _CameraPageState extends State<CameraPage> {
               ),
             ),
             const Divider(height: 24),
-            _buildInstructionStep('Take a photo of your car dashboard', theme, Icons.camera_alt_outlined),
-            _buildInstructionStep('Wait for AI to analyze the image', theme, Icons.autorenew),
-            _buildInstructionStep('Review detected issues', theme, Icons.report_problem_outlined),
+            _buildInstructionStep('Take a photo of your car dashboard', theme,
+                Icons.camera_alt_outlined),
+            _buildInstructionStep(
+                'Wait for AI to analyze the image', theme, Icons.autorenew),
+            _buildInstructionStep(
+                'Review detected issues', theme, Icons.report_problem_outlined),
           ],
         ),
       ),
@@ -220,7 +225,8 @@ class _CameraPageState extends State<CameraPage> {
           Expanded(
             child: Text(
               text,
-              style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.onSurface),
             ),
           ),
         ],
@@ -244,12 +250,16 @@ class _CameraPageState extends State<CameraPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.camera_alt_outlined, size: 48, color: colorScheme.onSurfaceVariant),
+            Icon(Icons.camera_alt_outlined,
+                size: 48, color: colorScheme.onSurfaceVariant),
             const SizedBox(height: 16),
-            Text('No image selected', style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface)),
+            Text('No image selected',
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
             Text('Take or upload a dashboard photo',
-                style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant)),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: colorScheme.onSurfaceVariant)),
           ],
         ),
       ),
@@ -268,7 +278,8 @@ class _CameraPageState extends State<CameraPage> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: Image.file(_image!, height: 200, width: double.infinity, fit: BoxFit.cover),
+        child: Image.file(_image!,
+            height: 200, width: double.infinity, fit: BoxFit.cover),
       ),
     );
   }
@@ -287,7 +298,8 @@ class _CameraPageState extends State<CameraPage> {
         padding: const EdgeInsets.symmetric(vertical: 30),
         child: Column(
           children: [
-            CircularProgressIndicator(color: colorScheme.primary, strokeWidth: 3),
+            CircularProgressIndicator(
+                color: colorScheme.primary, strokeWidth: 3),
             const SizedBox(height: 20),
             Text(
               "Analyzing dashboard...",
@@ -343,7 +355,8 @@ class _CameraPageState extends State<CameraPage> {
                   Expanded(
                     child: Text(
                       'We recommend consulting a mechanic for these issues.',
-                      style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: colorScheme.onSurface),
                     ),
                   ),
                 ],
@@ -358,17 +371,21 @@ class _CameraPageState extends State<CameraPage> {
   Widget _buildDetailedIssueItem(dynamic issue, ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final title = issue["title"]?.toString().trim() ?? "Unknown Issue";
-    final description = issue["description"]?.toString().trim() ?? "No description available";
-    final solution = issue["solution"]?.toString().trim() ?? "No solution provided";
-    
+    final description =
+        issue["description"]?.toString().trim() ?? "No description available";
+    final solution =
+        issue["solution"]?.toString().trim() ?? "No solution provided";
+
     // Default icon mapping based on common dashboard warning lights
     IconData getIssueIcon(String issueTitle) {
       final lowerTitle = issueTitle.toLowerCase();
       if (lowerTitle.contains('battery')) return Icons.battery_alert;
       if (lowerTitle.contains('abs')) return Icons.report_problem;
       if (lowerTitle.contains('oil')) return Icons.oil_barrel;
-      if (lowerTitle.contains('temp') || lowerTitle.contains('temperature')) return Icons.thermostat;
-      if (lowerTitle.contains('tire') || lowerTitle.contains('pressure')) return Icons.tire_repair;
+      if (lowerTitle.contains('temp') || lowerTitle.contains('temperature'))
+        return Icons.thermostat;
+      if (lowerTitle.contains('tire') || lowerTitle.contains('pressure'))
+        return Icons.tire_repair;
       if (lowerTitle.contains('engine')) return Icons.car_repair;
       if (lowerTitle.contains('belt')) return Icons.line_style;
       if (lowerTitle.contains('fuel')) return Icons.local_gas_station;
@@ -380,7 +397,8 @@ class _CameraPageState extends State<CameraPage> {
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.error.withOpacity(0.8), width: 1.5),
+        border:
+            Border.all(color: colorScheme.error.withOpacity(0.8), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: colorScheme.error.withOpacity(0.1),
@@ -423,7 +441,7 @@ class _CameraPageState extends State<CameraPage> {
               ],
             ),
           ),
-          
+
           // Content section
           Padding(
             padding: const EdgeInsets.all(16),
@@ -463,9 +481,9 @@ class _CameraPageState extends State<CameraPage> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Solution section
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,7 +549,8 @@ class _CameraPageState extends State<CameraPage> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
-                      side: BorderSide(color: colorScheme.primary.withOpacity(0.5)),
+                      side: BorderSide(
+                          color: colorScheme.primary.withOpacity(0.5)),
                     ),
                     elevation: 3,
                   ),

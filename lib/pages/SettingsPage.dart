@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:garagecom/pages/AccountSettingsPage.dart';
-import '../components/CustomNavBar.dart';
 // import '../ProfileSettingsPage.dart'; // Import the ProfileSettingsPage
 
 class SettingsPage extends StatelessWidget {
@@ -49,13 +48,13 @@ class SettingsPage extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AccountSettingsPage()),
+                MaterialPageRoute(
+                    builder: (context) => const AccountSettingsPage()),
               );
             },
           ),
         ],
       ),
-      bottomNavigationBar: const CustomNavBar(),
     );
   }
 }

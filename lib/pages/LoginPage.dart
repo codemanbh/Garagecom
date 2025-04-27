@@ -221,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                     }
 
                     // Navigate to home page
-                    Navigator.of(context).pushNamed('/homePage');
+                    Navigator.of(context).pushNamed('/mainPage');
                   } else {
                     // Show more specific error message if available
                     String errorMessage = response["message"] ??
@@ -266,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
               TextButton(
                 onPressed: () {
                   // Navigate to the signup page or implement signup logic
-                  Navigator.of(context).pushNamed('/homePage');
+                  Navigator.of(context).pushNamed('/mainPage');
                 },
                 child: Text(
                   'Home page',

@@ -26,22 +26,10 @@ import './pages/CreatePostPage.dart';
 import './pages/TestPage.dart';
 import './pages/CameraPage.dart';
 import './pages/AddPartPage.dart';
+import './pages/MainPage.dart';
 
-// Background handler
-// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   await dotenv.load(fileName: 'assets/.env'); // loud the env variables
-
-//   await Firebase.initializeApp(
-//     options: FirebaseOptions(
-//       apiKey: dotenv.env['apiKey'] ?? '',
-//       appId: dotenv.env['appId'] ?? '',
-//       messagingSenderId: dotenv.env['messagingSenderId'] ?? '',
-//       projectId: dotenv.env['projectId'] ?? '',
-//       storageBucket: dotenv.env['storageBucket'] ?? '',
-//     ),
-//   );
-//   print('Background message: ${message.messageId}');
-// }
+// Helpers
+import './helpers/navigationHeper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,30 +51,30 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: FlutterMidnightNeonTheme.lightTheme,
-        darkTheme: FlutterMidnightNeonTheme.darkTheme,
-        themeMode: ThemeMode.dark,
-        debugShowCheckedModeBanner: false,
-        // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-
-        initialRoute: '/loginPage',
-        routes: {
-          '/loginPage': (context) => const LoginPage(),
-          '/signup': (context) => const SignupPage(),
-          '/homePage': (context) => const HomePage(),
-          '/profilePage': (context) => const AccountSettingsPage(),
-          '/servicePage': (context) => const ServicePage(),
-          '/settingsPage': (context) => const SettingsPage(),
-          '/createPostPage': (context) => const CreatePostPage(),
-          '/testPage': (context) => const TestPage(),
-          '/aiPage': (context) => CameraPage(),
-          '/AddPartPage': (context) => const AddPartPage(),
-          '/AccountSettingsPage': (context) => const AccountSettingsPage(),
-        });
+      title: 'Flutter Demo',
+      theme: FlutterMidnightNeonTheme.lightTheme,
+      darkTheme: FlutterMidnightNeonTheme.darkTheme,
+      themeMode: ThemeMode.dark,
+      debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
+      initialRoute: '/mainPage',
+      routes: {
+        '/loginPage': (context) => const LoginPage(),
+        '/signup': (context) => const SignupPage(),
+        '/homePage': (context) => const HomePage(),
+        '/profilePage': (context) => const AccountSettingsPage(),
+        '/servicePage': (context) => const ServicePage(),
+        '/settingsPage': (context) => const SettingsPage(),
+        '/createPostPage': (context) => const CreatePostPage(),
+        '/testPage': (context) => const TestPage(),
+        '/aiPage': (context) => CameraPage(),
+        '/AddPartPage': (context) => const AddPartPage(),
+        '/AccountSettingsPage': (context) => const AccountSettingsPage(),
+        '/mainPage': (context) => const MainPage()
+      },
+    );
   }
 }
