@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiHelper {
   late Dio dio;
-  static String mainDomain = 'https://584e-46-184-248-40.ngrok-free.app/';
+  static String mainDomain = 'https://4001-77-69-247-225.ngrok-free.app/';
 
   static Future<Dio> Client() async {
     final prefs = await SharedPreferences.getInstance();
@@ -20,8 +20,8 @@ class ApiHelper {
       }, // Changed to JSON
       // headers: {'Content-Type': 'multipart/form-data'}, // Changed to JSON
 
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
       // Don't throw on error status codes - let us handle them
       validateStatus: (status) => true,
     ));

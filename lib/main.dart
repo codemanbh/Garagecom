@@ -7,9 +7,9 @@ import './theme/flutter_midnight_neon_theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // firebase
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'firebase_options.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'firebase_options.dart';
 
 // providers
 import 'package:garagecom/providers/NavProvider.dart';
@@ -33,12 +33,12 @@ import './pages/CommentPage.dart';
 import './helpers/navigationHeper.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: 'assets/.env'); // loud the env variables
-  print(dotenv.env);
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await dotenv.load(fileName: 'assets/.env'); // loud the env variables
+  // print(dotenv.env);
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
   // list of providers
   runApp(MultiProvider(
     providers: [

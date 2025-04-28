@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -22,10 +23,12 @@ class _CameraPageState extends State<CameraPage> {
       setState(() {
         _isProcessing = true;
       });
-
+      
+      // Use image_picker directly - it will handle permissions internally
       final XFile? pickedFile = await picker.pickImage(source: source);
 
       if (pickedFile != null) {
+        // Add a small delay if you need it
         await Future.delayed(const Duration(seconds: 2));
 
         setState(() {
@@ -33,6 +36,7 @@ class _CameraPageState extends State<CameraPage> {
           _isProcessing = false;
         });
       } else {
+        // User canceled the picker
         setState(() {
           _isProcessing = false;
         });
@@ -41,9 +45,24 @@ class _CameraPageState extends State<CameraPage> {
       setState(() {
         _isProcessing = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error accessing camera or gallery: $e')),
-      );
+      
+      // Handle specific permission denied error
+      if (e.toString().contains('permission')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Camera permission is required. Please enable it in app settings.'),
+            action: SnackBarAction(
+              label: 'Settings',
+              onPressed: () => openAppSettings(),
+            ),
+          ),
+        );
+      } else {
+        // Handle other errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error accessing camera or gallery: $e')),
+        );
+      }
     }
   }
 

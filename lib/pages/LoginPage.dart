@@ -178,12 +178,12 @@ class _LoginPageState extends State<LoginPage> {
               ElevatedButton(
                 onPressed: () async {
                   print('login button pressed');
-                  String deviceToken = await notificationHelper.getNotiToken();
+                  // String deviceToken = await notificationHelper.getNotiToken();
 
                   Map<String, dynamic> data = {
                     'userName': usernameController.text,
                     'password': passwordController.text,
-                    'deviceToken': deviceToken
+                    // 'deviceToken': deviceToken
                   };
 
                   print("***********************" + data.toString());

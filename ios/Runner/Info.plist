@@ -28,6 +28,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- You can comment these out if not using remote notifications -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -51,5 +52,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to take photos of your dashboard</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to select dashboard images</string>
 </dict>
 </plist>
