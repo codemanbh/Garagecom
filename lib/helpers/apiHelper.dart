@@ -43,10 +43,12 @@ class ApiHelper {
   }
 
   static void handeAnAuthorized() async {
-    print('**************** un auth');
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('tocken');
-    navigatorKey.currentState?.pushReplacementNamed('/loginPage');
+    navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      '/loginPage',
+      (route) => false,
+    );
     final messenger = ScaffoldMessenger.of(navigatorKey.currentContext!);
     messenger.showSnackBar(
       SnackBar(

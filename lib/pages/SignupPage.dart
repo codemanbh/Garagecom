@@ -247,8 +247,8 @@ class _SignupPageState extends State<SignupPage> {
                   };
                   Map<String, dynamic> response =
                       await ApiHelper.post("api/Registration/register", data);
-                  print("---${response}");
-                  print("---${response['succeeded']}");
+                  // print("---${response}");
+                  // print("---${response['succeeded']}");
                   // print('jasdbnjasbndajsndajnd');
                   if (response["succeeded"] as bool == true) {
                     String token = response["parameters"]["Token"];

@@ -100,8 +100,8 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
 
         // Update controllers with user data
         if (userData != null) {
-          firstNameController.text = userData!['firstName'] ?? '';
-          lastNameController.text = userData!['lastName'] ?? '';
+          firstNameController.text = userData!['FirstName'] ?? '';
+          lastNameController.text = userData!['LastName'] ?? '';
           usernameController.text = userData!['userName'] ?? '';
           emailController.text = userData!['email'] ?? '';
           phoneController.text = userData!['phoneNumber'] ?? '';
@@ -614,7 +614,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account Settings'),
+        title: const Text('Edit cas'),
         actions: [
           if (!isLoading && !isError)
             IconButton(
@@ -683,126 +683,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 20),
-                      Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 60,
-                            backgroundColor: colorScheme.primaryContainer,
-                            backgroundImage: userData != null &&
-                                    userData!['profilePicture'] != null
-                                ? NetworkImage(
-                                    '${ApiHelper.mainDomain}api/Users/GetProfilePicture?filename=${userData!['profilePicture']}')
-                                : null,
-                            child: userData == null ||
-                                    userData!['profilePicture'] == null
-                                ? Icon(
-                                    Icons.person,
-                                    size: 80,
-                                    color: colorScheme.onPrimaryContainer,
-                                  )
-                                : null,
-                          ),
-                          if (isEditMode)
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: colorScheme.primary,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        userData != null
-                            ? '${userData!['firstName'] ?? ''} ${userData!['lastName'] ?? ''}'
-                            : 'User',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      Text(
-                        userData != null
-                            ? userData!['email'] ?? 'Email'
-                            : 'Email',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                          onPressed: _handleLogout, child: Text('Logout')),
                       if (!isEditMode) ...[
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerLow
-                                .withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: colorScheme.primary.withOpacity(0.2),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: colorScheme.primary.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(
-                                  'Personal Information',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                              buildInfoItem(
-                                  'Username',
-                                  userData != null
-                                      ? userData!['userName'] ?? ''
-                                      : '',
-                                  Icons.account_circle),
-                              buildInfoItem(
-                                  'Full Name',
-                                  userData != null
-                                      ? '${userData!['firstName'] ?? ''} ${userData!['lastName'] ?? ''}'
-                                      : '',
-                                  Icons.person),
-                              buildInfoItem(
-                                  'Email',
-                                  userData != null
-                                      ? userData!['email'] ?? ''
-                                      : '',
-                                  Icons.email),
-                              buildInfoItem(
-                                  'Phone',
-                                  userData != null
-                                      ? userData!['phoneNumber'] ?? ''
-                                      : '',
-                                  Icons.phone),
-                            ],
-                          ),
-                        ),
                         const SizedBox(height: 24),
                         Container(
                           width: double.infinity,
@@ -905,7 +786,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
                             Icons.edit,
                             color: Colors.white,
                           ),
-                          label: const Text('Edit Profile'),
+                          label: const Text('Edit Cars'),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 40, vertical: 15),
@@ -919,73 +800,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
                           ),
                         ),
                       ] else ...[
-                        // Edit mode UI
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerLow
-                                .withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: colorScheme.primary.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(
-                                  'Personal Information',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                              buildEditableField(
-                                label: 'Username',
-                                icon: Icons.account_circle,
-                                controller: usernameController,
-                              ),
-                              buildEditableField(
-                                label: 'First Name',
-                                icon: Icons.person_outline,
-                                controller: firstNameController,
-                              ),
-                              buildEditableField(
-                                label: 'Last Name',
-                                icon: Icons.person,
-                                controller: lastNameController,
-                              ),
-                              buildEditableField(
-                                label: 'Email',
-                                icon: Icons.email,
-                                controller: emailController,
-                              ),
-                              buildEditableField(
-                                label: 'Phone Number',
-                                icon: Icons.phone,
-                                controller: phoneController,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: updateProfile,
-                                child: const Text('Save Profile'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primary,
-                                  foregroundColor: colorScheme.onPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
                         const SizedBox(height: 24),
-
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
