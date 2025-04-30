@@ -14,7 +14,7 @@ class AddPartPage extends StatefulWidget {
 class _AddPartPageState extends State<AddPartPage> {
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController partNameController = TextEditingController();
+  TextEditingController partIdController = TextEditingController();
   TextEditingController partReplacedDistanceController =
       TextEditingController();
   TextEditingController partLifetimeDistanceController =
@@ -157,38 +157,44 @@ class _AddPartPageState extends State<AddPartPage> {
     });
   }
 
-  void handleSave() async {
-    if (_formKey.currentState!.validate()) {
-      // Format the interval with the selected value and unit
-      final String formattedInterval =
-          selectedIntervalValue != null && selectedIntervalUnit != null
-              ? '$selectedIntervalValue $selectedIntervalUnit'
-              : '';
+  @override
+  Widget build(BuildContext context) {
+    void handleSave() async {
+      if (_formKey.currentState!.validate()) {
+        // Format the interval with the selected value and unit
+        final String formattedInterval =
+            selectedIntervalValue != null && selectedIntervalUnit != null
+                ? '$selectedIntervalValue $selectedIntervalUnit'
+                : '';
 
-      // partNameController
-      // partReplacedDistanceController
-      // partLifetimeDistanceController
-      // partLifetimeTimeController
-      // intervalValueController
+        // partIdController
+        // partReplacedDistanceController
+        // partLifetimeDistanceController
+        // partLifetimeTimeController
+        // intervalValueController
 
-      Map<String, dynamic> data = {
-        "carId": 3,
-        "partId": partNameController.text,
-        "lifeTimeInterval": intervalValueController.text,
-        "notes": "this note is empty and it shoun't be"
-      };
+        final args =
+            ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+        final carId = args['carId'];
 
-      print(data);
+        Map<String, dynamic> data = {
+          "carId": carId,
+          "partId": partIdController.text,
+          "lifeTimeInterval": intervalValueController.text,
+          "notes": "this note is empty and it shoun't be"
+        };
 
-      Map<String, dynamic> response =
-          await ApiHelper.post('/api/Cars/SetCarPart', data);
+        print(data);
 
-      // Pass the data back to the previous screen
-      // You can create a CarPart object here with all the collected data
-      // For example:
-      /*
+        Map<String, dynamic> response =
+            await ApiHelper.post('/api/Cars/SetCarPart', data);
+        print(response);
+        // Pass the data back to the previous screen
+        // You can create a CarPart object here with all the collected data
+        // For example:
+        /*
       final part = CarPart(
-        partName: partNameController.text,
+        partName: partIdController.text,
         lastReplacedDate: replacementDate != null ? DateFormat('MMM dd, yyyy').format(replacementDate!) : null,
         nextReplacedDate: nextServiceDate != null ? DateFormat('MMM dd, yyyy').format(nextServiceDate!) : null,
         replacementInterval: formattedInterval,
@@ -198,12 +204,10 @@ class _AddPartPageState extends State<AddPartPage> {
       Navigator.of(context).pop(part);
       */
 
-      Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -322,7 +326,7 @@ class _AddPartPageState extends State<AddPartPage> {
                               onChanged: (String? newValue) {
                                 setState(() {
                                   selectedPartType = newValue;
-                                  partNameController.text = newValue ?? '';
+                                  partIdController.text = newValue ?? '';
                                 });
                               },
                               decoration: InputDecoration(
@@ -384,7 +388,7 @@ class _AddPartPageState extends State<AddPartPage> {
                                 ],
                               ),
                               child: TextFormField(
-                                controller: partNameController,
+                                controller: partIdController,
                                 decoration: InputDecoration(
                                   labelText: 'Custom Part Name',
                                   border: OutlineInputBorder(

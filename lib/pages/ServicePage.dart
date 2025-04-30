@@ -57,13 +57,13 @@ class _ServicePageState extends State<ServicePage> {
   void goToAddPartPage() {
     if (userCars.isEmpty) return;
 
-    final currentCarId = userCars[currentCarIndex]['CarID'];
-    Navigator.of(context)
-        .pushNamed(
+    final currentCarId = userCars[currentCarIndex]['carID'];
+
+    // "-------------- goToAddPartPage was clicked, userCars[currentCarIndex = $");
+    Navigator.of(context).pushNamed(
       '/AddPartPage',
-      arguments: currentCarId,
-    )
-        .then((_) {
+      arguments: {'carId': currentCarId},
+    ).then((_) {
       // Refresh data when coming back
       fetchUserCarsWithParts();
     });
@@ -170,13 +170,6 @@ class _ServicePageState extends State<ServicePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Service'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: goToAddPartPage,
-            tooltip: 'Add new part',
-          ),
-        ],
       ),
       body: SafeArea(
         child: Column(

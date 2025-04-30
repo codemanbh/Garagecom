@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
+import 'package:garagecom/helpers/notificationHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
@@ -220,6 +221,8 @@ class _SignupPageState extends State<SignupPage> {
               ElevatedButton(
                 onPressed: () async {
                   print('Sign Up button pressed');
+
+
                   Map<String, dynamic> data =  {
                     'firstName': firstnameController.text,
                     'lastName': lastnameController.text,
