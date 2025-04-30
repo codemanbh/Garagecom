@@ -12,14 +12,13 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final TextEditingController firstnameController = TextEditingController();
-   final TextEditingController lastnameController = TextEditingController();
+  final TextEditingController lastnameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController usernameController = TextEditingController();
-    final TextEditingController phoneController = TextEditingController();
-
-
+  final TextEditingController phoneController = TextEditingController();
 
   @override
   void dispose() {
@@ -27,7 +26,7 @@ class _SignupPageState extends State<SignupPage> {
     lastnameController.dispose();
     emailController.dispose();
     usernameController.dispose();
-    phoneController.dispose();  
+    phoneController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -37,7 +36,7 @@ class _SignupPageState extends State<SignupPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sign Up'),
@@ -77,11 +76,13 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
                 keyboardType: TextInputType.name,
@@ -99,11 +100,13 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
                 keyboardType: TextInputType.name,
@@ -121,11 +124,13 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
                 keyboardType: TextInputType.emailAddress,
@@ -135,7 +140,8 @@ class _SignupPageState extends State<SignupPage> {
                 controller: usernameController,
                 decoration: InputDecoration(
                   labelText: 'Username',
-                  prefixIcon: Icon(Icons.person_outline, color: colorScheme.primary),
+                  prefixIcon:
+                      Icon(Icons.person_outline, color: colorScheme.primary),
                   filled: true,
                   fillColor: theme.colorScheme.surfaceContainerLow,
                   border: OutlineInputBorder(
@@ -143,11 +149,13 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
                 keyboardType: TextInputType.emailAddress,
@@ -165,11 +173,13 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
               ),
@@ -186,11 +196,13 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
                 obscureText: true,
@@ -200,7 +212,8 @@ class _SignupPageState extends State<SignupPage> {
                 controller: confirmPasswordController,
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
-                  prefixIcon: Icon(Icons.lock_outline, color: colorScheme.primary),
+                  prefixIcon:
+                      Icon(Icons.lock_outline, color: colorScheme.primary),
                   filled: true,
                   fillColor: theme.colorScheme.surfaceContainerLow,
                   border: OutlineInputBorder(
@@ -208,11 +221,13 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide:
+                        BorderSide(color: colorScheme.primary, width: 2),
                   ),
                 ),
                 obscureText: true,
@@ -222,8 +237,7 @@ class _SignupPageState extends State<SignupPage> {
                 onPressed: () async {
                   print('Sign Up button pressed');
 
-
-                  Map<String, dynamic> data =  {
+                  Map<String, dynamic> data = {
                     'firstName': firstnameController.text,
                     'lastName': lastnameController.text,
                     'email': emailController.text,
@@ -231,13 +245,16 @@ class _SignupPageState extends State<SignupPage> {
                     'phoneNumber': phoneController.text,
                     'password': passwordController.text,
                   };
-                  Map<String,dynamic> response = await ApiHelper.post("api/Registration/register", data);
-                  print(response);
-                  print(response["succeeded"]);
-                  if(response["succeeded"] as bool == true) {
+                  Map<String, dynamic> response =
+                      await ApiHelper.post("api/Registration/register", data);
+                  print("---${response}");
+                  print("---${response['succeeded']}");
+                  // print('jasdbnjasbndajsndajnd');
+                  if (response["succeeded"] as bool == true) {
                     String token = response["parameters"]["Token"];
                     int userId = response["parameters"]["UserID"];
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
                     await prefs.setString("token", token);
                     await prefs.setInt("userId", userId);
                     Navigator.of(context).pushNamed('/homePage');
@@ -248,7 +265,8 @@ class _SignupPageState extends State<SignupPage> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),

@@ -217,7 +217,7 @@ class _AddPartPageState extends State<AddPartPage> {
         elevation: 0,
       ),
       body: _isLoading
-          ? CircularProgressIndicator()
+          ? Center(child: CircularProgressIndicator())
           : Container(
               decoration: BoxDecoration(
                 color: theme.scaffoldBackgroundColor,
@@ -512,67 +512,67 @@ class _AddPartPageState extends State<AddPartPage> {
                           // ),
 
                           // Service schedule section
-                          const SizedBox(height: 24),
-                          Text(
-                            'Service Schedule',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
+                          // const SizedBox(height: 24),
+                          // Text(
+                          //   'Service Schedule',
+                          //   style: TextStyle(
+                          //     fontSize: 16,
+                          //     fontWeight: FontWeight.bold,
+                          //     color: colorScheme.onSurface,
+                          //   ),
+                          // ),
+                          // const SizedBox(height: 16),
 
                           // Next service date picker
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surface,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: colorScheme.primary.withOpacity(0.2),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: colorScheme.primary.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: ListTile(
-                              title: Text(
-                                'Next Service Date',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                              subtitle: Text(
-                                nextServiceDate != null
-                                    ? DateFormat('MMM dd, yyyy')
-                                        .format(nextServiceDate!)
-                                    : 'Select Date',
-                                style: TextStyle(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                              leading: Icon(
-                                Icons.event,
-                                color: colorScheme.primary,
-                              ),
-                              trailing: Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              onTap: () => _selectNextServiceDate(context),
-                            ),
-                          ),
+                          // Container(
+                          //   margin: const EdgeInsets.only(bottom: 16),
+                          //   decoration: BoxDecoration(
+                          //     color: colorScheme.surface,
+                          //     borderRadius: BorderRadius.circular(12),
+                          //     border: Border.all(
+                          //       color: colorScheme.primary.withOpacity(0.2),
+                          //       width: 1,
+                          //     ),
+                          //     boxShadow: [
+                          //       BoxShadow(
+                          //         color: colorScheme.primary.withOpacity(0.1),
+                          //         blurRadius: 4,
+                          //         offset: const Offset(0, 2),
+                          //       ),
+                          //     ],
+                          //   ),
+                          //   child: ListTile(
+                          //     title: Text(
+                          //       'Next Service Date',
+                          //       style: TextStyle(
+                          //         fontSize: 16,
+                          //         color: colorScheme.onSurface,
+                          //       ),
+                          //     ),
+                          //     subtitle: Text(
+                          //       nextServiceDate != null
+                          //           ? DateFormat('MMM dd, yyyy')
+                          //               .format(nextServiceDate!)
+                          //           : 'Select Date',
+                          //       style: TextStyle(
+                          //         color: colorScheme.onSurfaceVariant,
+                          //       ),
+                          //     ),
+                          //     leading: Icon(
+                          //       Icons.event,
+                          //       color: colorScheme.primary,
+                          //     ),
+                          //     trailing: Icon(
+                          //       Icons.arrow_forward_ios,
+                          //       size: 16,
+                          //       color: colorScheme.onSurfaceVariant,
+                          //     ),
+                          //     shape: RoundedRectangleBorder(
+                          //       borderRadius: BorderRadius.circular(12),
+                          //     ),
+                          //     onTap: () => _selectNextServiceDate(context),
+                          //   ),
+                          // ),
 
                           const SizedBox(height: 24),
                           Text(

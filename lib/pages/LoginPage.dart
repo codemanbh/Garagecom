@@ -85,30 +85,28 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Added logo at the top
-              Center(
-                child: Container(
-                  height: 150,
-                  width: 350,
-                  margin: const EdgeInsets.only(top: 50, bottom: 20),
-                  child: Image.asset(
-                    'assets/logo-raw-purple.png',
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      print('Logo loading error: $error');
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: colorScheme.primaryContainer,
-                          shape: BoxShape.circle,
-                        ),
-                      );
-                    },
-                  ),
+              Container(
+                height: 100,
+                // width: 350,
+                margin: const EdgeInsets.only(top: 50, bottom: 20),
+                child: Image.asset(
+                  'assets/logo-raw-purple.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    print('Logo loading error: $error');
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                    );
+                  },
                 ),
               ),
               const Text(
@@ -221,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                     }
 
                     // Navigate to home page
-                    Navigator.of(context).pushNamed('/mainPage');
+                    Navigator.of(context).popAndPushNamed('/mainPage');
                   } else {
                     // Show more specific error message if available
                     String errorMessage = response["message"] ??
@@ -263,35 +261,38 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              TextButton(
-                onPressed: () {
-                  // Navigate to the signup page or implement signup logic
-                  Navigator.of(context).popAndPushNamed('/mainPage');
-                },
-                child: Text(
-                  'Home page',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  // Navigate to the signup page or implement signup logic
-                  Navigator.of(context).pushNamed('/testPage');
-                },
-                child: Text(
-                  'Test Page',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
               const SizedBox(
-                height: 60,
+                height: 80,
               ),
+              // TextButton(
+              //   onPressed: () {
+              //     // Navigate to the signup page or implement signup logic
+              //     Navigator.of(context).popAndPushNamed('/mainPage');
+              //   },
+              //   child: Text(
+              //     'Home page',
+              //     style: TextStyle(
+              //       fontSize: 16,
+              //       color: colorScheme.primary,
+              //     ),
+              //   ),
+              // ),
+              // TextButton(
+              //   onPressed: () {
+              //     // Navigate to the signup page or implement signup logic
+              //     Navigator.of(context).pushNamed('/testPage');
+              //   },
+              //   child: Text(
+              //     'Test Page',
+              //     style: TextStyle(
+              //       fontSize: 16,
+              //       color: colorScheme.primary,
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(
+              //   height: 60,
+              // ),
             ],
           ),
         ),
