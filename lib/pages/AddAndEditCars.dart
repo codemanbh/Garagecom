@@ -120,7 +120,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
 
   void _handleLogout() {
     ApiHelper.post('/api/Proile/Logout', {});
-    ApiHelper.handeAnAuthorized();
+    ApiHelper.handleAnAuthorized();
   }
 
   Future<void> updateProfile() async {

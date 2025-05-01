@@ -257,7 +257,9 @@ class _SignupPageState extends State<SignupPage> {
                         await SharedPreferences.getInstance();
                     await prefs.setString("token", token);
                     await prefs.setInt("userId", userId);
-                    Navigator.of(context).pushNamed('/homePage');
+    //context.<NavProvider>().pageIndex;
+
+                    Navigator.of(context).popAndPushNamed('/mainPage');
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('There was an error ')),

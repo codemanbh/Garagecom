@@ -9,4 +9,13 @@ class NavProvider extends ChangeNotifier {
     _pageIndex = index;
     notifyListeners();
   }
+
+  void setPageIndex(int index) {
+    _pageIndex = index;
+    notifyListeners();
+  }
+  void resetPageIndex() {
+    _pageIndex = 0;
+    notifyListeners();
+  }
 }

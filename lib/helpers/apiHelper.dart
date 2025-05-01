@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:provider/provider.dart';
+import '../providers/NavProvider.dart';
 import './navigationHeper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,9 +44,16 @@ class ApiHelper {
     return dio;
   }
 
-  static void handeAnAuthorized() async {
+  static void handleAnAuthorized() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.remove('tocken');
+    prefs.remove('token');
+    prefs.remove('userId');
+
+    final context = navigatorKey.currentContext;
+  if (context != null) {
+    Provider.of<NavProvider>(context, listen: false).resetPageIndex();
+  }
+
     navigatorKey.currentState?.pushNamedAndRemoveUntil(
       '/loginPage',
       (route) => false,
@@ -141,7 +150,7 @@ class ApiHelper {
     }
 
     if (response.statusCode == 401) {
-      handeAnAuthorized();
+      handleAnAuthorized();
     }
 
     if (response.statusCode != 200) {
