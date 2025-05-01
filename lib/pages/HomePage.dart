@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: const Text('Cars Forum'),
+        title: const Text('Cars Community'),
         actions: [
           IconButton(
               onPressed: () {

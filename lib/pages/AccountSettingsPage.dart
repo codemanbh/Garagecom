@@ -614,7 +614,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account Settings'),
+        title: const Text('Profile'),
         actions: [
           if (!isLoading && !isError)
             IconButton(
@@ -740,8 +740,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      ElevatedButton(
-                          onPressed: _handleLogout, child: Text('Logout')),
                       if (!isEditMode) ...[
                         Container(
                           width: double.infinity,
@@ -908,8 +906,27 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                           label: const Text('Edit Profile'),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 40, vertical: 15),
+                                horizontal: 20, vertical: 8),
                             backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            elevation: 4,
+                            shadowColor: colorScheme.primary.withOpacity(0.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton.icon(
+                          icon: Icon(Icons.logout),
+                          onPressed: _handleLogout,
+                          label: Text('Logout'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 8),
+                            backgroundColor: colorScheme.error,
                             foregroundColor: colorScheme.onPrimary,
                             elevation: 4,
                             shadowColor: colorScheme.primary.withOpacity(0.5),

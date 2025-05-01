@@ -129,6 +129,15 @@ class _ServicePageState extends State<ServicePage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget _buildAddCarsPage() {
+      return ElevatedButton.icon(
+          onPressed: () {
+            Navigator.of(context).pushNamed('/addAndEditCarsPage');
+          },
+          label: Text('Add Cars'),
+          icon: Icon(Icons.add));
+    }
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -158,6 +167,7 @@ class _ServicePageState extends State<ServicePage> {
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
+              _buildAddCarsPage()
             ],
           ),
         ),
@@ -170,14 +180,7 @@ class _ServicePageState extends State<ServicePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Service'),
-        actions: [
-          ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/addAndEditCarsPage');
-              },
-              label: Text('Edit Cars'),
-              icon: Icon(Icons.edit))
-        ],
+        actions: [_buildAddCarsPage()],
       ),
       body: SafeArea(
         child: Column(

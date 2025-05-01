@@ -25,7 +25,7 @@ class CustomNavBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.forum),
-          label: 'Cars Forum',
+          label: 'Community',
         ),
 
         // BottomNavigationBarItem(
@@ -35,7 +35,7 @@ class CustomNavBar extends StatelessWidget {
 
         BottomNavigationBarItem(
           icon: Icon(Icons.account_circle),
-          label: 'Account',
+          label: 'Profile',
         ),
       ],
       selectedItemColor: Theme.of(context).colorScheme.secondary,
