@@ -232,8 +232,8 @@ class _ServicePageState extends State<ServicePage> {
                 },
                 itemBuilder: (context, index) {
                   final car = userCars[index];
-                  final brand = car['carModel']['brand']['brandName'];
-                  final model = car['carModel']['modelName'];
+                  final brand = car['model']['brand']['brandName'];
+                  final model = car['model']['modelName'];
                   final year = car['year'].toString();
 
                   return Padding(

@@ -62,7 +62,7 @@ class UserService {
     try {
       // Simplify the data structure to match what the API expects
       final simplifiedData = {
-        'medelID': carData['model']['ModelID'],
+        'modelID': carData['model']['modelID'],
         'year': carData['year'],
         'nickname': carData['nickname'] ?? '',
         'kilos': carData['kilos'] ?? 0,
@@ -122,13 +122,14 @@ class UserService {
   // Get all car brands and models to extract unique brands
   static Future<Map<String, dynamic>> getCarBrands() async {
     try {
-      final response = await ApiHelper.get('api/Cars/GetCarModels', {});
+      final response = await ApiHelper.get('api/Cars/GetModels', {});
+      // print("------${response}");
 
       if (response['succeeded'] == true &&
           response['parameters'] != null &&
-          response['parameters']['CarModels'] != null) {
+          response['parameters']['Models'] != null) {
         // Get the CarModels array
-        List<dynamic> carModels = response['parameters']['CarModels'];
+        List<dynamic> carModels = response['parameters']['Models'];
 
         // Extract unique brands
         Set<int> brandIdSet = {};
@@ -161,13 +162,13 @@ class UserService {
   // Get models for a specific brand
   static Future<Map<String, dynamic>> getCarModels(int brandId) async {
     try {
-      final response = await ApiHelper.get('api/Cars/GetCarModels', {});
+      final response = await ApiHelper.get('api/Cars/GetModels', {});
 
       if (response['succeeded'] == true &&
           response['parameters'] != null &&
-          response['parameters']['CarModels'] != null) {
+          response['parameters']['Models'] != null) {
         // Get all car models and filter by the selected brand ID
-        List<dynamic> allModels = response['parameters']['CarModels'];
+        List<dynamic> allModels = response['parameters']['Models'];
         List<dynamic> brandModels = allModels
             .where((model) =>
                 model['brand'] != null && model['brand']['brandID'] == brandId)

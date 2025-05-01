@@ -177,8 +177,8 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
         'year': DateTime.now().year,
         'nickname': '',
         'kilos': 0,
-        'carModel': {
-          'medelID': 0,
+        'model': {
+          'modelID': 0,
           'modelName': '',
           'brand': {'brandID': 0, 'brandName': ''}
         }
@@ -202,10 +202,10 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
       currentEditingCar = Map<String, dynamic>.from(car);
 
       // Initialize controllers with car data
-      selectedBrandId = car['carModel']['brand']['brandID'];
-      selectedBrandName = car['carModel']['brand']['brandName'];
-      selectedModelId = car['carModel']['medelID'];
-      selectedModelName = car['carModel']['modelName'];
+      selectedBrandId = car['model']['brand']['brandID'];
+      selectedBrandName = car['model']['brand']['brandName'];
+      selectedModelId = car['model']['modelID'];
+      selectedModelName = car['model']['modelName'];
       selectedYear = car['year'];
       carNameController.text = car['nickname'] ?? '';
       mileageController.text = car['kilos']?.toString() ?? '0';
@@ -238,8 +238,8 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
       currentEditingCar!['year'] = selectedYear;
       currentEditingCar!['nickname'] = carNameController.text;
       currentEditingCar!['kilos'] = int.tryParse(mileageController.text) ?? 0;
-      currentEditingCar!['carModel'] = {
-        'medelID': selectedModelId,
+      currentEditingCar!['model'] = {
+        'modelID': selectedModelId,
         'modelName': selectedModelName,
         'brand': {'brandID': selectedBrandId, 'brandName': selectedBrandName}
       };
@@ -295,7 +295,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
       builder: (context) => AlertDialog(
         title: const Text('Confirm Deletion'),
         content: Text(
-            'Are you sure you want to delete "${car['nickname'] != null && car['nickname'].toString().isNotEmpty ? car['nickname'] : "${car['carModel']['brand']['brandName']} ${car['carModel']['modelName']}"}"?'),
+            'Are you sure you want to delete "${car['nickname'] != null && car['nickname'].toString().isNotEmpty ? car['nickname'] : "${car['model']['brand']['brandName']} ${car['model']['modelName']}"}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -355,8 +355,8 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final brand = car['carModel']['brand']['brandName'];
-    final model = car['carModel']['modelName'];
+    final brand = car['model']['brand']['brandName'];
+    final model = car['model']['modelName'];
     final year = car['year']?.toString() ?? '';
     final nickname = car['nickname'] ?? '';
     final kilos = car['kilos'] ?? 0;
@@ -578,7 +578,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
         // Print each model for debugging
         for (var model in carModels) {
           print(
-              'Model ID: ${model['medelID']}, Model Name: ${model['modelName']}');
+              'Model ID: ${model['modelID']}, Model Name: ${model['modelName']}');
         }
       } else {
         setState(() {
@@ -1050,7 +1050,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
             icon: Icons.model_training,
             value: selectedModelId != null && carModels.isNotEmpty
                 ? carModels.cast<Map<String, dynamic>>().firstWhere(
-                      (model) => model['medelID'] == selectedModelId,
+                      (model) => model['modelID'] == selectedModelId,
                       orElse: () => <String, dynamic>{},
                     )
                 : null,
@@ -1061,7 +1061,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
                     if (newValue != null) {
                       print('Selected model: $newValue');
                       setState(() {
-                        selectedModelId = newValue['medelID'];
+                        selectedModelId = newValue['modelID'];
                         selectedModelName = newValue['modelName'];
                       });
                     }
