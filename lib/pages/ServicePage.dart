@@ -80,7 +80,8 @@ class _ServicePageState extends State<ServicePage> {
       replacementInterval: '${part['lifeTimeInterval']} Months',
       lifespanProgress:
           calculateLifespanProgress(part['createdIn'], part['nextDueDate']),
-      carId: userCars[currentCarIndex]['carID'], // Change from userCarID to carID
+      carId: userCars[currentCarIndex]
+          ['carID'], // Change from userCarID to carID
     );
 
     Navigator.of(context)
@@ -168,9 +169,6 @@ class _ServicePageState extends State<ServicePage> {
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
-<<<<<<< HEAD
-              _buildAddCarsPage()
-=======
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () {
@@ -186,14 +184,13 @@ class _ServicePageState extends State<ServicePage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
               ),
->>>>>>> 2a4a18e0d51160a46d621628bad009947d768c68
             ],
           ),
         ),
@@ -206,10 +203,6 @@ class _ServicePageState extends State<ServicePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Service'),
-<<<<<<< HEAD
-        actions: [_buildAddCarsPage()],
-=======
->>>>>>> 2a4a18e0d51160a46d621628bad009947d768c68
       ),
       body: SafeArea(
         child: Column(

@@ -3,6 +3,8 @@ import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:image/image.dart' as img;
+import 'package:path/path.dart' as path;
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -16,7 +18,57 @@ class _CameraPageState extends State<CameraPage> {
   bool _isProcessing = false;
   List<dynamic> problems = [];
 
+  Future<XFile?> pickAndResizeImage(ImageSource source) async {
+    const int maxShortSide = 768;
+    const int maxLongSide = 2000;
+
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile == null) return null;
+
+    final bytes = await pickedFile.readAsBytes();
+    final original = img.decodeImage(bytes);
+    if (original == null) return null;
+
+    int originalWidth = original.width;
+    int originalHeight = original.height;
+
+    int shortSide =
+        originalWidth < originalHeight ? originalWidth : originalHeight;
+    int longSide =
+        originalWidth > originalHeight ? originalWidth : originalHeight;
+
+    double shortScale = maxShortSide / shortSide;
+    double longScale = maxLongSide / longSide;
+
+    double scale = shortScale < longScale ? shortScale : longScale;
+
+    if (scale >= 1.0) {
+      // No resizing needed, return original as XFile
+      return pickedFile;
+    }
+
+    int newWidth = (originalWidth * scale).round();
+    int newHeight = (originalHeight * scale).round();
+
+    final resized =
+        img.copyResize(original, width: newWidth, height: newHeight);
+
+    final resizedBytes = img.encodeJpg(resized, quality: 85);
+
+    // Save to temp file
+    final tempDir = Directory.systemTemp;
+    final filePath = path.join(
+        tempDir.path, 'resized_${DateTime.now().millisecondsSinceEpoch}.jpg');
+    final resizedFile = await File(filePath).writeAsBytes(resizedBytes);
+
+    return XFile(resizedFile.path);
+  }
+
   Future<void> _pickImage(ImageSource source) async {
+    const int maxShortSide = 768;
+    const int maxLongSide = 2000;
     final ImagePicker picker = ImagePicker();
 
     try {
@@ -25,7 +77,7 @@ class _CameraPageState extends State<CameraPage> {
       });
 
       // Use image_picker directly - it will handle permissions internally
-      final XFile? pickedFile = await picker.pickImage(source: source);
+      final XFile? pickedFile = await pickAndResizeImage(source);
 
       if (pickedFile != null) {
         // Add a small delay if you need it
