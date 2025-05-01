@@ -92,12 +92,14 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               // Added logo at the top
               Container(
-                height: 100,
-                // width: 350,
+                height: 80,
+                width: 350,
                 margin: const EdgeInsets.only(top: 50, bottom: 20),
                 child: Image.asset(
                   'assets/logo-raw-purple.png',
-                  fit: BoxFit.contain,
+                  height: 50,
+                  width: 10,
+                  fit: BoxFit.fitHeight,
                   errorBuilder: (context, error, stackTrace) {
                     print('Logo loading error: $error');
                     return Container(
@@ -115,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
-                height: 20,
+                height: 8,
               ),
               const Text(
                 'Log in or create an account to get started.',
@@ -123,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(fontSize: 20),
               ),
               const SizedBox(
-                height: 40,
+                height: 20,
               ),
               TextFormField(
                 controller: usernameController,

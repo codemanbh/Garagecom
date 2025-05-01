@@ -97,24 +97,7 @@ class PostsManager {
   Future<bool> _loadFallbackPosts() async {
     print('Loading fallback posts...');
 
-    List<Map<String, dynamic>> postsMap = [
-      {
-        "id": 1,
-        "autherUsername": "GlitchHorizon",
-        "title": "I have a weird sound in my Accord car engine",
-        "content":
-            "I've been hearing a strange ticking noise coming from my engine. Has anyone experienced this before?",
-      },
-      {
-        "id": 2,
-        "autherUsername": "TurboAccord2.0",
-        "title": "Best tires for off-road driving?",
-        "content":
-            "I'm looking for durable off-road tires for my Jeep Wrangler. Any recommendations?",
-        "image": "https://example.com/images/jeep-tires.jpg"
-      },
-      // Rest of your fallback posts...
-    ];
+    List<Map<String, dynamic>> postsMap = [];
 
     // Clear existing posts
     posts.clear();

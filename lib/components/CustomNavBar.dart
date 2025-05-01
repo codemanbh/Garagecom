@@ -16,21 +16,23 @@ class CustomNavBar extends StatelessWidget {
       },
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.design_services),
           label: 'Service',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.add),
-          label: 'Create',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.camera),
+          icon: Icon(Icons.photo_camera),
           label: 'Dashboard',
         ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.forum),
+          label: 'Cars Forum',
+        ),
+
+        // BottomNavigationBarItem(
+        //   icon: Icon(Icons.add),
+        //   label: 'Create',
+        // ),
+
         BottomNavigationBarItem(
           icon: Icon(Icons.account_circle),
           label: 'Account',

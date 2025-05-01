@@ -16,19 +16,25 @@ class MainPage extends StatelessWidget {
     final pageIndex = context.watch<NavProvider>().pageIndex;
 
     final List<Widget> pages = const [
-      HomePage(),
       ServicePage(),
-      CreatePostPage(),
       CameraPage(),
+
+      HomePage(),
+      // CreatePostPage(),
       AccountSettingsPage(),
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: pageIndex,
-        children: pages,
-      ),
+      body: pages[pageIndex],
       bottomNavigationBar: const CustomNavBar(),
     );
+
+    // return Scaffold(
+    //   body: IndexedStack(
+    //     index: pageIndex,
+    //     children: pages,
+    //   ),
+    //   bottomNavigationBar: const CustomNavBar(),
+    // );
   }
 }
