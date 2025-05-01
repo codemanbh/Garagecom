@@ -75,6 +75,11 @@ class _CameraPageState extends State<CameraPage> {
       return;
     }
 
+    // Set loading state to true before API call
+    setState(() {
+      _isProcessing = true;
+    });
+
     ApiHelper.uploadImage(_image!, '/api/Dashboard/GetDashboardSigns')
         .then((response) {
       if (response['succeeded'] == true) {

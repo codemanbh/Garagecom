@@ -198,489 +198,6 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(part.partName ?? 'Part Details'),
-        actions: [
-          IconButton(
-            icon: Icon(isEditing ? Icons.save : Icons.edit),
-            onPressed: isEditing ? _saveChanges : _toggleEditMode,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16.0),
-              // Part Name
-              _buildEditableField(
-                label: 'Part Name',
-                value: part.partName,
-                onSaved: (value) => part.partName = value,
-                isEditing: isEditing,
-              ),
-              const SizedBox(height: 16.0),
-              // Last Replaced Date
-              _buildDateField(
-                label: 'Last Replaced Date',
-                controller: lastReplacedController,
-                onSaved: (value) => part.lastReplacedDate = value,
-                isEditing: isEditing,
-                isLastReplaced: true,
-              ),
-              const SizedBox(height: 16.0),
-              // Next Replaced Date
-              _buildDateField(
-                label: 'Next Replaced Date',
-                controller: nextReplacedController,
-                onSaved: (value) => part.nextReplacedDate = value,
-                isEditing: isEditing,
-                isLastReplaced: false,
-              ),
-              const SizedBox(height: 16.0),
-              // Replacement Interval
-              _buildIntervalField(
-                label: 'Replacement Interval',
-                controller: replacementIntervalController,
-                onSaved: (value) => replacementIntervalController.text = value ?? '',
-                isEditing: isEditing,
-              ),
-              const SizedBox(height: 8.0),
-              // Progress Indicator
-              LinearProgressIndicator(
-                value: part.lifespanProgress ?? 0.0,
-                backgroundColor: Colors.grey[300],
-                color: _getProgressColor(part.lifespanProgress),
-                minHeight: 8.0,
-              ),
-              const SizedBox(height: 8.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Lifespan Progress',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  Text(
-                    '${((part.lifespanProgress ?? 0.0) * 100).toStringAsFixed(0)}%',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16.0),
-              // Store Location
-              _buildEditableField(
-                label: 'Store Location',
-                value: part.storeLocation,
-                onSaved: (value) => part.storeLocation = value,
-                isEditing: isEditing,
-              ),
-              const SizedBox(height: 16.0),
-              // Notes
-              _buildEditableField(
-                label: 'Notes',
-                value: part.notes,
-                onSaved: (value) => part.notes = value,
-                isEditing: isEditing,
-                maxLines: 3,
-              ),
-              // Item Image
-              _buildImageSection(
-                label: 'Item Image',
-                imagePath: part.itemImagePath,
-                onTap: () => _pickImage(false),
-              ),
-              const SizedBox(height: 16.0),
-              // Receipt Image
-              _buildImageSection(
-                label: 'Receipt Image',
-                imagePath: part.receiptImagePath,
-                onTap: () => _pickImage(true),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEditableField({
-    required String label,
-    required String? value,
-    required Function(String?) onSaved,
-    required bool isEditing,
-    int maxLines = 1,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 8.0),
-        isEditing
-            ? TextFormField(
-                initialValue: value,
-                decoration: InputDecoration(
-                  labelText: label,
-                  prefixIcon: _getIconForField(label, colorScheme),
-                  hintText: 'Enter $label',
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
-                  ),
-                ),
-                maxLines: maxLines,
-                onSaved: onSaved,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter $label';
-                  }
-                  return null;
-                },
-              )
-            : Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
-                ),
-                child: Row(
-                  children: [
-                    _getIconForField(label, colorScheme),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        value ?? 'Not provided',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ],
-    );
-  }
-
-  Widget _buildDateField({
-    required String label,
-    required TextEditingController controller,
-    required Function(String?) onSaved,
-    required bool isEditing,
-    required bool isLastReplaced,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 8.0),
-        isEditing
-            ? TextFormField(
-                controller: controller,
-                readOnly: true,
-                onTap: () => _selectDate(context, isLastReplaced),
-                decoration: InputDecoration(
-                  labelText: label,
-                  prefixIcon: _getIconForField(label, colorScheme),
-                  suffixIcon: Icon(Icons.calendar_today, color: colorScheme.primary),
-                  hintText: 'Select $label',
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: colorScheme.primary, width: 2),
-                  ),
-                ),
-                onSaved: onSaved,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select $label';
-                  }
-                  return null;
-                },
-              )
-            : Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
-                ),
-                child: Row(
-                  children: [
-                    _getIconForField(label, colorScheme),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        controller.text.isNotEmpty ? controller.text : 'Not provided',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ],
-    );
-  }
-
-  Widget _buildIntervalField({
-    required String label,
-    required TextEditingController controller,
-    required Function(String?) onSaved,
-    required bool isEditing,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 8.0),
-        isEditing
-            ? Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: DropdownButtonFormField<String>(
-                      value: selectedIntervalValue,
-                      decoration: InputDecoration(
-                        labelText: 'Value',
-                        prefixIcon: _getIconForField(label, colorScheme),
-                        hintText: 'Select value',
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: colorScheme.primary, width: 2),
-                        ),
-                      ),
-                      items: presetIntervalValues[selectedIntervalUnit]?.map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList() ?? [],
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedIntervalValue = newValue;
-                          controller.text = newValue ?? '';
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select a value';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 2,
-                    child: DropdownButtonFormField<String>(
-                      value: selectedIntervalUnit,
-                      decoration: InputDecoration(
-                        labelText: 'Unit',
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: colorScheme.primary, width: 2),
-                        ),
-                      ),
-                      items: intervalUnits.map((String unit) {
-                        return DropdownMenuItem<String>(
-                          value: unit,
-                          child: Text(unit),
-                        );
-                      }).toList(),
-                      onChanged: _handleIntervalUnitChange,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select a unit';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ],
-              )
-            : Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
-                ),
-                child: Row(
-                  children: [
-                    _getIconForField(label, colorScheme),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        part.replacementInterval ?? 'Not provided',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ],
-    );
-  }
-
-  Widget _getIconForField(String label, ColorScheme colorScheme) {
-    IconData iconData;
-    switch (label) {
-      case 'Part Name':
-        iconData = Icons.build;
-        break;
-      case 'Last Replaced Date':
-        iconData = Icons.calendar_today;
-        break;
-      case 'Next Replaced Date':
-        iconData = Icons.event_available;
-        break;
-      case 'Replacement Interval':
-        iconData = Icons.update;
-        break;
-      case 'Store Location':
-        iconData = Icons.store;
-        break;
-      case 'Notes':
-        iconData = Icons.note;
-        break;
-      default:
-        iconData = Icons.info;
-    }
-    return Icon(iconData, color: colorScheme.primary);
-  }
-
-  Widget _buildImageSection({
-    required String label,
-    required String? imagePath,
-    required VoidCallback onTap,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 8.0),
-        GestureDetector(
-          onTap: isEditing ? onTap : null,
-          child: Container(
-            width: double.infinity,
-            height: 150,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
-            ),
-            child: imagePath != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.file(
-                      File(imagePath),
-                      width: double.infinity,
-                      height: 150,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_a_photo,
-                          size: 40,
-                          color: isEditing ? colorScheme.primary : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                        ),
-                        const SizedBox(height: 8.0),
-                        Text(
-                          isEditing ? 'Tap to upload $label' : 'No $label available',
-                          style: TextStyle(
-                            color: isEditing ? colorScheme.onSurfaceVariant : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Color _getProgressColor(double? progress) {
     if (progress == null) return Colors.grey;
     if (progress > 0.75) {
@@ -690,5 +207,908 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
     } else {
       return Colors.red;
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(part.partName ?? 'Part Details'),
+        actions: [
+          IconButton(
+            icon: Icon(isEditing ? Icons.save : Icons.edit),
+            onPressed: isEditing ? _saveChanges : _toggleEditMode,
+          ),
+        ],
+        elevation: 0,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header section
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.build_rounded,
+                              color: colorScheme.primary,
+                              size: 28,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  part.partName ?? 'Car Part',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Maintenance schedule and details',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Part Information
+                    Text(
+                      'Part Information',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    isEditing
+                        ? Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: TextFormField(
+                              initialValue: part.partName,
+                              decoration: InputDecoration(
+                                labelText: 'Part Name',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: Icon(Icons.build, color: colorScheme.primary),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              ),
+                              onSaved: (value) => part.partName = value,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter a part name';
+                                }
+                                return null;
+                              },
+                            ),
+                          )
+                        : Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              leading: Icon(
+                                Icons.build,
+                                color: colorScheme.primary,
+                              ),
+                              title: Text(
+                                'Part Name',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              subtitle: Text(
+                                part.partName ?? 'Not specified',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                    // Service History section
+                    const SizedBox(height: 24),
+                    Text(
+                      'Service History',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Last Replacement Date
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: isEditing
+                          ? ListTile(
+                              title: Text(
+                                'Last Replacement Date',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              subtitle: Text(
+                                lastReplacedController.text.isNotEmpty
+                                    ? lastReplacedController.text
+                                    : 'Select Date',
+                                style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              leading: Icon(
+                                Icons.calendar_today,
+                                color: colorScheme.primary,
+                              ),
+                              trailing: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 16,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onTap: () => _selectDate(context, true),
+                            )
+                          : ListTile(
+                              leading: Icon(
+                                Icons.calendar_today,
+                                color: colorScheme.primary,
+                              ),
+                              title: Text(
+                                'Last Replacement Date',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              subtitle: Text(
+                                part.lastReplacedDate ?? 'Not specified',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                    ),
+
+                    // Service Schedule section
+                    const SizedBox(height: 24),
+                    Text(
+                      'Service Schedule',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Next Service Date
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: isEditing
+                          ? ListTile(
+                              title: Text(
+                                'Next Service Date',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              subtitle: Text(
+                                nextReplacedController.text.isNotEmpty
+                                    ? nextReplacedController.text
+                                    : 'Select Date',
+                                style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              leading: Icon(
+                                Icons.event,
+                                color: colorScheme.primary,
+                              ),
+                              trailing: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 16,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onTap: () => _selectDate(context, false),
+                            )
+                          : ListTile(
+                              leading: Icon(
+                                Icons.event,
+                                color: colorScheme.primary,
+                              ),
+                              title: Text(
+                                'Next Service Date',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              subtitle: Text(
+                                part.nextReplacedDate ?? 'Not specified',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                    ),
+
+                    // Service Interval
+                    const SizedBox(height: 16),
+                    Text(
+                      'Service Interval',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: isEditing
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Service Interval',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: DropdownButtonFormField<String>(
+                                        value: selectedIntervalValue,
+                                        decoration: InputDecoration(
+                                          labelText: 'Value',
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        items: presetIntervalValues[selectedIntervalUnit]?.map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList() ?? [],
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            selectedIntervalValue = newValue;
+                                            replacementIntervalController.text = newValue ?? '';
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      flex: 2,
+                                      child: DropdownButtonFormField<String>(
+                                        value: selectedIntervalUnit,
+                                        decoration: InputDecoration(
+                                          labelText: 'Unit',
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        items: intervalUnits.map((String unit) {
+                                          return DropdownMenuItem<String>(
+                                            value: unit,
+                                            child: Text(unit),
+                                          );
+                                        }).toList(),
+                                        onChanged: _handleIntervalUnitChange,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          : ListTile(
+                              leading: Icon(
+                                Icons.update,
+                                color: colorScheme.primary,
+                              ),
+                              title: Text(
+                                'Service Interval',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              subtitle: Text(
+                                part.replacementInterval ?? 'Not specified',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                    ),
+
+                    // Lifespan progress
+                    const SizedBox(height: 16),
+                    Text(
+                      'Lifespan Progress',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Current Progress',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _getProgressColor(part.lifespanProgress),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${((part.lifespanProgress ?? 0.0) * 100).toStringAsFixed(0)}%',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: part.lifespanProgress ?? 0.0,
+                              backgroundColor: Colors.grey[200],
+                              color: _getProgressColor(part.lifespanProgress),
+                              minHeight: 8,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Additional Details
+                    const SizedBox(height: 24),
+                    Text(
+                      'Additional Details',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Store Location
+                    isEditing
+                        ? Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: TextFormField(
+                              initialValue: part.storeLocation,
+                              decoration: InputDecoration(
+                                labelText: 'Store Location',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: Icon(Icons.store, color: colorScheme.primary),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              ),
+                              onSaved: (value) => part.storeLocation = value,
+                            ),
+                          )
+                        : part.storeLocation != null && part.storeLocation!.isNotEmpty
+                            ? Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: colorScheme.primary.withOpacity(0.2),
+                                    width: 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: colorScheme.primary.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.store,
+                                    color: colorScheme.primary,
+                                  ),
+                                  title: Text(
+                                    'Store Location',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    part.storeLocation ?? '',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+
+                    // Notes
+                    isEditing
+                        ? Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: TextFormField(
+                              initialValue: part.notes,
+                              decoration: InputDecoration(
+                                labelText: 'Notes',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: Icon(Icons.note, color: colorScheme.primary),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              ),
+                              maxLines: 3,
+                              onSaved: (value) => part.notes = value,
+                            ),
+                          )
+                        : part.notes != null && part.notes!.isNotEmpty
+                            ? Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: colorScheme.primary.withOpacity(0.2),
+                                    width: 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: colorScheme.primary.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.note,
+                                    color: colorScheme.primary,
+                                  ),
+                                  title: Text(
+                                    'Notes',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    part.notes ?? '',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+
+                    // Images section
+                    const SizedBox(height: 24),
+                    Text(
+                      'Images',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Item Image
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8, top: 8, bottom: 8),
+                            child: Text(
+                              'Item Image',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: isEditing ? () => _pickImage(false) : null,
+                            child: Container(
+                              width: double.infinity,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerLow,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: part.itemImagePath != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(
+                                        File(part.itemImagePath!),
+                                        width: double.infinity,
+                                        height: 150,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.add_a_photo,
+                                            size: 40,
+                                            color: isEditing
+                                                ? colorScheme.primary
+                                                : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                                          ),
+                                          const SizedBox(height: 8.0),
+                                          Text(
+                                            isEditing ? 'Tap to upload image' : 'No image available',
+                                            style: TextStyle(
+                                              color: isEditing
+                                                  ? colorScheme.onSurfaceVariant
+                                                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Receipt Image
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8, top: 8, bottom: 8),
+                            child: Text(
+                              'Receipt Image',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: isEditing ? () => _pickImage(true) : null,
+                            child: Container(
+                              width: double.infinity,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerLow,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: part.receiptImagePath != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(
+                                        File(part.receiptImagePath!),
+                                        width: double.infinity,
+                                        height: 150,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.add_a_photo,
+                                            size: 40,
+                                            color: isEditing
+                                                ? colorScheme.primary
+                                                : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                                          ),
+                                          const SizedBox(height: 8.0),
+                                          Text(
+                                            isEditing ? 'Tap to upload receipt' : 'No receipt available',
+                                            style: TextStyle(
+                                              color: isEditing
+                                                  ? colorScheme.onSurfaceVariant
+                                                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Save button (only visible in edit mode)
+                    if (isEditing)
+                      Center(
+                        child: ElevatedButton.icon(
+                          onPressed: _saveChanges,
+                          icon: const Icon(Icons.save),
+                          label: const Text('Save Changes'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            elevation: 4,
+                            shadowColor: colorScheme.primary.withOpacity(0.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
