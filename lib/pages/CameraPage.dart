@@ -23,13 +23,15 @@ class _CameraPageState extends State<CameraPage> {
       setState(() {
         _isProcessing = true;
       });
-      
+
       // Use image_picker directly - it will handle permissions internally
       final XFile? pickedFile = await picker.pickImage(source: source);
 
       if (pickedFile != null) {
         // Add a small delay if you need it
-        await Future.delayed(const Duration(seconds: 2));
+        // await Future.delayed(const Duration(seconds: 2));
+
+        // pickedFile.
 
         setState(() {
           _image = File(pickedFile.path);
@@ -45,12 +47,13 @@ class _CameraPageState extends State<CameraPage> {
       setState(() {
         _isProcessing = false;
       });
-      
+
       // Handle specific permission denied error
       if (e.toString().contains('permission')) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Camera permission is required. Please enable it in app settings.'),
+            content: const Text(
+                'Camera permission is required. Please enable it in app settings.'),
             action: SnackBarAction(
               label: 'Settings',
               onPressed: () => openAppSettings(),
@@ -74,11 +77,6 @@ class _CameraPageState extends State<CameraPage> {
       );
       return;
     }
-
-    // Set loading state to true before API call
-    setState(() {
-      _isProcessing = true;
-    });
 
     ApiHelper.uploadImage(_image!, '/api/Dashboard/GetDashboardSigns')
         .then((response) {
