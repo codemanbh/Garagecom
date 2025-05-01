@@ -311,7 +311,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         ),
                         ElevatedButton(
                           onPressed: () async {
-                            await showCategoriesDialog(context);
+                            await showCategoriesDialog(context, 'create');
                             // Force refresh UI to show selected category
                             setState(() {});
                           },

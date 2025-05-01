@@ -142,7 +142,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await showCategoriesDialog(context);
+                    await showCategoriesDialog(context, 'filter');
+                    await _loadPosts();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(

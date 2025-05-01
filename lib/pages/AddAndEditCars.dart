@@ -178,7 +178,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
         'nickname': '',
         'kilos': 0,
         'carModel': {
-          'carModelID': 0,
+          'medelID': 0,
           'modelName': '',
           'brand': {'brandID': 0, 'brandName': ''}
         }
@@ -204,7 +204,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
       // Initialize controllers with car data
       selectedBrandId = car['carModel']['brand']['brandID'];
       selectedBrandName = car['carModel']['brand']['brandName'];
-      selectedModelId = car['carModel']['carModelID'];
+      selectedModelId = car['carModel']['medelID'];
       selectedModelName = car['carModel']['modelName'];
       selectedYear = car['year'];
       carNameController.text = car['nickname'] ?? '';
@@ -239,7 +239,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
       currentEditingCar!['nickname'] = carNameController.text;
       currentEditingCar!['kilos'] = int.tryParse(mileageController.text) ?? 0;
       currentEditingCar!['carModel'] = {
-        'carModelID': selectedModelId,
+        'medelID': selectedModelId,
         'modelName': selectedModelName,
         'brand': {'brandID': selectedBrandId, 'brandName': selectedBrandName}
       };
@@ -578,7 +578,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
         // Print each model for debugging
         for (var model in carModels) {
           print(
-              'Model ID: ${model['carModelID']}, Model Name: ${model['modelName']}');
+              'Model ID: ${model['medelID']}, Model Name: ${model['modelName']}');
         }
       } else {
         setState(() {
@@ -1050,7 +1050,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
             icon: Icons.model_training,
             value: selectedModelId != null && carModels.isNotEmpty
                 ? carModels.cast<Map<String, dynamic>>().firstWhere(
-                      (model) => model['carModelID'] == selectedModelId,
+                      (model) => model['medelID'] == selectedModelId,
                       orElse: () => <String, dynamic>{},
                     )
                 : null,
@@ -1061,7 +1061,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
                     if (newValue != null) {
                       print('Selected model: $newValue');
                       setState(() {
-                        selectedModelId = newValue['carModelID'];
+                        selectedModelId = newValue['medelID'];
                         selectedModelName = newValue['modelName'];
                       });
                     }

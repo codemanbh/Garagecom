@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:garagecom/managers/CategoryManager.dart';
 import 'package:garagecom/models/Category.dart';
 import '../models/Post.dart';
 import 'dart:convert';
@@ -15,21 +16,11 @@ class PostsManager {
     fetchPosts();
   }
 
-  Future<bool> fetchPostDetails(int postId) async {
-    final response =
-        await _dio.get('http://192.168.243.1:3000/api/posts/$postId');
-    if (response.statusCode == 200) {
-      // Post post = Post();
-    }
-
-    return true;
-  }
-
   Future<bool> fetchPosts() async {
     try {
       // Fetch posts from API
-      Map<String, dynamic> response =
-          await ApiHelper.get('api/Posts/GetPosts', {'categoryId': 1});
+      Map<String, dynamic> response = await ApiHelper.get('api/Posts/GetPosts',
+          {'categoryId': CategoryManager.selectedCategories});
 
       print('API Response received');
       print(response);
