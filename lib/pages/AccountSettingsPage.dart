@@ -119,7 +119,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 
   void _handleLogout() {
-    ApiHelper.post('/api/Proile/Logout', {});
+    ApiHelper.post('/api/Profile/Logout', {});
     ApiHelper.handeAnAuthorized();
   }
 
@@ -1346,6 +1346,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                       colorScheme.onSurfaceVariant.withOpacity(0.5),
                 ),
               ),
+              
             ],
           ),
         ],
@@ -1447,6 +1448,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 ),
               ),
             ),
+            
         ],
       ),
     );

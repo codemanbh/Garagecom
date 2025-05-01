@@ -6,10 +6,12 @@ import '../pages/CommentPage.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
+  final bool isAdminView;
 
   const PostCard({
     super.key,
     required this.post,
+    this.isAdminView = false, // Add this parameter
   });
 
   void navigateToCommentPage(BuildContext context, String title,

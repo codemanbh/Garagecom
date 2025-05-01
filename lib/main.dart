@@ -29,6 +29,7 @@ import './pages/AddPartPage.dart';
 import './pages/MainPage.dart';
 import './pages/CommentPage.dart';
 import './pages/AddAndEditCars.dart';
+import './pages/AdminPage.dart';
 
 // Helpers
 import './helpers/navigationHeper.dart';
@@ -82,7 +83,8 @@ class MyApp extends StatelessWidget {
               questionBody: '',
               initialVotes: 0,
             ),
-        '/addAndEditCarsPage': (context) => AddAndEditCars()
+        '/addAndEditCarsPage': (context) => AddAndEditCars(),
+        '/adminPage': (context) => const AdminPage(),
       },
     );
   }

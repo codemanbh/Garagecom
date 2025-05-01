@@ -122,10 +122,16 @@ class UserService {
   // Get all car brands and models to extract unique brands
   static Future<Map<String, dynamic>> getCarBrands() async {
     try {
+<<<<<<< HEAD
       final response = await ApiHelper.get('api/Cars/GetModels', {});
       // print("------${response}");
 
       if (response['succeeded'] == true &&
+=======
+      final response = await ApiHelper.get('api/Cars/GetBrands', {});
+      
+      if (response['succeeded'] == true && 
+>>>>>>> 8fcec20 (Admin)
           response['parameters'] != null &&
           response['parameters']['Models'] != null) {
         // Get the CarModels array
@@ -163,8 +169,13 @@ class UserService {
   static Future<Map<String, dynamic>> getCarModels(int brandId) async {
     try {
       final response = await ApiHelper.get('api/Cars/GetModels', {});
+<<<<<<< HEAD
 
       if (response['succeeded'] == true &&
+=======
+      
+      if (response['succeeded'] == true && 
+>>>>>>> 8fcec20 (Admin)
           response['parameters'] != null &&
           response['parameters']['Models'] != null) {
         // Get all car models and filter by the selected brand ID
