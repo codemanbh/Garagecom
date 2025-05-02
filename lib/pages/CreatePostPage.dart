@@ -89,16 +89,32 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
       print('Post data: $postData');
 
+      // Make regular API call for text-only post
+        final response = await ApiHelper.post('api/Posts/Setpost', postData);
+        print(response);
+        if(response['succeeded'] == true) {
+          int postId = response['parameters']['PostID'];
+          print('Post created with ID: $postId');
+          print(_selectedImage != null);
+          if(_selectedImage != null) {
+            File imageFile = File(_selectedImage!.path);
+            Map<String, dynamic> imageData = {
+              'postId': postId
+            };
+            final response = await ApiHelper.uploadImage(imageFile, "api/Posts/SetPostAttachment", options: {
+              'postId': postId
+            });
+            print('Image upload response: $response');
+          }
+        }
+
       // If there's an image, we need to handle that with a multipart request
       if (_selectedImage != null) {
-        await _submitPostWithImage(title, description);
-      } else {
-        // Make regular API call for text-only post
-        final response = await ApiHelper.post('api/Posts/Setpost', postData);
-
+        
+      }
+        
         print('API Response: $response');
         _handlePostResponse(response);
-      }
     } catch (e) {
       print('Exception in _submitPost: $e');
       setState(() {
@@ -116,66 +132,39 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   // Helper method to handle multipart request with image
-  Future<void> _submitPostWithImage(String title, String description) async {
-    try {
-      print('Creating post with image');
+  // Future<void> _submitPostWithImage(String title, String description) async {
+  //   try {
+  //     print('Creating post with image');
 
-      // Create a FormData object with the correct field name for the category ID
-      FormData formData = FormData.fromMap({
-        'title': title,
-        'description': description,
-        'allowComments': _allowComments,
-        'postCategoryID': CategoryManager
-            .selectedCategoryId, // Use the correct field name here too
-      });
+  //     // Create a FormData object with the correct field name for the category ID
+  //     Map<String, dynamic> postData = {
+  //       'title': title,
+  //       'description': description,
+  //       'allowComments': _allowComments,
+  //       'postCategoryID': CategoryManager
+  //           .selectedCategoryId, // Use the correct field name here too
+  //     };
+  //     ApiHelper.post("")
 
-      // Add the image file
-      String fileName = _selectedImage!.path.split('/').last;
-      print('Image file name: $fileName');
+  //     print('API Response status: ${response.statusCode}');
+  //     print('API Response data: ${response.data}');
 
-      formData.files.add(
-        MapEntry(
-          'attachment',
-          await MultipartFile.fromFile(
-            _selectedImage!.path,
-            filename: fileName,
-          ),
-        ),
-      );
+  //     // Handle the response
+  //     _handlePostResponse(response.data);
+  //   } catch (e) {
+  //     print('Exception in _submitPostWithImage: $e');
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
 
-      // Get the Dio client
-      Dio client = await ApiHelper.Client();
-
-      // Set content type for multipart request
-      client.options.headers['Content-Type'] = 'multipart/form-data';
-
-      print('Making API call to api/Posts/Setpost with image');
-
-      // Make the API call using the same correct endpoint
-      final response = await client.post(
-        'api/Posts/Setpost',
-        data: formData,
-      );
-
-      print('API Response status: ${response.statusCode}');
-      print('API Response data: ${response.data}');
-
-      // Handle the response
-      _handlePostResponse(response.data);
-    } catch (e) {
-      print('Exception in _submitPostWithImage: $e');
-      setState(() {
-        _isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error uploading image: ${e.toString()}'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    }
-  }
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Error uploading image: ${e.toString()}'),
+  //         backgroundColor: Theme.of(context).colorScheme.error,
+  //       ),
+  //     );
+  //   }
+  // }
 
   // Helper method to handle the API response
   void _handlePostResponse(dynamic response) {

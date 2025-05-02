@@ -14,6 +14,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isLoading = false; // Add this line to track loading state
 
   @override
   void dispose() {
@@ -176,78 +177,119 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () async {
-                  print('login button pressed');
-                  // String deviceToken = await notificationHelper.getNotiToken();
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        // Set loading state to true
+                        setState(() {
+                          _isLoading = true;
+                        });
 
-                  Map<String, dynamic> data = {
-                    'userName': usernameController.text,
-                    'password': passwordController.text,
-                    // 'deviceToken': deviceToken
-                  };
+                        try {
+                          print('login button pressed');
+                          // String deviceToken = await notificationHelper.getNotiToken();
 
-                  print("***********************" + data.toString());
+                          Map<String, dynamic> data = {
+                            'userName': usernameController.text,
+                            'password': passwordController.text,
+                            // 'deviceToken': deviceToken
+                          };
 
-                  Map<String, dynamic> response =
-                      await ApiHelper.post("api/Registration/login", data);
-                  print(response);
-                  print(response["succeeded"]);
+                          print("***********************" + data.toString());
 
-                  if (response["succeeded"] == true) {
-                    String token = response["parameters"]["Token"];
+                          Map<String, dynamic> response = await ApiHelper.post(
+                              "api/Registration/login", data);
+                          print(response);
+                          print(response["succeeded"]);
 
-                    // Safely handle missing UserID
-                    int? userId;
-                    if (response["parameters"].containsKey("UserID") &&
-                        response["parameters"]["UserID"] != null) {
-                      userId = response["parameters"]["UserID"];
-                    } else if (response["parameters"].containsKey("UserId") &&
-                        response["parameters"]["UserId"] != null) {
-                      // Try alternate casing of UserId
-                      userId = response["parameters"]["UserId"];
-                    } else {
-                      // Extract user ID from token if possible
-                      // JWT tokens have a payload section with user data
-                      userId = _extractUserIdFromToken(token);
-                    }
+                          // Reset loading state after getting response
+                          setState(() {
+                            _isLoading = false;
+                          });
 
-                    // Store token and userId (if available)
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.setString("token", token);
+                          if (response["succeeded"] == true) {
+                            String token = response["parameters"]["Token"];
 
-                    if (userId != null) {
-                      await prefs.setInt("userId", userId);
-                    }
+                            // Safely handle missing UserID
+                            int? userId;
+                            if (response["parameters"].containsKey("UserID") &&
+                                response["parameters"]["UserID"] != null) {
+                              userId = response["parameters"]["UserID"];
+                            } else if (response["parameters"]
+                                    .containsKey("UserId") &&
+                                response["parameters"]["UserId"] != null) {
+                              // Try alternate casing of UserId
+                              userId = response["parameters"]["UserId"];
+                            } else {
+                              // Extract user ID from token if possible
+                              userId = _extractUserIdFromToken(token);
+                            }
 
-                    // Navigate to home page
-                    Navigator.of(context).popAndPushNamed('/mainPage');
-                  } else {
-                    // Show more specific error message if available
-                    String errorMessage = response["message"] ??
-                        'Login failed. Please check your credentials.';
+                            // Store token and userId (if available)
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            await prefs.setString("token", token);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(errorMessage),
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                        duration: const Duration(seconds: 4),
-                      ),
-                    );
-                  }
-                },
+                            if (userId != null) {
+                              await prefs.setInt("userId", userId);
+                            }
+
+                            // Navigate to home page
+                            Navigator.of(context).popAndPushNamed('/mainPage');
+                          } else {
+                            // Show more specific error message if available
+                            String errorMessage = response["message"] ??
+                                'Login failed. Please check your credentials.';
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(errorMessage),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.error,
+                                duration: const Duration(seconds: 4),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          // Reset loading state in case of error
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          // Show error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: ${e.toString()}'),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.error,
+                              duration: const Duration(seconds: 4),
+                            ),
+                          );
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: colorScheme.primary,
+                  disabledBackgroundColor:
+                      colorScheme.primary.withOpacity(0.6),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                child: _isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Login',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
               ),
               const SizedBox(height: 16),
               TextButton(
@@ -279,40 +321,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              
-              // TextButton(
-              //   onPressed: () {
-              //     // Navigate to the signup page or implement signup logic
-              //     Navigator.of(context).popAndPushNamed('/mainPage');
-              //   },
-              //   child: Text(
-              //     'Home page',
-              //     style: TextStyle(
-              //       fontSize: 16,
-              //       color: colorScheme.primary,
-              //     ),
-              //   ),
-              // ),
-              // TextButton(
-              //   onPressed: () {
-              //     // Navigate to the signup page or implement signup logic
-              //     Navigator.of(context).pushNamed('/testPage');
-              //   },
-              //   child: Text(
-              //     'Test Page',
-              //     style: TextStyle(
-              //       fontSize: 16,
-              //       color: colorScheme.primary,
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(
-              //   height: 60,
-              // ),
             ],
           ),
         ),
-        
       ),
     );
   }

@@ -470,6 +470,7 @@ class _CameraPageState extends State<CameraPage> {
         issue["description"]?.toString().trim() ?? "No description available";
     final solution =
         issue["solution"]?.toString().trim() ?? "No solution provided";
+        final logo = issue["logo"]?.toString().trim() ?? "No logo available";
 
     // Default icon mapping based on common dashboard warning lights
     IconData getIssueIcon(String issueTitle) {
@@ -518,10 +519,15 @@ class _CameraPageState extends State<CameraPage> {
             ),
             child: Row(
               children: [
-                Icon(
-                  getIssueIcon(title),
-                  color: colorScheme.error,
-                  size: 24,
+                // Icon(
+                //   getIssueIcon(title),
+                //   color: colorScheme.error,
+                //   size: 24,
+                // ),
+                SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: ApiHelper.image(logo, 'api/Dashboard/GetDashboardSignAttachment'),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

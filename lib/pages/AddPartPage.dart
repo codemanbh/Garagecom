@@ -45,6 +45,8 @@ class _AddPartPageState extends State<AddPartPage> {
   // List of common car parts for dropdown
   List<Map<String, dynamic>> partTypes = [];
   bool _isLoading = true;
+      bool _isProcessing = false;
+
 
   @override
   void initState() {
@@ -180,6 +182,9 @@ class _AddPartPageState extends State<AddPartPage> {
         Map<String, dynamic> data = {
           "carId": carId,
           "partId": partIdController.text,
+        "lastReplacementDate": replacementDate != null
+            ? DateFormat('yyyy-MM-dd').format(replacementDate!)
+            : null,
           "lifeTimeInterval": intervalValueController.text,
           "notes": "this note is empty and it shoun't be"
         };
@@ -631,7 +636,8 @@ class _AddPartPageState extends State<AddPartPage> {
 
                           // Save button
                           Center(
-                            child: ElevatedButton.icon(
+                            child:
+                             ElevatedButton.icon(
                               onPressed: handleSave,
                               icon: const Icon(Icons.save),
                               label: const Text('Save Part'),

@@ -194,6 +194,8 @@ class ApiHelper {
     });
 
     try {
+      print(formData.fields);
+      print('POST Request to: ${client.options.baseUrl}$path');
       final response = await client.post(
         path,
         data: formData,
