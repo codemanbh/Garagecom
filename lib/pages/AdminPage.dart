@@ -20,7 +20,7 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       setState(() {
         _selectedIndex = _tabController.index;

@@ -19,6 +19,7 @@ class _SignupPageState extends State<SignupPage> {
       TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -234,48 +235,120 @@ class _SignupPageState extends State<SignupPage> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () async {
-                  print('Sign Up button pressed');
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
 
-                  Map<String, dynamic> data = {
-                    'firstName': firstnameController.text,
-                    'lastName': lastnameController.text,
-                    'email': emailController.text,
-                    'userName': usernameController.text,
-                    'phoneNumber': phoneController.text,
-                    'password': passwordController.text,
-                  };
-                  Map<String, dynamic> response =
-                      await ApiHelper.post("api/Registration/register", data);
-                  // print("---${response}");
-                  // print("---${response['succeeded']}");
-                  // print('jasdbnjasbndajsndajnd');
-                  if (response["succeeded"] as bool == true) {
-                    String token = response["parameters"]["Token"];
-                    int userId = response["parameters"]["UserID"];
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.setString("token", token);
-                    await prefs.setInt("userId", userId);
-                    Navigator.of(context).pushNamed('/homePage');
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('There was an error ')),
-                    );
-                  }
-                },
+                        try {
+                          print('Sign Up button pressed');
+
+                          if (firstnameController.text.isEmpty ||
+                              lastnameController.text.isEmpty ||
+                              emailController.text.isEmpty ||
+                              usernameController.text.isEmpty ||
+                              passwordController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Please fill in all required fields')),
+                            );
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            return;
+                          }
+
+                          if (passwordController.text !=
+                              confirmPasswordController.text) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Passwords do not match')),
+                            );
+                            setState(() {
+                              _isLoading = false;
+                            });
+                            return;
+                          }
+
+                          Map<String, dynamic> data = {
+                            'firstName': firstnameController.text,
+                            'lastName': lastnameController.text,
+                            'email': emailController.text,
+                            'userName': usernameController.text,
+                            'phoneNumber': phoneController.text,
+                            'password': passwordController.text,
+                          };
+
+                          Map<String, dynamic> response = await ApiHelper.post(
+                              "api/Registration/register", data);
+
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          if (response["succeeded"] as bool == true) {
+                            String token = response["parameters"]["Token"];
+                            int userId = response["parameters"]["UserID"];
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            await prefs.setString("token", token);
+                            await prefs.setInt("userId", userId);
+
+                            Navigator.of(context)
+                                .popAndPushNamed('/mainPage');
+                          } else {
+                            String errorMessage = response["message"] ??
+                                'There was an error with registration';
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(errorMessage),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.error,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Error during registration: ${e.toString()}'),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.error,
+                            ),
+                          );
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   backgroundColor: colorScheme.primary,
+                  disabledBackgroundColor:
+                      colorScheme.primary.withOpacity(0.6),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
-                child: const Text(
-                  'Sign Up',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                child: _isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Sign Up',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
               ),
               const SizedBox(height: 16),
               Row(
@@ -287,7 +360,6 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Navigate back to login page
                       Navigator.of(context).pop();
                     },
                     child: Text(

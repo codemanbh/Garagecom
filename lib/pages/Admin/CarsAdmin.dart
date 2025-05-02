@@ -98,14 +98,14 @@ class _CarsAdminState extends State<CarsAdmin> with SingleTickerProviderStateMix
     });
 
     try {
-      final response = await ApiHelper.get('/api/Cars/GetCarModels', {});
+      final response = await ApiHelper.get('/api/Cars/GetModels', {});
       
       if (response['succeeded'] == true && 
           response['parameters'] != null &&
-          response['parameters']['CarModels'] != null) {
+          response['parameters']['Models'] != null) {
         
         setState(() {
-          models = response['parameters']['CarModels'];
+          models = response['parameters']['Models'];
           _isLoading = false;
         });
       } else {
@@ -622,14 +622,7 @@ class _CarsAdminState extends State<CarsAdmin> with SingleTickerProviderStateMix
                 textCapitalization: TextCapitalization.words,
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: noteController,
-                decoration: const InputDecoration(
-                  labelText: 'Part Description',
-                  hintText: 'Enter part description or notes',
-                ),
-                maxLines: 3,
-              ),
+             
             ],
           ),
         ),
@@ -708,14 +701,8 @@ class _CarsAdminState extends State<CarsAdmin> with SingleTickerProviderStateMix
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        title: const Text('Cars Management'),
-        actions: [
-          IconButton(
-            onPressed: _loadDataForCurrentTab,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
+        title: const Text('Car Management'),
+        automaticallyImplyLeading: false,
         bottom: TabBar(
           controller: _tabController,
           labelColor: colorScheme.primary,

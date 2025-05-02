@@ -10,9 +10,11 @@ class PostsAdminTab extends StatefulWidget {
   PostsAdminTabState createState() => PostsAdminTabState();
 }
 
-class PostsAdminTabState extends State<PostsAdminTab> {
+class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMixin {
   late PostsManager _postsManager;
-  late List<Post> posts;
+  late TabController _tabController;
+  // Initialize the posts list with an empty list instead of using late
+  List<Post> posts = [];  // Changed from 'late List<Post> posts'
   bool _isLoading = true;
   int _currentPostIndex = 0;
   
@@ -22,6 +24,7 @@ class PostsAdminTabState extends State<PostsAdminTab> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 4, vsync: this);  // CHANGE THIS VALUE to match your tabs
     _postsManager = PostsManager();
     _loadPendingPosts();
     
@@ -342,6 +345,25 @@ class PostsAdminTabState extends State<PostsAdminTab> {
                                         children: [
                                           Expanded(
                                             child: ElevatedButton.icon(
+                                              onPressed: () => _blockPost(posts[_currentPostIndex]),
+                                              icon: const Icon(Icons.block),
+                                              label: const Text('Block'),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                                foregroundColor: Colors.white,
+                                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(100),
+                                                ),
+                                                elevation: 3,
+                                                shadowColor: Colors.red.withOpacity(0.5),
+                                              ),
+                                            ),
+                                          ),
+                                                                                    const SizedBox(width: 12),
+
+                                          Expanded(
+                                            child: ElevatedButton.icon(
                                               onPressed: () => _approvePost(posts[_currentPostIndex]),
                                               icon: const Icon(Icons.check_circle_outline),
                                               label: const Text('Approve'),
@@ -358,23 +380,7 @@ class PostsAdminTabState extends State<PostsAdminTab> {
                                             ),
                                           ),
                                           const SizedBox(width: 12),
-                                          Expanded(
-                                            child: ElevatedButton.icon(
-                                              onPressed: () => _blockPost(posts[_currentPostIndex]),
-                                              icon: const Icon(Icons.block),
-                                              label: const Text('Block'),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.red,
-                                                foregroundColor: Colors.white,
-                                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(100),
-                                                ),
-                                                elevation: 3,
-                                                shadowColor: Colors.red.withOpacity(0.5),
-                                              ),
-                                            ),
-                                          ),
+                                          
                                         ],
                                       ),
                                     ),

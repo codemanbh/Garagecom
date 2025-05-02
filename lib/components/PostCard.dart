@@ -188,48 +188,49 @@ class PostCard extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    post.imageUrl!,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                          color: colorScheme.primary,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        alignment: Alignment.center,
-                        color: colorScheme.surfaceVariant,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.broken_image_rounded,
-                              color:
-                                  colorScheme.onSurfaceVariant.withOpacity(0.5),
-                              size: 36,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "Image not available",
-                              style: TextStyle(
-                                color: colorScheme.onSurfaceVariant
-                                    .withOpacity(0.7),
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                  child: ApiHelper.image(post.imageUrl!, "api/posts/GetPostAttachment"),
+                  // Image.network(
+                  //   post.imageUrl!,
+                  //   fit: BoxFit.cover,
+                  //   loadingBuilder: (context, child, loadingProgress) {
+                  //     if (loadingProgress == null) return child;
+                  //     return Center(
+                  //       child: CircularProgressIndicator(
+                  //         value: loadingProgress.expectedTotalBytes != null
+                  //             ? loadingProgress.cumulativeBytesLoaded /
+                  //                 loadingProgress.expectedTotalBytes!
+                  //             : null,
+                  //         color: colorScheme.primary,
+                  //       ),
+                  //     );
+                  //   },
+                  //   errorBuilder: (context, error, stackTrace) {
+                  //     return Container(
+                  //       alignment: Alignment.center,
+                  //       color: colorScheme.surfaceVariant,
+                  //       child: Column(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           Icon(
+                  //             Icons.broken_image_rounded,
+                  //             color:
+                  //                 colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  //             size: 36,
+                  //           ),
+                  //           const SizedBox(height: 8),
+                  //           Text(
+                  //             "Image not available",
+                  //             style: TextStyle(
+                  //               color: colorScheme.onSurfaceVariant
+                  //                   .withOpacity(0.7),
+                  //               fontSize: 12,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                 ),
               ),
 

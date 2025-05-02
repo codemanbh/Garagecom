@@ -120,7 +120,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
   void _handleLogout() {
     ApiHelper.post('/api/Profile/Logout', {});
-    ApiHelper.handeAnAuthorized();
+    ApiHelper.handleAnAuthorized();
   }
 
   Future<void> updateProfile() async {
