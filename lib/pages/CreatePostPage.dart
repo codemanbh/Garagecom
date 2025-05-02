@@ -710,21 +710,21 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ],
           ),
           const SizedBox(height: 16),
-         ElevatedButton.icon(
-            onPressed: _isProcessing ? null : _submitPost,
-            icon: _isProcessing 
-                ? SizedBox(
-                    width: 20, 
-                    height: 20, 
-                    child: CircularProgressIndicator(
-                      color: colorScheme.onPrimary,
-                      strokeWidth: 2,
-                    ),
-                  ) 
-                : const Icon(Icons.send_rounded),
-            label: Text(
+ ElevatedButton.icon(
+    onPressed: _isProcessing ? null : _submitPost,
+    icon: _isProcessing 
+        ? SizedBox(
+            width: 20, 
+            height: 20, 
+            child: CircularProgressIndicator(
+              color: colorScheme.onPrimary,
+              strokeWidth: 2,
+            ),
+          ) 
+        : Icon(Icons.post_add, color: colorScheme.onPrimary),
+    label: Text(
               _isProcessing ? 'Processing...' : 'Post',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold ,color: Colors.white),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,

@@ -124,101 +124,101 @@ class _CommentCardState extends State<CommentCard> {
             // Comment actions
             const SizedBox(height: 8),
             
-            Row(
-              children: [
+            // Row(
+            //   children: [
                 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Upvote button
-                    IconButton(
-                      onPressed: widget.onUpvote,
-                      icon: Icon(
-                        Icons.arrow_upward_rounded,
-                        size: 20,
-                        color: colorScheme.primary,
-                      ),
-                      style: IconButton.styleFrom(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        minimumSize: const Size(36, 36),
-                        padding: EdgeInsets.zero,
-                      ),
-                      tooltip: 'Upvote',
-                    ),
+            //     Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: [
+            //         // Upvote button
+            //         IconButton(
+            //           onPressed: widget.onUpvote,
+            //           icon: Icon(
+            //             Icons.arrow_upward_rounded,
+            //             size: 20,
+            //             color: colorScheme.primary,
+            //           ),
+            //           style: IconButton.styleFrom(
+            //             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            //             minimumSize: const Size(36, 36),
+            //             padding: EdgeInsets.zero,
+            //           ),
+            //           tooltip: 'Upvote',
+            //         ),
                     
-                    // Combined vote count
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: (widget.upvotes - widget.downvotes) > 0 
-                          ? colorScheme.primary.withOpacity(0.1)
-                          : (widget.upvotes - widget.downvotes) < 0
-                            ? colorScheme.error.withOpacity(0.1)
-                            : colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: (widget.upvotes - widget.downvotes) > 0 
-                            ? colorScheme.primary.withOpacity(0.5)
-                            : (widget.upvotes - widget.downvotes) < 0
-                              ? colorScheme.error.withOpacity(0.5)
-                              : colorScheme.outline.withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        '${widget.upvotes - widget.downvotes}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: (widget.upvotes - widget.downvotes) > 0
-                            ? colorScheme.primary
-                            : (widget.upvotes - widget.downvotes) < 0
-                              ? colorScheme.error
-                              : colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
+            //         // Combined vote count
+            //         Container(
+            //           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            //           decoration: BoxDecoration(
+            //             color: (widget.upvotes - widget.downvotes) > 0 
+            //               ? colorScheme.primary.withOpacity(0.1)
+            //               : (widget.upvotes - widget.downvotes) < 0
+            //                 ? colorScheme.error.withOpacity(0.1)
+            //                 : colorScheme.surfaceVariant,
+            //             borderRadius: BorderRadius.circular(12),
+            //             border: Border.all(
+            //               color: (widget.upvotes - widget.downvotes) > 0 
+            //                 ? colorScheme.primary.withOpacity(0.5)
+            //                 : (widget.upvotes - widget.downvotes) < 0
+            //                   ? colorScheme.error.withOpacity(0.5)
+            //                   : colorScheme.outline.withOpacity(0.3),
+            //               width: 1,
+            //             ),
+            //           ),
+            //           child: Text(
+            //             '${widget.upvotes - widget.downvotes}',
+            //             style: TextStyle(
+            //               fontSize: 14,
+            //               fontWeight: FontWeight.bold,
+            //               color: (widget.upvotes - widget.downvotes) > 0
+            //                 ? colorScheme.primary
+            //                 : (widget.upvotes - widget.downvotes) < 0
+            //                   ? colorScheme.error
+            //                   : colorScheme.onSurfaceVariant,
+            //             ),
+            //           ),
+            //         ),
                     
-                    // Downvote button
-                    IconButton(
-                      onPressed: widget.onDownvote,
-                      icon: Icon(
-                        Icons.arrow_downward_rounded,
-                        size: 20,
-                        color: colorScheme.error,
-                      ),
-                      style: IconButton.styleFrom(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        minimumSize: const Size(36, 36),
-                        padding: EdgeInsets.zero,
-                      ),
-                      tooltip: 'Downvote',
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: widget.onReply,
-                  icon: Icon(
-                    Icons.reply,
-                    size: 16,
-                    color: colorScheme.secondary,
-                  ),
-                  label: Text(
-                    'Reply',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.secondary,
-                    ),
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-              ],
-            ),
+            //         // Downvote button
+            //         IconButton(
+            //           onPressed: widget.onDownvote,
+            //           icon: Icon(
+            //             Icons.arrow_downward_rounded,
+            //             size: 20,
+            //             color: colorScheme.error,
+            //           ),
+            //           style: IconButton.styleFrom(
+            //             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            //             minimumSize: const Size(36, 36),
+            //             padding: EdgeInsets.zero,
+            //           ),
+            //           tooltip: 'Downvote',
+            //         ),
+            //       ],
+            //     ),
+            //     const Spacer(),
+            //     TextButton.icon(
+            //       onPressed: widget.onReply,
+            //       icon: Icon(
+            //         Icons.reply,
+            //         size: 16,
+            //         color: colorScheme.secondary,
+            //       ),
+            //       label: Text(
+            //         'Reply',
+            //         style: TextStyle(
+            //           fontSize: 14,
+            //           color: colorScheme.secondary,
+            //         ),
+            //       ),
+            //       style: TextButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            //         minimumSize: Size.zero,
+            //         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),

@@ -145,14 +145,62 @@ class _ServicePageState extends State<ServicePage> {
 
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Service')),
+        appBar: AppBar(
+          title: const Text('Service'),
+          actions: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.directions_car_outlined , color: Colors.white,),
+              label: const Text('Add and edit cars'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddAndEditCars(),
+                  ),
+                ).then((_) {
+                  // Refresh data when coming back
+                  fetchUserCarsWithParts();
+                });
+              },
+              
+            ),
+          ],
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (userCars.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Service')),
+        appBar: AppBar(
+          title: const Text('Service'),
+          actions: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.directions_car_outlined , color: Colors.white,),
+              label: const Text('Add and edit cars'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddAndEditCars(),
+                  ),
+                ).then((_) {
+                  // Refresh data when coming back
+                  fetchUserCarsWithParts();
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 3,
+              ),
+            ),
+          ],
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -160,7 +208,7 @@ class _ServicePageState extends State<ServicePage> {
               Icon(
                 Icons.directions_car_outlined,
                 size: 64,
-                color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                color: Colors.white
               ),
               const SizedBox(height: 16),
               Text(
@@ -179,8 +227,8 @@ class _ServicePageState extends State<ServicePage> {
                     ),
                   );
                 },
-                icon: const Icon(Icons.add_circle_outline),
-                label: const Text('Add a Car in Account Settings'),
+                icon: Icon(Icons.add_circle_outline, color: Colors.white), 
+                label: const Text('Add Your  Car '),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
@@ -203,6 +251,32 @@ class _ServicePageState extends State<ServicePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Service'),
+        actions: [
+          ElevatedButton.icon(
+            icon: const Icon(Icons.directions_car_outlined , color: Colors.white),
+            label: const Text('Add and edit cars'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AddAndEditCars(),
+                ),
+              ).then((_) {
+                // Refresh data when coming back
+                fetchUserCarsWithParts();
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 3,
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -342,7 +416,7 @@ class _ServicePageState extends State<ServicePage> {
                           const SizedBox(height: 8),
                           ElevatedButton.icon(
                             onPressed: goToAddPartPage,
-                            icon: const Icon(Icons.add),
+                            icon: Icon(Icons.add, color: colorScheme.onPrimary),
                             label: const Text('Add First Part'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colorScheme.primary,
@@ -385,17 +459,73 @@ class _ServicePageState extends State<ServicePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Icon(
-                                        getPartIcon(partName),
-                                        color: colorScheme.primary,
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            getPartIcon(partName),
+                                            color: colorScheme.primary,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            partName,
+                                            style: theme.textTheme.titleMedium
+                                                ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        partName,
-                                        style: theme.textTheme.titleMedium
-                                            ?.copyWith(
-                                          fontWeight: FontWeight.bold,
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              title: Text('Renew $partName'),
+                                              
+                                              content: Text(
+                                                  'Are you sure you want to mark this part as renewed today?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: Text('Cancel'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    // TODO: Implement API call to update renewal date
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                          content: Text(
+                                                              '$partName renewal scheduled')),
+                                                    );
+                                                    fetchUserCarsWithParts(); // Refresh data
+                                                  },
+                                                  child: Text('Confirm'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                        icon: Icon(Icons.refresh, size: 16, color: Colors.white),
+                                        label: Text('Renew'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 6),
+                                          textStyle: const TextStyle(
+                                              fontSize: 12),
+                                          minimumSize: const Size(80, 32),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
                                         ),
                                       ),
                                     ],
