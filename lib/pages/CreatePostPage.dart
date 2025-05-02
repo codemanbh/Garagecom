@@ -19,6 +19,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   XFile? _selectedImage;
   bool _allowComments = true; // Comment toggle state
   bool _isLoading = false; // Loading state
+    bool _isProcessing = false;
+
 
   @override
   void initState() {
@@ -64,7 +66,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
     // Show loading indicator
     setState(() {
-      _isLoading = true;
+      // _isLoading = true;
+      _isProcessing = true;
     });
 
     try {
@@ -100,6 +103,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       print('Exception in _submitPost: $e');
       setState(() {
         _isLoading = false;
+        _isProcessing = false;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -717,12 +721,21 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ],
           ),
           const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _submitPost,
-            icon: const Icon(Icons.send_rounded),
-            label: const Text(
-              'Publish Post',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+         ElevatedButton.icon(
+            onPressed: _isProcessing ? null : _submitPost,
+            icon: _isProcessing 
+                ? SizedBox(
+                    width: 20, 
+                    height: 20, 
+                    child: CircularProgressIndicator(
+                      color: colorScheme.onPrimary,
+                      strokeWidth: 2,
+                    ),
+                  ) 
+                : const Icon(Icons.send_rounded),
+            label: Text(
+              _isProcessing ? 'Processing...' : 'Post',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
@@ -733,6 +746,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
               ),
               elevation: 4,
               shadowColor: colorScheme.primary.withOpacity(0.5),
+              disabledBackgroundColor: colorScheme.primary.withOpacity(0.6),
+              disabledForegroundColor: colorScheme.onPrimary.withOpacity(0.8),
             ),
           ),
         ],

@@ -17,6 +17,8 @@ class _CameraPageState extends State<CameraPage> {
   File? _image;
   bool _isProcessing = false;
   List<dynamic> problems = [];
+  // Add a request cancellation token
+  int _currentRequestId = 0;
 
   Future<XFile?> pickAndResizeImage(ImageSource source) async {
     const int maxShortSide = 768;
@@ -74,17 +76,16 @@ class _CameraPageState extends State<CameraPage> {
     try {
       setState(() {
         _isProcessing = true;
+        // Increment the request ID to invalidate any pending requests
+        _currentRequestId++;
+        // Clear any previous results when picking a new image
+        problems = [];
       });
 
       // Use image_picker directly - it will handle permissions internally
       final XFile? pickedFile = await pickAndResizeImage(source);
 
       if (pickedFile != null) {
-        // Add a small delay if you need it
-        // await Future.delayed(const Duration(seconds: 2));
-
-        // pickedFile.
-
         setState(() {
           _image = File(pickedFile.path);
           _isProcessing = false;
@@ -130,8 +131,22 @@ class _CameraPageState extends State<CameraPage> {
       return;
     }
 
+    // Set processing state to true before sending the request
+    setState(() {
+      _isProcessing = true;
+    });
+
+    // Create a local copy of the current request ID
+    final int requestId = _currentRequestId;
+
     ApiHelper.uploadImage(_image!, '/api/Dashboard/GetDashboardSigns')
         .then((response) {
+      // Check if this response is for the most recent request
+      if (requestId != _currentRequestId) {
+        // This response is for an old request, ignore it
+        return;
+      }
+
       if (response['succeeded'] == true) {
         setState(() {
           print(response);
@@ -140,7 +155,7 @@ class _CameraPageState extends State<CameraPage> {
           _isProcessing = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Image submitted successfully!')),
+          const SnackBar(content: Text('Image Processed successfully!')),
         );
       } else {
         setState(() {
@@ -151,6 +166,12 @@ class _CameraPageState extends State<CameraPage> {
         );
       }
     }).catchError((error) {
+      // Check if this error is for the most recent request
+      if (requestId != _currentRequestId) {
+        // This error is for an old request, ignore it
+        return;
+      }
+
       setState(() {
         _isProcessing = false;
       });
@@ -611,7 +632,7 @@ class _CameraPageState extends State<CameraPage> {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => _pickImage(ImageSource.camera),
+                  onPressed: _isProcessing ? null : () => _pickImage(ImageSource.camera),
                   icon: const Icon(
                     Icons.camera_alt_rounded,
                     size: 20,
@@ -633,7 +654,7 @@ class _CameraPageState extends State<CameraPage> {
               const SizedBox(width: 16),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => _pickImage(ImageSource.gallery),
+                  onPressed: _isProcessing ? null : () => _pickImage(ImageSource.gallery),
                   icon: const Icon(Icons.photo_library_rounded),
                   label: const Text('Gallery'),
                   style: OutlinedButton.styleFrom(
@@ -650,11 +671,20 @@ class _CameraPageState extends State<CameraPage> {
           ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
-            onPressed: _checkImage,
-            icon: const Icon(Icons.send_rounded),
-            label: const Text(
-              'Submit',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            onPressed: _isProcessing ? null : _checkImage,
+            icon: _isProcessing 
+                ? SizedBox(
+                    width: 20, 
+                    height: 20, 
+                    child: CircularProgressIndicator(
+                      color: colorScheme.onPrimary,
+                      strokeWidth: 2,
+                    ),
+                  ) 
+                : const Icon(Icons.send_rounded),
+            label: Text(
+              _isProcessing ? 'Processing...' : 'Submit',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
@@ -665,6 +695,8 @@ class _CameraPageState extends State<CameraPage> {
               ),
               elevation: 4,
               shadowColor: colorScheme.primary.withOpacity(0.5),
+              disabledBackgroundColor: colorScheme.primary.withOpacity(0.6),
+              disabledForegroundColor: colorScheme.onPrimary.withOpacity(0.8),
             ),
           ),
         ],
