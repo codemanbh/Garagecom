@@ -48,4 +48,4 @@ app.*.map.json
 docs/
 
 /assets/.env
-/android/graddle.properties
+/android/gradle.properties

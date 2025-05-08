@@ -101,17 +101,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
             Map<String, dynamic> imageData = {
               'postId': postId
             };
-            final response = await ApiHelper.uploadImage(imageFile, "api/Posts/SetPostAttachment", options: {
-              'postId': postId
-            });
+            final response = await ApiHelper.uploadImage(imageFile, "api/Posts/SetPostAttachment", options: imageData);
             print('Image upload response: $response');
           }
         }
-
-      // If there's an image, we need to handle that with a multipart request
-      if (_selectedImage != null) {
-        
-      }
         
         print('API Response: $response');
         _handlePostResponse(response);

@@ -37,6 +37,7 @@ class _PostCardState extends State<PostCard> {
         "Posted by: ${PostsManager.posts[postIndex].autherUsername}"
         "https:\\\\garagcom.com\\posts\\${PostsManager.posts[postIndex].postID}";
 
+
     try {
       // Show loading indicator
       final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -176,7 +177,7 @@ class _PostCardState extends State<PostCard> {
                           ),
                         ),
                         Text(
-                          "Posted 2 days ago", // Replace with actual date
+                        PostsManager.posts[postIndex].createdIn ?? 'Unknown date', 
                           style: TextStyle(
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
