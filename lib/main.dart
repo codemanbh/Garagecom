@@ -33,6 +33,7 @@ import './pages/AdminPage.dart';
 
 // Helpers
 import './helpers/navigationHeper.dart';
+import './models/Post.dart';
 
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Garagecom',
       theme: FlutterMidnightNeonTheme.lightTheme,
       darkTheme: FlutterMidnightNeonTheme.darkTheme,
       themeMode: ThemeMode.dark,
@@ -77,12 +78,7 @@ class MyApp extends StatelessWidget {
         '/AddPartPage': (context) => const AddPartPage(),
         '/AccountSettingsPage': (context) => const AccountSettingsPage(),
         '/mainPage': (context) => const MainPage(),
-        '/commentPage': (context) => CommentPage(
-              postID: ModalRoute.of(context)!.settings.arguments as int? ?? 0,
-              postTitle: '',
-              questionBody: '',
-              initialVotes: 0,
-            ),
+        '/commentPage': (context) => CommentPage(postIndex: 0),
         '/addAndEditCarsPage': (context) => AddAndEditCars(),
         '/adminPage': (context) => const AdminPage(),
       },

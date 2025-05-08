@@ -1346,7 +1346,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                       colorScheme.onSurfaceVariant.withOpacity(0.5),
                 ),
               ),
-              
             ],
           ),
         ],
@@ -1448,7 +1447,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                 ),
               ),
             ),
-            
         ],
       ),
     );

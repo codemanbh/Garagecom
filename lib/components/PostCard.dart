@@ -1,42 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
+import 'package:garagecom/managers/PostsManager.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/Post.dart';
 import '../pages/CommentPage.dart';
 
-class PostCard extends StatelessWidget {
-  final Post post;
+class PostCard extends StatefulWidget {
+  // final Post post;
+  final int postIndex;
   final bool isAdminView;
 
   const PostCard({
     super.key,
-    required this.post,
+    required this.postIndex,
     this.isAdminView = false, // Add this parameter
   });
 
-  void navigateToCommentPage(BuildContext context, String title,
-      String? imageUrl, String description, int votes, int postID) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CommentPage(
-          postTitle: title,
-          questionBody: description,
-          initialVotes: votes,
-          imageUrl: imageUrl,
-          postID: postID,
-        ),
-      ),
-    );
+  @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  late int postIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    postIndex = widget.postIndex;
   }
 
   // Share function to handle sharing post content
   void _sharePost(BuildContext context) async {
     final String postContent = "Check out this post from GarageCom:\n\n"
-        "${post.title}\n\n"
-        "${post.description}\n\n"
-        "Posted by: ${post.autherUsername}"
-        "https:\\\\garagcom.com\\posts\\${post.postID}";
+        "${PostsManager.posts[postIndex].title}\n\n"
+        "${PostsManager.posts[postIndex].description}\n\n"
+        "Posted by: ${PostsManager.posts[postIndex].autherUsername}"
+        "https:\\\\garagcom.com\\posts\\${PostsManager.posts[postIndex].postID}";
 
     try {
       // Show loading indicator
@@ -51,7 +50,7 @@ class PostCard extends StatelessWidget {
       // Use the share_plus package to open the native share dialog
       await Share.share(
         postContent,
-        subject: post.title,
+        subject: PostsManager.posts[postIndex].title,
       );
     } catch (e) {
       // Handle errors
@@ -69,8 +68,65 @@ class PostCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    BoxDecoration buildPressedStyle() {
+      return BoxDecoration(
+        shape: BoxShape.circle,
+        // border: Border.all(
+        //   color: Colors.grey, // Border color
+        //   // width: 1.0,
+        // ),
+        color: const Color.fromARGB(42, 255, 255, 255), // Background color
+      );
+    }
+
+    Widget _buildUpVote() {
+      bool isUpVoted = PostsManager.posts[postIndex].voteValue == 1;
+
+      return Container(
+        decoration: isUpVoted ? buildPressedStyle() : BoxDecoration(),
+        child: IconButton(
+          onPressed: () async {
+            await PostsManager.posts[postIndex].handleUpvote();
+            setState(() {});
+          },
+          icon: Icon(Icons.arrow_upward_rounded,
+              color: colorScheme.primary, size: 22),
+          tooltip: 'Upvote',
+        ),
+      );
+    }
+
+    Widget _buildDownVote() {
+      bool isDownVoted = PostsManager.posts[postIndex].voteValue == -1;
+      return Container(
+        decoration: isDownVoted ? buildPressedStyle() : BoxDecoration(),
+        child: IconButton(
+          onPressed: () async {
+            await PostsManager.posts[postIndex].handleDownvote();
+            setState(() {});
+          },
+          icon: Icon(
+            Icons.arrow_downward_rounded,
+            color: colorScheme.error,
+            size: 22,
+          ),
+          tooltip: 'Downvote',
+        ),
+      );
+    }
+
+    void navigateToCommentPage(int pageIndex) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CommentPage(postIndex: postIndex),
+        ),
+      );
+    }
+
     // Check if image is non-empty and non-null
-    final bool hasImage = post.imageUrl != null && post.imageUrl!.isNotEmpty;
+    final bool hasImage = PostsManager.posts[postIndex].imageUrl != null &&
+        PostsManager.posts[postIndex].imageUrl!.isNotEmpty;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -82,14 +138,7 @@ class PostCard extends StatelessWidget {
         side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
       ),
       child: InkWell(
-        onTap: () => navigateToCommentPage(
-            context,
-            post.title,
-            post.imageUrl,
-            post.description,
-            post.numOfVotes,
-            post.postID // Assuming post.postID exists
-            ),
+        onTap: () => navigateToCommentPage(postIndex),
         borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,8 +152,9 @@ class PostCard extends StatelessWidget {
                     radius: 20,
                     backgroundColor: colorScheme.primaryContainer,
                     child: Text(
-                      post.autherUsername.isNotEmpty
-                          ? post.autherUsername[0].toUpperCase()
+                      PostsManager.posts[postIndex].autherUsername.isNotEmpty
+                          ? PostsManager.posts[postIndex].autherUsername[0]
+                              .toUpperCase()
                           : "?",
                       style: TextStyle(
                         color: colorScheme.onPrimaryContainer,
@@ -118,7 +168,7 @@ class PostCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          post.autherUsername,
+                          PostsManager.posts[postIndex].autherUsername,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -153,7 +203,7 @@ class PostCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                post.title,
+                PostsManager.posts[postIndex].title,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -166,7 +216,7 @@ class PostCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(16, 8, 16, hasImage ? 12 : 16),
               child: Text(
-                post.description,
+                PostsManager.posts[postIndex].description,
                 style: TextStyle(
                   fontSize: 14,
                   color: colorScheme.onSurfaceVariant,
@@ -188,7 +238,9 @@ class PostCard extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: ApiHelper.image(post.imageUrl!, "api/posts/GetPostAttachment"),
+                  child: ApiHelper.image(
+                      PostsManager.posts[postIndex].imageUrl!,
+                      "api/posts/GetPostAttachment"),
                   // Image.network(
                   //   post.imageUrl!,
                   //   fit: BoxFit.cover,
@@ -243,49 +295,26 @@ class PostCard extends StatelessWidget {
                   // Votes section
                   Row(
                     children: [
-                      IconButton(
-                        onPressed: post.handleUpvote,
-                        icon: Icon(
-                          Icons.arrow_upward_rounded,
-                          color: colorScheme.primary,
-                          size: 22,
-                        ),
-                        tooltip: 'Upvote',
-                      ),
+                      _buildUpVote(),
                       Text(
-                        post.numOfVotes.toString(),
+                        PostsManager.posts[postIndex].numOfVotes.toString(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: post.numOfVotes > 0
+                          color: PostsManager.posts[postIndex].numOfVotes > 0
                               ? colorScheme.primary
-                              : post.numOfVotes < 0
+                              : PostsManager.posts[postIndex].numOfVotes < 0
                                   ? colorScheme.error
                                   : colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      IconButton(
-                        onPressed: post.handleDownvote,
-                        icon: Icon(
-                          Icons.arrow_downward_rounded,
-                          color: colorScheme.error,
-                          size: 22,
-                        ),
-                        tooltip: 'Downvote',
-                      ),
+                      _buildDownVote(),
                     ],
                   ),
 
                   // Comment button
                   TextButton.icon(
-                    onPressed: () => navigateToCommentPage(
-                        context,
-                        post.title,
-                        post.imageUrl,
-                        post.description,
-                        post.numOfVotes,
-                        post.postID // Assuming post.postID exists
-                        ),
+                    onPressed: () => navigateToCommentPage(postIndex),
                     icon: Icon(
                       Icons.comment_outlined,
                       size: 20,

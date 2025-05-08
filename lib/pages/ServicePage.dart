@@ -92,7 +92,9 @@ class _ServicePageState extends State<ServicePage> {
     )
         .then((_) {
       // Refresh data when coming back
-      fetchUserCarsWithParts();
+      setState(() {
+        fetchUserCarsWithParts();
+      });
     });
   }
 
@@ -129,13 +131,17 @@ class _ServicePageState extends State<ServicePage> {
     return Icons.build;
   }
 
+  void navigateToAddEditCars() {
+    Navigator.of(context).pushNamed('/addAndEditCarsPage').then((_) {
+      fetchUserCarsWithParts();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget _buildAddCarsPage() {
       return ElevatedButton.icon(
-          onPressed: () {
-            Navigator.of(context).pushNamed('/addAndEditCarsPage');
-          },
+          onPressed: navigateToAddEditCars,
           label: Text('Add Cars'),
           icon: Icon(Icons.add));
     }
@@ -145,14 +151,20 @@ class _ServicePageState extends State<ServicePage> {
 
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Service')),
+        appBar: AppBar(
+          title: const Text('Service'),
+          actions: [_buildAddCarsPage()],
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (userCars.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Service')),
+        appBar: AppBar(
+          title: const Text('Service'),
+          actions: [_buildAddCarsPage()],
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -171,16 +183,9 @@ class _ServicePageState extends State<ServicePage> {
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddAndEditCars(),
-                    ),
-                  );
-                },
+                onPressed: navigateToAddEditCars,
                 icon: const Icon(Icons.add_circle_outline),
-                label: const Text('Add a Car in Account Settings'),
+                label: const Text('Add a Car'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
@@ -203,6 +208,7 @@ class _ServicePageState extends State<ServicePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Service'),
+        actions: [_buildAddCarsPage()],
       ),
       body: SafeArea(
         child: Column(

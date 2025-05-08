@@ -13,14 +13,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late PostsManager _postsManager;
-  late List<Post> posts;
+  // late PostsManager _postsManager;
+  // late List<Post> posts;
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _postsManager = PostsManager();
+    // _postsManager = PostsManager();
     _loadPosts();
   }
 
@@ -30,18 +30,18 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
-      final success = await _postsManager.fetchPosts();
+      final success = await PostsManager.fetchPosts();
 
       if (success) {
         setState(() {
-          posts = List.from(PostsManager.posts); // Create a copy
+          // posts = List.from(PostsManager.posts); // Create a copy
           _isLoading = false;
         });
 
-        print('HomePage loaded ${posts.length} posts successfully');
+        print(
+            'HomePage loaded ${PostsManager.posts.length} posts successfully');
       } else {
         setState(() {
-          posts = [];
           _isLoading = false;
         });
 
@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 showSearch(
                   context: context,
-                  delegate: PostSearchDelegate(posts),
+                  delegate: PostSearchDelegate(PostsManager.posts),
                 );
               },
               icon: const Icon(Icons.search))
@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                       color: colorScheme.primary,
                     ),
                   )
-                : posts.isEmpty
+                : PostsManager.posts.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -206,11 +206,10 @@ class _HomePageState extends State<HomePage> {
                         color: colorScheme.primary,
                         child: ListView.builder(
                           padding: const EdgeInsets.only(bottom: 16.0),
-                          itemCount: posts.length,
+                          itemCount: PostsManager.posts.length,
                           itemBuilder: (context, index) {
-                            final post = posts[index];
                             return PostCard(
-                              post: post,
+                              postIndex: index,
                             );
                           },
                         ),

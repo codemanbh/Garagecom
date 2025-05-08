@@ -6,11 +6,11 @@ class Comment {
   final String text;
   final String createdIn;
   final String modifiedIn;
-  
+
   // For voting functionality
   int upvotes = 0;
   int downvotes = 0;
-  
+
   Comment({
     required this.commentID,
     required this.userID,
@@ -22,20 +22,20 @@ class Comment {
     this.upvotes = 0,
     this.downvotes = 0,
   });
-  
+
   // Format the date to a more readable format
   String getFormattedDate() {
     if (createdIn.isEmpty) {
       return "Unknown date";
     }
-    
+
     try {
       // Parse the date from the format "2025-04-25 01:44:14"
       DateTime dateTime = DateTime.parse(createdIn);
-      
+
       // Get difference from now
       final difference = DateTime.now().difference(dateTime);
-      
+
       if (difference.inDays > 365) {
         return "${(difference.inDays / 365).floor()} years ago";
       } else if (difference.inDays > 30) {
@@ -53,7 +53,7 @@ class Comment {
       return createdIn;
     }
   }
-  
+
   // Get username for display
   String getUsernameDisplay() {
     return "User #$userID"; // You can replace this with actual username lookup if available

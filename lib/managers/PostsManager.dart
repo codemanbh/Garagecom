@@ -12,11 +12,11 @@ class PostsManager {
   static List<Post> posts = [];
   final Dio _dio = Dio();
 
-  PostsManager() {
-    fetchPosts();
-  }
+  // PostsManager() {
+  //   fetchPosts();
+  // }
 
-  Future<bool> fetchPosts() async {
+  static Future<bool> fetchPosts() async {
     try {
       // Fetch posts from API
       Map<String, dynamic> response = await ApiHelper.get('api/Posts/GetPosts',
@@ -41,6 +41,7 @@ class PostsManager {
 
           // Map API data to Post objects
           for (var postData in postsData) {
+            print(postData);
             Post post = Post(
               postID: postData['postID'] ?? 0,
               title: postData['title'] ?? 'No Title',
@@ -85,7 +86,7 @@ class PostsManager {
   }
 
   // Helper method to load fallback posts
-  Future<bool> _loadFallbackPosts() async {
+  static Future<bool> _loadFallbackPosts() async {
     print('Loading fallback posts...');
 
     List<Map<String, dynamic>> postsMap = [];

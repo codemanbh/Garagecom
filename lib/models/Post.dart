@@ -25,21 +25,39 @@ class Post {
     this.voteValue = 0,
   });
 
-  void handleUpvote() {
-    if (voteValue != 0) {
+  Future<void> handleUpvote() async {
+    if (voteValue == 0 || voteValue == -1) {
       ApiHelper.post(
-        'api/Posts/SetVote',
+        'api/posts/SetVote',
         {'PostID': postID, 'value': 1},
       );
+      voteValue = 1;
+      numOfVotes++;
+    } else if (voteValue == 1) {
+      ApiHelper.post(
+        'api/posts/DeleteVote',
+        {'PostID': postID},
+      );
+      voteValue = 0;
+      numOfVotes--;
     }
   }
 
-  void handleDownvote() {
-    if (voteValue != 0) {
+  Future<void> handleDownvote() async {
+    if (voteValue == 0 || voteValue == 1) {
       ApiHelper.post(
-        'api/Posts/SetVote',
+        'api/posts/SetVote',
         {'PostID': postID, 'value': -1},
       );
+      voteValue = -1;
+      numOfVotes--;
+    } else if (voteValue == -1) {
+      ApiHelper.post(
+        'api/posts/DeleteVote',
+        {'PostID': postID},
+      );
+      numOfVotes++;
+      voteValue = 0;
     }
   }
 

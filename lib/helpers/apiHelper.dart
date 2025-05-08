@@ -6,9 +6,10 @@ import 'package:provider/provider.dart';
 import '../providers/NavProvider.dart';
 import './navigationHeper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as img;
 
 class ApiHelper {
-  late Dio dio;
+  // late Dio dio;
   static String mainDomain = 'https://assuring-fox-conversely.ngrok-free.app/';
 
   static Future<Dio> Client() async {
@@ -50,9 +51,9 @@ class ApiHelper {
     prefs.remove('userId');
 
     final context = navigatorKey.currentContext;
-  if (context != null) {
-    Provider.of<NavProvider>(context, listen: false).resetPageIndex();
-  }
+    if (context != null) {
+      Provider.of<NavProvider>(context, listen: false).resetPageIndex();
+    }
 
     navigatorKey.currentState?.pushNamedAndRemoveUntil(
       '/loginPage',
@@ -180,14 +181,37 @@ class ApiHelper {
     }
   }
 
+  static Future<File> convertToJpg(File inputImageFile) async {
+    // Read the image file as bytes
+    final imageBytes = await inputImageFile.readAsBytes();
+
+    // Decode the image (supports PNG, GIF, WebP, etc.)
+    final decodedImage = img.decodeImage(imageBytes);
+    if (decodedImage == null) {
+      throw Exception('Unable to decode image.');
+    }
+
+    // Encode it to JPG
+    final jpgBytes = img.encodeJpg(decodedImage);
+
+    // Create a new file path
+    final newPath = inputImageFile.path.replaceAll(RegExp(r'\.\w+$'), '.jpg');
+
+    // Write the bytes to the new file
+    final jpgFile = File(newPath)..writeAsBytesSync(jpgBytes);
+
+    return jpgFile;
+  }
+
   static Future<Map<String, dynamic>> uploadImage(File image, String path,
       {Map<String, dynamic>? options}) async {
     options ??= {};
     Dio client = await Client();
     client.options.headers['Content-Type'] = 'multipart/form-data';
+    File jpgImage = await convertToJpg(image);
 
     FormData formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(image.path,
+      'file': await MultipartFile.fromFile(jpgImage.path,
           contentType: DioMediaType.parse("image/jpg"),
           filename: image.path.split('/').last),
       ...options

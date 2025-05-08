@@ -10,28 +10,30 @@ class PostsAdminTab extends StatefulWidget {
   PostsAdminTabState createState() => PostsAdminTabState();
 }
 
-class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMixin {
+class PostsAdminTabState extends State<PostsAdminTab>
+    with TickerProviderStateMixin {
   late PostsManager _postsManager;
   late TabController _tabController;
   // Initialize the posts list with an empty list instead of using late
-  List<Post> posts = [];  // Changed from 'late List<Post> posts'
+  List<Post> posts = []; // Changed from 'late List<Post> posts'
   bool _isLoading = true;
   int _currentPostIndex = 0;
-  
+
   // Static function to allow parent to trigger refresh
   static Function? refreshPosts;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);  // CHANGE THIS VALUE to match your tabs
+    _tabController = TabController(
+        length: 4, vsync: this); // CHANGE THIS VALUE to match your tabs
     _postsManager = PostsManager();
     _loadPendingPosts();
-    
+
     // Set the refresh function
     refreshPosts = _loadPendingPosts;
   }
-  
+
   @override
   void dispose() {
     // Clear the refresh function
@@ -46,7 +48,7 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
 
     try {
       // This would ideally call a different API endpoint for pending/unapproved posts
-      final success = await _postsManager.fetchPosts();
+      final success = await PostsManager.fetchPosts();
 
       if (success) {
         setState(() {
@@ -103,7 +105,7 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
     try {
       // Call API or service to approve the post
       // await _postsManager.approvePost(post.id);
-      
+
       // Remove the post from the pending list
       setState(() {
         posts.remove(post);
@@ -113,7 +115,7 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
           _currentPostIndex = posts.length - 1;
         }
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Post approved successfully'),
@@ -129,12 +131,12 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
       );
     }
   }
-  
+
   Future<void> _blockPost(Post post) async {
     try {
       // Call API or service to block the post
       // await _postsManager.blockPost(post.id);
-      
+
       // Remove the post from the pending list
       setState(() {
         posts.remove(post);
@@ -144,7 +146,7 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
           _currentPostIndex = posts.length - 1;
         }
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Post blocked successfully'),
@@ -164,7 +166,7 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Column(
       children: [
         Container(
@@ -307,7 +309,7 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
                             ],
                           ),
                         ),
-                        
+
                         // Current post card
                         Expanded(
                           child: SingleChildScrollView(
@@ -315,7 +317,8 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
                               padding: const EdgeInsets.all(16.0),
                               child: Card(
                                 elevation: 4,
-                                shadowColor: colorScheme.primary.withOpacity(0.3),
+                                shadowColor:
+                                    colorScheme.primary.withOpacity(0.3),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   side: BorderSide(
@@ -327,13 +330,14 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
                                   children: [
                                     // Post content
                                     PostCard(
-                                      post: posts[_currentPostIndex],
+                                      postIndex: _currentPostIndex,
                                       isAdminView: true,
                                     ),
-                                    
+
                                     // Admin action buttons
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0, vertical: 12.0),
                                       decoration: BoxDecoration(
                                         color: colorScheme.surfaceContainerLow,
                                         borderRadius: const BorderRadius.only(
@@ -345,42 +349,53 @@ class PostsAdminTabState extends State<PostsAdminTab> with TickerProviderStateMi
                                         children: [
                                           Expanded(
                                             child: ElevatedButton.icon(
-                                              onPressed: () => _blockPost(posts[_currentPostIndex]),
+                                              onPressed: () => _blockPost(
+                                                  posts[_currentPostIndex]),
                                               icon: const Icon(Icons.block),
                                               label: const Text('Block'),
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.red,
                                                 foregroundColor: Colors.white,
-                                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12),
                                                 shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(100),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
                                                 ),
                                                 elevation: 3,
-                                                shadowColor: Colors.red.withOpacity(0.5),
-                                              ),
-                                            ),
-                                          ),
-                                                                                    const SizedBox(width: 12),
-
-                                          Expanded(
-                                            child: ElevatedButton.icon(
-                                              onPressed: () => _approvePost(posts[_currentPostIndex]),
-                                              icon: const Icon(Icons.check_circle_outline),
-                                              label: const Text('Approve'),
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.green,
-                                                foregroundColor: Colors.white,
-                                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(100),
-                                                ),
-                                                elevation: 3,
-                                                shadowColor: Colors.green.withOpacity(0.5),
+                                                shadowColor:
+                                                    Colors.red.withOpacity(0.5),
                                               ),
                                             ),
                                           ),
                                           const SizedBox(width: 12),
-                                          
+                                          Expanded(
+                                            child: ElevatedButton.icon(
+                                              onPressed: () => _approvePost(
+                                                  posts[_currentPostIndex]),
+                                              icon: const Icon(
+                                                  Icons.check_circle_outline),
+                                              label: const Text('Approve'),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
+                                                foregroundColor: Colors.white,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                ),
+                                                elevation: 3,
+                                                shadowColor: Colors.green
+                                                    .withOpacity(0.5),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
                                         ],
                                       ),
                                     ),
