@@ -1,0 +1,65 @@
+{
+    "comments": [
+      {
+        "id": 1,
+        "post_id": 1,
+        "username": "CarGuy123",
+        "content": "Sounds like it could be a timing belt issue. You should get it checked!"
+      },
+      {
+        "id": 2,
+        "post_id": 1,
+        "username": "HondaFan",
+        "content": "I had the same problem with my Accord. Turned out to be low oil levels."
+      },
+      {
+        "id": 3,
+        "post_id": 2,
+        "username": "OffRoadKing",
+        "content": "BFGoodrich KO2s are amazing for off-road! Highly recommend."
+      },
+      {
+        "id": 4,
+        "post_id": 2,
+        "username": "TrailBlazer99",
+        "content": "Depends on your budget. Falken Wildpeak is a good balance of price and performance."
+      },
+      {
+        "id": 5,
+        "post_id": 3,
+        "username": "CheckEngineBro",
+        "content": "Try getting an OBD2 scanner to read the error codes. Could be anything!"
+      },
+      {
+        "id": 6,
+        "post_id": 3,
+        "username": "FixItFast",
+        "content": "Mine was due to a loose gas cap. Check that first!"
+      },
+      {
+        "id": 7,
+        "post_id": 4,
+        "username": "MustangFreak",
+        "content": "Borla and Flowmaster make some of the best exhaust systems for Mustangs."
+      },
+      {
+        "id": 8,
+        "post_id": 4,
+        "username": "Speedster22",
+        "content": "Go for a cat-back system. It improves sound and performance."
+      },
+      {
+        "id": 9,
+        "post_id": 5,
+        "username": "CoolBreeze",
+        "content": "You probably have mold in your AC vents. Try using an AC cleaner spray."
+      },
+      {
+        "id": 10,
+        "post_id": 5,
+        "username": "FreshAirDude",
+        "content": "Changing the cabin air filter can help. Also, run the AC on full blast for a few minutes."
+      }
+    ]
+  }
+  
