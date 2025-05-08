@@ -47,6 +47,9 @@ class ApiHelper {
 
   static void handleAnAuthorized() async {
     final prefs = await SharedPreferences.getInstance();
+
+    // String? token = await prefs.getString('token');
+
     prefs.remove('token');
     prefs.remove('userId');
 
@@ -59,13 +62,13 @@ class ApiHelper {
       '/loginPage',
       (route) => false,
     );
-    final messenger = ScaffoldMessenger.of(navigatorKey.currentContext!);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text('You have been logged out.'),
-        backgroundColor: Colors.red,
-      ),
-    );
+    // final messenger = ScaffoldMessenger.of(navigatorKey.currentContext!);
+    // messenger.showSnackBar(
+    //   SnackBar(
+    //     content: Text('You have been logged out.'),
+    //     backgroundColor: Colors.red,
+    //   ),
+    // );
   }
 
   static Future<Map<String, dynamic>> get(
@@ -91,16 +94,14 @@ class ApiHelper {
   static Future<Image> _image(String imageName, String path) async {
     final prefs = await SharedPreferences.getInstance();
     final token = await prefs.getString('token');
-    String fullImageUrl = '$mainDomain$path/?filename=$imageName';
-    print(fullImageUrl);
+    String fullImageUrl = '$mainDomain$path?filename=$imageName';
+
+    print("fullImageUrl: " + fullImageUrl);
     Map<String, String> headers = {};
     if (token != null) {
       headers = {"Authorization": token};
     }
-    return Image.network(
-      fullImageUrl,
-      headers: headers,
-    );
+    return Image.network(fullImageUrl, headers: headers, fit: BoxFit.cover);
   }
 
   static FutureBuilder<Image> image(String imageName, String path) {
