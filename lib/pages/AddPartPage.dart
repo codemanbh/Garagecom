@@ -639,8 +639,8 @@ class _AddPartPageState extends State<AddPartPage> {
                             child:
                              ElevatedButton.icon(
                               onPressed: handleSave,
-                              icon: const Icon(Icons.save),
-                              label: const Text('Save Part'),
+                         icon: Icon(Icons.add, color: colorScheme.onPrimary),
+                            label: const Text('Add First Part'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: colorScheme.primary,
                                 foregroundColor: colorScheme.onPrimary,
@@ -657,19 +657,7 @@ class _AddPartPageState extends State<AddPartPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                           TextButton(
-                onPressed: () {
-                  // Navigate to the signup page
-                  Navigator.of(context).pushNamed('/adminPage');
-                },
-                child: Text(
-                  'Admin Page',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
+                           
                         ],
                       ),
                     ),

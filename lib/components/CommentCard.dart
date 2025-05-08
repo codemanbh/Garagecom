@@ -146,7 +146,6 @@ class _CommentCardState extends State<CommentCard> {
             //           ),
             //           tooltip: 'Upvote',
             //         ),
-
             //         // Combined vote count
             //         Container(
             //           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -179,7 +178,6 @@ class _CommentCardState extends State<CommentCard> {
             //             ),
             //           ),
             //         ),
-
             //         // Downvote button
             //         IconButton(
             //           onPressed: widget.onDownvote,

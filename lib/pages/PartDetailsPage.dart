@@ -747,340 +747,340 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
 
                     // Additional Details
                     const SizedBox(height: 24),
-                    Text(
-                      'Additional Details',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // Text(
+                    //   'Additional Details',
+                    //   style: TextStyle(
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.bold,
+                    //     color: colorScheme.onSurface,
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 16),
 
-                    // Store Location
-                    isEditing
-                        ? Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surface,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: colorScheme.primary.withOpacity(0.2),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: colorScheme.primary.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: TextFormField(
-                              initialValue: part.storeLocation,
-                              decoration: InputDecoration(
-                                labelText: 'Store Location',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                prefixIcon: Icon(Icons.store, color: colorScheme.primary),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                              ),
-                              onSaved: (value) => part.storeLocation = value,
-                            ),
-                          )
-                        : part.storeLocation != null && part.storeLocation!.isNotEmpty
-                            ? Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: colorScheme.primary.withOpacity(0.2),
-                                    width: 1,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: colorScheme.primary.withOpacity(0.1),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: ListTile(
-                                  leading: Icon(
-                                    Icons.store,
-                                    color: colorScheme.primary,
-                                  ),
-                                  title: Text(
-                                    'Store Location',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    part.storeLocation ?? '',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
+                    // // Store Location
+                    // isEditing
+                    //     ? Container(
+                    //         margin: const EdgeInsets.only(bottom: 16),
+                    //         decoration: BoxDecoration(
+                    //           color: colorScheme.surface,
+                    //           borderRadius: BorderRadius.circular(12),
+                    //           border: Border.all(
+                    //             color: colorScheme.primary.withOpacity(0.2),
+                    //             width: 1,
+                    //           ),
+                    //           boxShadow: [
+                    //             BoxShadow(
+                    //               color: colorScheme.primary.withOpacity(0.1),
+                    //               blurRadius: 4,
+                    //               offset: const Offset(0, 2),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         child: TextFormField(
+                    //           initialValue: part.storeLocation,
+                    //           decoration: InputDecoration(
+                    //             labelText: 'Store Location',
+                    //             border: OutlineInputBorder(
+                    //               borderRadius: BorderRadius.circular(12),
+                    //               borderSide: BorderSide.none,
+                    //             ),
+                    //             prefixIcon: Icon(Icons.store, color: colorScheme.primary),
+                    //             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    //           ),
+                    //           onSaved: (value) => part.storeLocation = value,
+                    //         ),
+                    //       )
+                    //     : part.storeLocation != null && part.storeLocation!.isNotEmpty
+                    //         ? Container(
+                    //             margin: const EdgeInsets.only(bottom: 16),
+                    //             decoration: BoxDecoration(
+                    //               color: colorScheme.surface,
+                    //               borderRadius: BorderRadius.circular(12),
+                    //               border: Border.all(
+                    //                 color: colorScheme.primary.withOpacity(0.2),
+                    //                 width: 1,
+                    //               ),
+                    //               boxShadow: [
+                    //                 BoxShadow(
+                    //                   color: colorScheme.primary.withOpacity(0.1),
+                    //                   blurRadius: 4,
+                    //                   offset: const Offset(0, 2),
+                    //                 ),
+                    //               ],
+                    //             ),
+                    //             child: ListTile(
+                    //               leading: Icon(
+                    //                 Icons.store,
+                    //                 color: colorScheme.primary,
+                    //               ),
+                    //               title: Text(
+                    //                 'Store Location',
+                    //                 style: TextStyle(
+                    //                   fontSize: 14,
+                    //                   color: colorScheme.onSurfaceVariant,
+                    //                 ),
+                    //               ),
+                    //               subtitle: Text(
+                    //                 part.storeLocation ?? '',
+                    //                 style: TextStyle(
+                    //                   fontSize: 16,
+                    //                   fontWeight: FontWeight.w500,
+                    //                   color: colorScheme.onSurface,
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           )
+                    //         : const SizedBox.shrink(),
 
-                    // Notes
-                    isEditing
-                        ? Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surface,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: colorScheme.primary.withOpacity(0.2),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: colorScheme.primary.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: TextFormField(
-                              initialValue: part.notes,
-                              decoration: InputDecoration(
-                                labelText: 'Notes',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                prefixIcon: Icon(Icons.note, color: colorScheme.primary),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                              ),
-                              maxLines: 3,
-                              onSaved: (value) => part.notes = value,
-                            ),
-                          )
-                        : part.notes != null && part.notes!.isNotEmpty
-                            ? Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: colorScheme.primary.withOpacity(0.2),
-                                    width: 1,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: colorScheme.primary.withOpacity(0.1),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: ListTile(
-                                  leading: Icon(
-                                    Icons.note,
-                                    color: colorScheme.primary,
-                                  ),
-                                  title: Text(
-                                    'Notes',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    part.notes ?? '',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
+                    // // Notes
+                    // isEditing
+                    //     ? Container(
+                    //         margin: const EdgeInsets.only(bottom: 16),
+                    //         decoration: BoxDecoration(
+                    //           color: colorScheme.surface,
+                    //           borderRadius: BorderRadius.circular(12),
+                    //           border: Border.all(
+                    //             color: colorScheme.primary.withOpacity(0.2),
+                    //             width: 1,
+                    //           ),
+                    //           boxShadow: [
+                    //             BoxShadow(
+                    //               color: colorScheme.primary.withOpacity(0.1),
+                    //               blurRadius: 4,
+                    //               offset: const Offset(0, 2),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         child: TextFormField(
+                    //           initialValue: part.notes,
+                    //           decoration: InputDecoration(
+                    //             labelText: 'Notes',
+                    //             border: OutlineInputBorder(
+                    //               borderRadius: BorderRadius.circular(12),
+                    //               borderSide: BorderSide.none,
+                    //             ),
+                    //             prefixIcon: Icon(Icons.note, color: colorScheme.primary),
+                    //             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    //           ),
+                    //           maxLines: 3,
+                    //           onSaved: (value) => part.notes = value,
+                    //         ),
+                    //       )
+                    //     : part.notes != null && part.notes!.isNotEmpty
+                    //         ? Container(
+                    //             margin: const EdgeInsets.only(bottom: 16),
+                    //             decoration: BoxDecoration(
+                    //               color: colorScheme.surface,
+                    //               borderRadius: BorderRadius.circular(12),
+                    //               border: Border.all(
+                    //                 color: colorScheme.primary.withOpacity(0.2),
+                    //                 width: 1,
+                    //               ),
+                    //               boxShadow: [
+                    //                 BoxShadow(
+                    //                   color: colorScheme.primary.withOpacity(0.1),
+                    //                   blurRadius: 4,
+                    //                   offset: const Offset(0, 2),
+                    //                 ),
+                    //               ],
+                    //             ),
+                    //             child: ListTile(
+                    //               leading: Icon(
+                    //                 Icons.note,
+                    //                 color: colorScheme.primary,
+                    //               ),
+                    //               title: Text(
+                    //                 'Notes',
+                    //                 style: TextStyle(
+                    //                   fontSize: 14,
+                    //                   color: colorScheme.onSurfaceVariant,
+                    //                 ),
+                    //               ),
+                    //               subtitle: Text(
+                    //                 part.notes ?? '',
+                    //                 style: TextStyle(
+                    //                   fontSize: 16,
+                    //                   fontWeight: FontWeight.w500,
+                    //                   color: colorScheme.onSurface,
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           )
+                    //         : const SizedBox.shrink(),
 
-                    // Images section
-                    const SizedBox(height: 24),
-                    Text(
-                      'Images',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // // Images section
+                    // const SizedBox(height: 24),
+                    // Text(
+                    //   'Images',
+                    //   style: TextStyle(
+                    //     fontSize: 16,
+                    //     fontWeight: FontWeight.bold,
+                    //     color: colorScheme.onSurface,
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 16),
 
-                    // Item Image
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8, top: 8, bottom: 8),
-                            child: Text(
-                              'Item Image',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: isEditing ? () => _pickImage(false) : null,
-                            child: Container(
-                              width: double.infinity,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceContainerLow,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: part.itemImagePath != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.file(
-                                        File(part.itemImagePath!),
-                                        width: double.infinity,
-                                        height: 150,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : Center(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.add_a_photo,
-                                            size: 40,
-                                            color: isEditing
-                                                ? colorScheme.primary
-                                                : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                                          ),
-                                          const SizedBox(height: 8.0),
-                                          Text(
-                                            isEditing ? 'Tap to upload image' : 'No image available',
-                                            style: TextStyle(
-                                              color: isEditing
-                                                  ? colorScheme.onSurfaceVariant
-                                                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // // Item Image
+                    // Container(
+                    //   margin: const EdgeInsets.only(bottom: 16),
+                    //   padding: const EdgeInsets.all(8),
+                    //   decoration: BoxDecoration(
+                    //     color: colorScheme.surface,
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     border: Border.all(
+                    //       color: colorScheme.primary.withOpacity(0.2),
+                    //       width: 1,
+                    //     ),
+                    //     boxShadow: [
+                    //       BoxShadow(
+                    //         color: colorScheme.primary.withOpacity(0.1),
+                    //         blurRadius: 4,
+                    //         offset: const Offset(0, 2),
+                    //       ),
+                    //     ],
+                    //   ),
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Padding(
+                    //         padding: const EdgeInsets.only(left: 8, top: 8, bottom: 8),
+                    //         child: Text(
+                    //           'Item Image',
+                    //           style: TextStyle(
+                    //             fontSize: 14,
+                    //             fontWeight: FontWeight.w500,
+                    //             color: colorScheme.onSurfaceVariant,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: isEditing ? () => _pickImage(false) : null,
+                    //         child: Container(
+                    //           width: double.infinity,
+                    //           height: 150,
+                    //           decoration: BoxDecoration(
+                    //             color: theme.colorScheme.surfaceContainerLow,
+                    //             borderRadius: BorderRadius.circular(8),
+                    //           ),
+                    //           child: part.itemImagePath != null
+                    //               ? ClipRRect(
+                    //                   borderRadius: BorderRadius.circular(8),
+                    //                   child: Image.file(
+                    //                     File(part.itemImagePath!),
+                    //                     width: double.infinity,
+                    //                     height: 150,
+                    //                     fit: BoxFit.cover,
+                    //                   ),
+                    //                 )
+                    //               : Center(
+                    //                   child: Column(
+                    //                     mainAxisAlignment: MainAxisAlignment.center,
+                    //                     children: [
+                    //                       Icon(
+                    //                         Icons.add_a_photo,
+                    //                         size: 40,
+                    //                         color: isEditing
+                    //                             ? colorScheme.primary
+                    //                             : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    //                       ),
+                    //                       const SizedBox(height: 8.0),
+                    //                       Text(
+                    //                         isEditing ? 'Tap to upload image' : 'No image available',
+                    //                         style: TextStyle(
+                    //                           color: isEditing
+                    //                               ? colorScheme.onSurfaceVariant
+                    //                               : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    //                         ),
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
 
-                    // Receipt Image
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8, top: 8, bottom: 8),
-                            child: Text(
-                              'Receipt Image',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: isEditing ? () => _pickImage(true) : null,
-                            child: Container(
-                              width: double.infinity,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceContainerLow,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: part.receiptImagePath != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.file(
-                                        File(part.receiptImagePath!),
-                                        width: double.infinity,
-                                        height: 150,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : Center(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.add_a_photo,
-                                            size: 40,
-                                            color: isEditing
-                                                ? colorScheme.primary
-                                                : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                                          ),
-                                          const SizedBox(height: 8.0),
-                                          Text(
-                                            isEditing ? 'Tap to upload receipt' : 'No receipt available',
-                                            style: TextStyle(
-                                              color: isEditing
-                                                  ? colorScheme.onSurfaceVariant
-                                                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // // Receipt Image
+                    // Container(
+                    //   margin: const EdgeInsets.only(bottom: 16),
+                    //   padding: const EdgeInsets.all(8),
+                    //   decoration: BoxDecoration(
+                    //     color: colorScheme.surface,
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     border: Border.all(
+                    //       color: colorScheme.primary.withOpacity(0.2),
+                    //       width: 1,
+                    //     ),
+                    //     boxShadow: [
+                    //       BoxShadow(
+                    //         color: colorScheme.primary.withOpacity(0.1),
+                    //         blurRadius: 4,
+                    //         offset: const Offset(0, 2),
+                    //       ),
+                    //     ],
+                    //   ),
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Padding(
+                    //         padding: const EdgeInsets.only(left: 8, top: 8, bottom: 8),
+                    //         child: Text(
+                    //           'Receipt Image',
+                    //           style: TextStyle(
+                    //             fontSize: 14,
+                    //             fontWeight: FontWeight.w500,
+                    //             color: colorScheme.onSurfaceVariant,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: isEditing ? () => _pickImage(true) : null,
+                    //         child: Container(
+                    //           width: double.infinity,
+                    //           height: 150,
+                    //           decoration: BoxDecoration(
+                    //             color: theme.colorScheme.surfaceContainerLow,
+                    //             borderRadius: BorderRadius.circular(8),
+                    //           ),
+                    //           child: part.receiptImagePath != null
+                    //               ? ClipRRect(
+                    //                   borderRadius: BorderRadius.circular(8),
+                    //                   child: Image.file(
+                    //                     File(part.receiptImagePath!),
+                    //                     width: double.infinity,
+                    //                     height: 150,
+                    //                     fit: BoxFit.cover,
+                    //                   ),
+                    //                 )
+                    //               : Center(
+                    //                   child: Column(
+                    //                     mainAxisAlignment: MainAxisAlignment.center,
+                    //                     children: [
+                    //                       Icon(
+                    //                         Icons.add_a_photo,
+                    //                         size: 40,
+                    //                         color: isEditing
+                    //                             ? colorScheme.primary
+                    //                             : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    //                       ),
+                    //                       const SizedBox(height: 8.0),
+                    //                       Text(
+                    //                         isEditing ? 'Tap to upload receipt' : 'No receipt available',
+                    //                         style: TextStyle(
+                    //                           color: isEditing
+                    //                               ? colorScheme.onSurfaceVariant
+                    //                               : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    //                         ),
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
 
                     // Save button (only visible in edit mode)
                     if (isEditing)
