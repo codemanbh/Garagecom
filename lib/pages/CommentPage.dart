@@ -8,11 +8,6 @@ import '../models/Post.dart';
 
 class CommentPage extends StatefulWidget {
   late int postIndex;
-  // final String postTitle;
-  // final String questionBody;
-  // final int initialVotes;
-  // final String? imageUrl;
-  // final int postID; // Add post ID to fetch related comments
 
   CommentPage({
     super.key,
@@ -24,14 +19,6 @@ class CommentPage extends StatefulWidget {
 }
 
 class _CommentPageState extends State<CommentPage> {
-  // late Post post;
-
-  // Track separate upvotes and downvotes for the post
-  // int postUpvotes = 0;
-  // int postDownvotes = 0;
-  // int postVotes = 0;
-  // String? imageUrl = '';
-
   List<Comment> comments = [];
   bool _isLoading = true;
   late int postIndex;
@@ -42,18 +29,9 @@ class _CommentPageState extends State<CommentPage> {
   void initState() {
     super.initState();
     postIndex = widget.postIndex;
-    // post = widget.post ??
-    //     Post(
-    //       postID: 0,
-    //       title: '',
-    //       description: '',
-    //       autherUsername: 'no username',
-    //     );
-    // Load comments when the page initializes
     _loadComments();
   }
 
-  // Function to load comments from the database
   Future<void> _loadComments() async {
     setState(() {
       _isLoading = true;
@@ -65,7 +43,7 @@ class _CommentPageState extends State<CommentPage> {
 
       if (success) {
         setState(() {
-          comments = List.from(CommentsManager.comments); // Create a copy
+          comments = List.from(CommentsManager.comments);
           _isLoading = false;
         });
 
@@ -99,7 +77,6 @@ class _CommentPageState extends State<CommentPage> {
     }
   }
 
-  // Add a comment to the database
   Future<void> addComment() async {
     final newCommentText = commentController.text.trim();
     if (newCommentText.isEmpty) {
@@ -112,7 +89,6 @@ class _CommentPageState extends State<CommentPage> {
       return;
     }
 
-    // Show loading state
     setState(() {
       _isLoading = true;
     });
@@ -122,7 +98,6 @@ class _CommentPageState extends State<CommentPage> {
           PostsManager.posts[postIndex].postID, newCommentText);
 
       if (success) {
-        // Refresh comments from server
         setState(() {
           comments = List.from(CommentsManager.comments);
           commentController.clear();
@@ -169,7 +144,6 @@ class _CommentPageState extends State<CommentPage> {
         "Join the conversation with ${comments.length} comments!";
 
     try {
-      // Show loading indicator
       final scaffoldMessenger = ScaffoldMessenger.of(context);
       scaffoldMessenger.showSnackBar(
         const SnackBar(
@@ -178,13 +152,11 @@ class _CommentPageState extends State<CommentPage> {
         ),
       );
 
-      // Use the share_plus package to open the native share dialog
       await Share.share(
         postContent,
         subject: PostsManager.posts[postIndex].title,
       );
     } catch (e) {
-      // Handle errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Could not share: ${e.toString()}'),
@@ -194,250 +166,246 @@ class _CommentPageState extends State<CommentPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+  BoxDecoration buildPressedStyle() {
+    return BoxDecoration(
+      shape: BoxShape.circle,
+      color: const Color.fromARGB(42, 255, 255, 255),
+    );
+  }
 
-    BoxDecoration buildPressedStyle() {
-      return BoxDecoration(
-        shape: BoxShape.circle,
-        // border: Border.all(
-        //   color: Colors.grey, // Border color
-        //   // width: 1.0,
-        // ),
-        color: const Color.fromARGB(42, 255, 255, 255), // Background color
-      );
-    }
+  Widget _buildUpVote() {
+    bool isUpVoted = PostsManager.posts[postIndex].voteValue == 1;
 
-    Widget _buildUpVote() {
-      bool isUpVoted = PostsManager.posts[postIndex].voteValue == 1;
+    return Container(
+      decoration: isUpVoted ? buildPressedStyle() : BoxDecoration(),
+      child: IconButton(
+        onPressed: () async {
+          await PostsManager.posts[postIndex].handleUpvote();
+          setState(() {});
+        },
+        icon: Icon(Icons.arrow_upward_rounded,
+            color: Theme.of(context).colorScheme.primary, size: 22),
+        tooltip: 'Upvote',
+      ),
+    );
+  }
 
-      return Container(
-        decoration: isUpVoted ? buildPressedStyle() : BoxDecoration(),
-        child: IconButton(
-          onPressed: () async {
-            await PostsManager.posts[postIndex].handleUpvote();
-            setState(() {});
-          },
-          icon: Icon(Icons.arrow_upward_rounded,
-              color: colorScheme.primary, size: 22),
-          tooltip: 'Upvote',
+  Widget _buildDownVote() {
+    bool isDownVoted = PostsManager.posts[postIndex].voteValue == -1;
+    return Container(
+      decoration: isDownVoted ? buildPressedStyle() : BoxDecoration(),
+      child: IconButton(
+        onPressed: () async {
+          await PostsManager.posts[postIndex].handleDownvote();
+          setState(() {});
+        },
+        icon: Icon(
+          Icons.arrow_downward_rounded,
+          color: Theme.of(context).colorScheme.error,
+          size: 22,
         ),
-      );
-    }
+        tooltip: 'Downvote',
+      ),
+    );
+  }
 
-    Widget _buildDownVote() {
-      bool isDownVoted = PostsManager.posts[postIndex].voteValue == -1;
-      return Container(
-        decoration: isDownVoted ? buildPressedStyle() : BoxDecoration(),
-        child: IconButton(
-          onPressed: () async {
-            await PostsManager.posts[postIndex].handleDownvote();
-            setState(() {});
-          },
-          icon: Icon(
-            Icons.arrow_downward_rounded,
-            color: colorScheme.error,
-            size: 22,
-          ),
-          tooltip: 'Downvote',
-        ),
-      );
-    }
-
-    Widget buildPostHeader(ThemeData theme, ColorScheme colorScheme) {
-      return Card(
-        elevation: 4,
-        color: colorScheme.surface,
-        shadowColor: colorScheme.primary.withOpacity(0.4),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side:
-              BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
-        ),
-        margin: const EdgeInsets.only(bottom: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (PostsManager.posts[postIndex].imageUrl != null &&
-                PostsManager.posts[postIndex].imageUrl!.isNotEmpty)
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.network(
-                  PostsManager.posts[postIndex].imageUrl!,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return SizedBox(
-                      height: 200,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                          color: colorScheme.primary,
-                        ),
+  Widget buildPostHeader(ThemeData theme, ColorScheme colorScheme) {
+    return Card(
+      elevation: 4,
+      color: colorScheme.surface,
+      shadowColor: colorScheme.primary.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
+      ),
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (PostsManager.posts[postIndex].imageUrl != null &&
+              PostsManager.posts[postIndex].imageUrl!.isNotEmpty)
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              child: Image.network(
+                PostsManager.posts[postIndex].imageUrl!,
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        color: colorScheme.primary,
                       ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 180,
-                      color: colorScheme.surfaceVariant,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.broken_image_rounded,
-                              size: 40,
-                              color:
-                                  colorScheme.onSurfaceVariant.withOpacity(0.6),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Image could not be loaded',
-                              style: TextStyle(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 18,
-                        backgroundColor: colorScheme.primaryContainer,
-                        child: Text(
-                          'A',
-                          style: TextStyle(
-                            color: colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 180,
+                    color: colorScheme.surfaceVariant,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'Author',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: colorScheme.onSurface,
-                            ),
+                          Icon(
+                            Icons.broken_image_rounded,
+                            size: 40,
+                            color: colorScheme.onSurfaceVariant.withOpacity(0.6),
                           ),
+                          const SizedBox(height: 8),
                           Text(
-                            'Posted 2 days ago',
+                            'Image could not be loaded',
                             style: TextStyle(
-                              fontSize: 12,
                               color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
-                    ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: colorScheme.primaryContainer,
+                      child: Text(
+                        PostsManager.posts[postIndex].autherUsername.isNotEmpty
+                            ? PostsManager.posts[postIndex].autherUsername[0]
+                                .toUpperCase()
+                            : '?',
+                        style: TextStyle(
+                          color: colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '@${PostsManager.posts[postIndex].autherUsername}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        Text(
+                          'Posted 2 days ago',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  PostsManager.posts[postIndex].title,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    PostsManager.posts[postIndex].title,
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: colorScheme.primary.withOpacity(0.1),
+                    ),
+                  ),
+                  child: Text(
+                    PostsManager.posts[postIndex].description,
                     style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                       color: colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: colorScheme.primary.withOpacity(0.1),
-                      ),
-                    ),
-                    child: Text(
-                      PostsManager.posts[postIndex].description,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildUpVote(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildUpVote(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: PostsManager.posts[postIndex].numOfVotes > 0
+                            ? colorScheme.primary.withOpacity(0.1)
+                            : PostsManager.posts[postIndex].numOfVotes < 0
+                                ? colorScheme.error.withOpacity(0.1)
+                                : colorScheme.surfaceVariant,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
                           color: PostsManager.posts[postIndex].numOfVotes > 0
-                              ? colorScheme.primary.withOpacity(0.1)
+                              ? colorScheme.primary.withOpacity(0.5)
                               : PostsManager.posts[postIndex].numOfVotes < 0
-                                  ? colorScheme.error.withOpacity(0.1)
-                                  : colorScheme.surfaceVariant,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: PostsManager.posts[postIndex].numOfVotes > 0
-                                ? colorScheme.primary.withOpacity(0.5)
-                                : PostsManager.posts[postIndex].numOfVotes < 0
-                                    ? colorScheme.error.withOpacity(0.5)
-                                    : colorScheme.outline.withOpacity(0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Text(
-                          PostsManager.posts[postIndex].numOfVotes.toString(),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: PostsManager.posts[postIndex].numOfVotes > 0
-                                ? colorScheme.primary
-                                : PostsManager.posts[postIndex].numOfVotes < 0
-                                    ? colorScheme.error
-                                    : colorScheme.onSurfaceVariant,
-                          ),
+                                  ? colorScheme.error.withOpacity(0.5)
+                                  : colorScheme.outline.withOpacity(0.3),
+                          width: 1,
                         ),
                       ),
-                      _buildDownVote(),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: _sharePost,
-                        icon: Icon(
-                          Icons.share_outlined,
-                          size: 25,
-                          color: colorScheme.onSurfaceVariant,
+                      child: Text(
+                        PostsManager.posts[postIndex].numOfVotes.toString(),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: PostsManager.posts[postIndex].numOfVotes > 0
+                              ? colorScheme.primary
+                              : PostsManager.posts[postIndex].numOfVotes < 0
+                                  ? colorScheme.error
+                                  : colorScheme.onSurfaceVariant,
                         ),
-                        tooltip: 'Share',
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    _buildDownVote(),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: _sharePost,
+                      icon: Icon(
+                        Icons.share_outlined,
+                        size: 25,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      tooltip: 'Share',
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
-      );
-    }
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -608,17 +576,29 @@ class _CommentPageState extends State<CommentPage> {
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: comments.length,
                           itemBuilder: (context, index) {
+                            // Print all comments once for debugging
+                            if (index == 0) {
+                              print('All comments: $comments');
+                              for (int i = 0; i < comments.length; i++) {
+                                print('Comment $i: username="${comments[i].username}"');
+                              }
+                            }
+                            
                             final comment = comments[index];
                             return CommentCard(
-                              username: comment.getUsernameDisplay(),
+                              username: comment.username.isNotEmpty ? comment.username : 'Anonymous',
                               content: comment.text,
                               timeAgo: comment.getFormattedDate(),
                               upvotes: comment.upvotes,
                               downvotes: comment.downvotes,
-                              onUpvote: () {},
-                              onDownvote: () {},
+                              onUpvote: () {
+                                // Handle upvote
+                              },
+                              onDownvote: () {
+                                // Handle downvote
+                              },
                               onReply: () {
-                                // Reply functionality
+                                // Handle reply
                               },
                             );
                           },

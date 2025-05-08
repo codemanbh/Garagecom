@@ -33,6 +33,13 @@ class CommentsManager {
           
           // Map API data to Comment objects
           for (var commentData in commentsData) {
+            // Try multiple possible field names for username
+            String username = commentData['username'] ?? 
+                             commentData['userName'] ?? 
+                             commentData['user_name'] ?? 
+                             commentData['name'] ?? 
+                             'Anonymous';
+
             Comment comment = Comment(
               commentID: commentData['commentID'] ?? 0,
               userID: commentData['userID'] ?? 0,
@@ -41,6 +48,7 @@ class CommentsManager {
               text: commentData['text'] ?? '',
               createdIn: commentData['createdIn'] ?? '',
               modifiedIn: commentData['modifiedIn'] ?? '',
+              username: username,
             );
             
             comments.add(comment);

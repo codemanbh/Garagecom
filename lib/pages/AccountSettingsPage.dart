@@ -3,6 +3,7 @@ import '../managers/CarInfo.dart';
 import '../models/UserData.dart';
 import '../managers/UserService.dart';
 import '../helpers/apiHelper.dart';
+import '../components/ProfileImage.dart';
 
 class AccountSettingsPage extends StatefulWidget {
   const AccountSettingsPage({super.key});
@@ -683,41 +684,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 20),
-                      Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 60,
-                            backgroundColor: colorScheme.primaryContainer,
-                            backgroundImage: userData != null &&
-                                    userData!['profilePicture'] != null
-                                ? NetworkImage(
-                                    '${ApiHelper.mainDomain}api/Users/GetProfilePicture?filename=${userData!['profilePicture']}')
-                                : null,
-                            child: userData == null ||
-                                    userData!['profilePicture'] == null
-                                ? Icon(
-                                    Icons.person,
-                                    size: 80,
-                                    color: colorScheme.onPrimaryContainer,
-                                  )
-                                : null,
-                          ),
-                          if (isEditMode)
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: colorScheme.primary,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
-                        ],
-                      ),
+                      ProfileImage(),
                       const SizedBox(height: 16),
                       Text(
                         userData != null
