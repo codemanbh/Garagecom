@@ -103,6 +103,7 @@ class PostsManager {
         autherUsername: postMap['autherUsername'],
         imageUrl: postMap.containsKey('image') ? postMap['image'] : null,
         description: postMap['content'],
+        createdIn: postMap['createdIn'],
       );
       posts.add(post);
     }
