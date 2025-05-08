@@ -1,8 +1,0 @@
-procedure send_image_to_AI_analysis(image):
-	pg_image <- convert_to_jpg(image)		
-    form_data <- {
-        "image":pg_image
-    }
-    result <- OpenAI( url_path: "/api/ai_image_analysis", data:form_data)
-    retrun result
-
