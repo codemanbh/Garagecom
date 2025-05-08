@@ -49,9 +49,3 @@ docs/
 
 /assets/.env
 /android/gradle.properties
-/linux
-/windows
-/ios
-/macos
-/web
-/test
