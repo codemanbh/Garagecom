@@ -91,6 +91,15 @@ class ApiHelper {
     }
   }
 
+  static Future<Image> _image(String imageName, String path,
+      {Map<String, dynamic>? options, errorBuilder}) async {
+    if (options == null) {
+      options = {};
+    }
+    String extra = '';
+    if (options?['userId'] != null) {
+      extra = "&userId=${options['userId'].toString()}&";
+    }
   static Future<Response<dynamic>> getWithFullResponse(
       String path, Map<String, dynamic> data) async {
     try {
@@ -118,23 +127,35 @@ class ApiHelper {
   static Future<Image> _image(String imageName, String path) async {
     final prefs = await SharedPreferences.getInstance();
     final token = await prefs.getString('token');
-    String fullImageUrl = '$mainDomain$path?filename=$imageName';
+    String fullImageUrl = '$mainDomain$path?${extra}filename=$imageName';
 
     print("fullImageUrl: " + fullImageUrl);
     Map<String, String> headers = {};
     if (token != null) {
       headers = {"Authorization": token};
     }
-    return Image.network(fullImageUrl, headers: headers, fit: BoxFit.cover, width: double.infinity,);
+    return Image.network(
+      fullImageUrl,
+      headers: headers,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      errorBuilder: errorBuilder,
+    );
   }
 
-  static FutureBuilder<Image> image(String imageName, String path) {
+  static FutureBuilder<Image> image(String imageName, String path,
+      {Map<String, dynamic>? options, errorBuilder}) {
+    if (options == null) {
+      options = {};
+    }
     return FutureBuilder<Image>(
-      future: ApiHelper._image(imageName, path),
+      future: ApiHelper._image(imageName, path,
+          options: options, errorBuilder: errorBuilder),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
+          print("Error: ${snapshot.error}");
           return const Icon(Icons.error);
         } else if (snapshot.hasData) {
           return snapshot.data!;

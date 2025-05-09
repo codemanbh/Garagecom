@@ -12,7 +12,8 @@ class PostsManager {
   static List<Post> posts = [];
   final Dio _dio = Dio();
   static int postsPage = 0;
-
+  static bool hasMore = true;
+  static bool isLoudingMore = false;
   // PostsManager() {
   //   fetchPosts();
   // }
@@ -20,6 +21,7 @@ class PostsManager {
   static Future<bool> fetchPosts() async {
     try {
       postsPage++;
+      // await Future.delayed(Duration(seconds: 2));
       // Fetch posts from API
       Map<String, dynamic> response = await ApiHelper.get(
           'api/Posts/GetPosts', {
@@ -27,12 +29,15 @@ class PostsManager {
         'page': postsPage
       });
 
-      print('API Response received');
-      print(response);
+      // print('API Response received');
+      // print(jsonEncode(response));
 
       // Check if the API call was successful
       if (response.containsKey('succeeded') && response['succeeded'] == true) {
         print('API call successful');
+        hasMore = response['parameters']['HasMore'];
+        // print(
+        //     "aaaaaaaaaaaaaaaaaaa has more:${response['parameters']['HasMore']}");
 
         // Check if we have the Posts array in the parameters
         if (response.containsKey('parameters') &&
@@ -42,7 +47,7 @@ class PostsManager {
           print('Found ${postsData.length} posts in API response');
 
           // Clear existing posts
-          posts.clear();
+          // posts.clear();
 
           // Map API data to Post objects
           for (var postData in postsData) {
@@ -73,6 +78,7 @@ class PostsManager {
           }
 
           print('Successfully parsed ${posts.length} posts from API');
+
           return true;
         } else {
           print('No Posts array found in parameters');
@@ -85,9 +91,11 @@ class PostsManager {
 
       // If we get here, something went wrong with the API response
       // Fall back to local data
+
       return _loadFallbackPosts();
     } catch (e) {
       print('Error fetching posts: $e');
+
       return _loadFallbackPosts();
     }
   }

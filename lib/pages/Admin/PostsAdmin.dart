@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../components/PostCard.dart';
 import '../../models/Post.dart';
 import '../../managers/PostsManager.dart';
+import '../../helpers/apiHelper.dart';
 
 class PostsAdminTab extends StatefulWidget {
   const PostsAdminTab({super.key});
@@ -47,30 +48,144 @@ class PostsAdminTabState extends State<PostsAdminTab>
     });
 
     try {
-      // This would ideally call a different API endpoint for pending/unapproved posts
-      final success = await PostsManager.fetchPosts();
+      // Call the specific endpoint for getting new reports
+      final response =
+          await ApiHelper.get('api/Administrations/GetNewReport', {});
+      print('Admin reports response: $response'); // Add logging to debug
 
-      if (success) {
-        setState(() {
-          posts = List.from(PostsManager.posts); // Create a copy
-          _currentPostIndex = posts.isNotEmpty ? 0 : -1;
-          _isLoading = false;
-        });
+      if (response['succeeded'] == true && response['parameters'] != null) {
+        // The response format is different than expected
+        // It contains a single Report object, not an array of reports
+        final reportData = response['parameters']['Report'];
+        print('Report data: $reportData'); // Debug info
+
+        if (reportData != null) {
+          // Get the specific post ID that was reported
+          final int? postId = reportData['postID'];
+          final int? commentId = reportData['commentID'];
+
+          if (postId != null) {
+            // If we have a postId, we need to fetch the post details
+            final postResponse = await ApiHelper.get(
+                'api/Posts/GetPostByPostID', {'postId': postId});
+            print('Post details response: $postResponse');
+
+            if (postResponse['succeeded'] == true &&
+                postResponse['parameters'] != null &&
+                postResponse['parameters']['Post'] != null) {
+              final postData = postResponse['parameters']['Post'];
+
+              setState(() {
+                // Clear existing posts
+                PostsManager.posts =
+                    []; // Update the static list in PostsManager
+                posts = []; // Clear local list
+
+                // Create a Post object from the post data
+                Post post = Post(
+                  postID: postData['postID'] ?? 0,
+                  title: postData['title'] ?? 'No Title',
+                  description: postData['description'] ?? 'No Content',
+                  autherUsername: postData['userName'] ?? 'Unknown User',
+                  imageUrl: postData['attachment'],
+                  autherId: postData['userID'] ?? -1,
+                  allowComments: postData['allowComments'],
+                  numOfVotes: postData['countVotes'] ?? 0,
+                  voteValue: postData['voteValue'] ?? 0,
+                  createdIn: postData['createdIn'] ?? '',
+                  categoryName: postData['postCategory'] != null
+                      ? postData['postCategory']['title']
+                      : '',
+                );
+
+                posts.add(post);
+                PostsManager.posts.add(post); // Add to the static list too
+
+                _currentPostIndex = 0;
+                _isLoading = false;
+              });
+            } else {
+              // Couldn't fetch post details
+              setState(() {
+                posts = [];
+                PostsManager.posts = [];
+                _currentPostIndex = -1;
+                _isLoading = false;
+              });
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Failed to load post details'),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            }
+          } else if (commentId != null) {
+            // Handle comment reports here if needed
+            // For now, just show a message that we have a comment report
+            setState(() {
+              posts = [];
+              PostsManager.posts = [];
+              _currentPostIndex = -1;
+              _isLoading = false;
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Comment reports are not implemented yet'),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
+          } else {
+            // No post or comment ID in the report
+            setState(() {
+              posts = [];
+              PostsManager.posts = [];
+              _currentPostIndex = -1;
+              _isLoading = false;
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Invalid report data received'),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
+          }
+        } else {
+          // No reports found
+          setState(() {
+            posts = [];
+            PostsManager.posts = [];
+            _currentPostIndex = -1;
+            _isLoading = false;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('No pending reports found'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
+        }
       } else {
         setState(() {
           posts = [];
+          PostsManager.posts = []; // Clear the static list too
           _currentPostIndex = -1;
           _isLoading = false;
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Failed to load pending posts'),
+            content:
+                Text(response['message'] ?? 'Failed to load pending reports'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
     } catch (e) {
+      print('Error loading admin reports: $e'); // Add logging to debug
       setState(() {
         _isLoading = false;
         _currentPostIndex = -1;
@@ -85,44 +200,43 @@ class PostsAdminTabState extends State<PostsAdminTab>
     }
   }
 
-  void _nextPost() {
-    if (posts.isNotEmpty && _currentPostIndex < posts.length - 1) {
-      setState(() {
-        _currentPostIndex++;
-      });
-    }
-  }
-
-  void _previousPost() {
-    if (posts.isNotEmpty && _currentPostIndex > 0) {
-      setState(() {
-        _currentPostIndex--;
-      });
-    }
-  }
-
   Future<void> _approvePost(Post post) async {
     try {
-      // Call API or service to approve the post
-      // await _postsManager.approvePost(post.id);
+      print('Approving post: ${post.postID}');
+      // Call API to approve the post
+      final response = await ApiHelper.post('api/Administrations/ProcessReport',
+          {'postId': post.postID, 'commentId': null, 'action': 'allow'});
 
-      // Remove the post from the pending list
-      setState(() {
-        posts.remove(post);
-        if (posts.isEmpty) {
+      print('Approve post response: $response'); // Add logging
+
+      if (response['succeeded'] == true) {
+        // Successfully processed the report
+        setState(() {
+          posts.clear();
+          PostsManager.posts.clear();
           _currentPostIndex = -1;
-        } else if (_currentPostIndex >= posts.length) {
-          _currentPostIndex = posts.length - 1;
-        }
-      });
+        });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Post approved successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Post approved successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Load the next report if available
+        _loadPendingPosts();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Failed to approve post: ${response['message'] ?? 'Unknown error'}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
+      print('Error approving post: $e'); // Add logging
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to approve post: ${e.toString()}'),
@@ -134,26 +248,41 @@ class PostsAdminTabState extends State<PostsAdminTab>
 
   Future<void> _blockPost(Post post) async {
     try {
-      // Call API or service to block the post
-      // await _postsManager.blockPost(post.id);
+      print('Blocking post: ${post.postID}');
+      // Call API to block the post
+      final response = await ApiHelper.post('api/Administrations/ProcessReport',
+          {'postId': post.postID, 'commentId': null, 'action': 'block'});
 
-      // Remove the post from the pending list
-      setState(() {
-        posts.remove(post);
-        if (posts.isEmpty) {
+      print('Block post response: $response'); // Add logging
+
+      if (response['succeeded'] == true) {
+        // Successfully processed the report
+        setState(() {
+          posts.clear();
+          PostsManager.posts.clear();
           _currentPostIndex = -1;
-        } else if (_currentPostIndex >= posts.length) {
-          _currentPostIndex = posts.length - 1;
-        }
-      });
+        });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Post blocked successfully'),
-          backgroundColor: Colors.red,
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Post blocked successfully'),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        // Load the next report if available
+        _loadPendingPosts();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Failed to block post: ${response['message'] ?? 'Unknown error'}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
+      print('Error blocking post: $e'); // Add logging
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to block post: ${e.toString()}'),
@@ -242,13 +371,13 @@ class PostsAdminTabState extends State<PostsAdminTab>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.task_alt,
+                            Icons.check_circle_outline,
                             size: 64,
                             color: colorScheme.primary,
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'No Posts Pending Review',
+                            'No Reports Pending Review',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -257,7 +386,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'All posts have been moderated',
+                            'All reported content has been moderated',
                             style: TextStyle(
                               fontSize: 16,
                               color: colorScheme.onSurfaceVariant,
@@ -267,7 +396,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
                           ElevatedButton.icon(
                             onPressed: _loadPendingPosts,
                             icon: const Icon(Icons.refresh),
-                            label: const Text('Refresh'),
+                            label: const Text('Check for Reports'),
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 24,
@@ -281,34 +410,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
                   : Column(
                       children: [
                         // Navigation buttons
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                onPressed: _currentPostIndex > 0
-                                    ? _previousPost
-                                    : null,
-                                icon: const Icon(Icons.arrow_back),
-                                tooltip: 'Previous post',
-                                color: _currentPostIndex > 0
-                                    ? colorScheme.primary
-                                    : colorScheme.onSurface.withOpacity(0.3),
-                              ),
-                              IconButton(
-                                onPressed: _currentPostIndex < posts.length - 1
-                                    ? _nextPost
-                                    : null,
-                                icon: const Icon(Icons.arrow_forward),
-                                tooltip: 'Next post',
-                                color: _currentPostIndex < posts.length - 1
-                                    ? colorScheme.primary
-                                    : colorScheme.onSurface.withOpacity(0.3),
-                              ),
-                            ],
-                          ),
-                        ),
 
                         // Current post card
                         Expanded(

@@ -6,6 +6,7 @@ import '../models/Comment.dart';
 import '../managers/CommentsManager.dart';
 import '../models/Post.dart';
 import '../components/PostActionsMenu.dart';
+import './../components/UserAvatar.dart';
 
 class CommentPage extends StatefulWidget {
   late final int postId;
@@ -282,6 +283,10 @@ class _CommentPageState extends State<CommentPage> {
               children: [
                 Row(
                   children: [
+                    UserAvatar(
+                      autherId: post.autherId,
+                      autherUsername:
+                          post.autherUsername,
                     CircleAvatar(
                       radius: 18,
                       backgroundColor: colorScheme.primaryContainer,

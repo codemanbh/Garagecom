@@ -465,7 +465,6 @@ class _ServicePageState extends State<ServicePage> {
                                                         // Refresh the data
                                                         fetchUserCarsWithParts();
                                                       } else {
-                                                        // Show error message if the API call failed
                                                         String errorMessage = response['message'] ?? 'Failed to renew part';
                                                         ScaffoldMessenger.of(context).showSnackBar(
                                                           SnackBar(
@@ -475,7 +474,6 @@ class _ServicePageState extends State<ServicePage> {
                                                         );
                                                       }
                                                     } catch (e) {
-                                                      // Show error message if an exception occurred
                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                         SnackBar(
                                                           content: Text('Error: ${e.toString()}'),

@@ -308,19 +308,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 80,
               ),
-              TextButton(
-                onPressed: () {
-                  // Navigate to the signup page
-                  Navigator.of(context).pushNamed('/adminPage');
-                },
-                child: Text(
-                  'Admin Page',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
+              
             ],
           ),
         ),
