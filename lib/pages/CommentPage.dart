@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:garagecom/managers/PostsManager.dart';
 import 'package:share_plus/share_plus.dart';
 import '../components/CommentCard.dart';
+import '../helpers/apiHelper.dart';
 import '../models/Comment.dart';
 import '../managers/CommentsManager.dart';
 import '../models/Post.dart';
@@ -177,35 +178,41 @@ class _CommentPageState extends State<CommentPage> {
   Widget _buildUpVote() {
     bool isUpVoted = PostsManager.posts[postIndex].voteValue == 1;
 
-    return Container(
-      decoration: isUpVoted ? buildPressedStyle() : BoxDecoration(),
-      child: IconButton(
-        onPressed: () async {
-          await PostsManager.posts[postIndex].handleUpvote();
-          setState(() {});
-        },
-        icon: Icon(Icons.arrow_upward_rounded,
-            color: Theme.of(context).colorScheme.primary, size: 22),
-        tooltip: 'Upvote',
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: isUpVoted ? buildPressedStyle() : BoxDecoration(),
+        child: IconButton(
+          onPressed: () async {
+            await PostsManager.posts[postIndex].handleUpvote();
+            setState(() {});
+          },
+          icon: Icon(Icons.arrow_upward_rounded,
+              color: Theme.of(context).colorScheme.primary, size: 22),
+          tooltip: 'Upvote',
+        ),
       ),
     );
   }
 
   Widget _buildDownVote() {
     bool isDownVoted = PostsManager.posts[postIndex].voteValue == -1;
-    return Container(
-      decoration: isDownVoted ? buildPressedStyle() : BoxDecoration(),
-      child: IconButton(
-        onPressed: () async {
-          await PostsManager.posts[postIndex].handleDownvote();
-          setState(() {});
-        },
-        icon: Icon(
-          Icons.arrow_downward_rounded,
-          color: Theme.of(context).colorScheme.error,
-          size: 22,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: isDownVoted ? buildPressedStyle() : BoxDecoration(),
+        child: IconButton(
+          onPressed: () async {
+            await PostsManager.posts[postIndex].handleDownvote();
+            setState(() {});
+          },
+          icon: Icon(
+            Icons.arrow_downward_rounded,
+            color: Theme.of(context).colorScheme.error,
+            size: 22,
+          ),
+          tooltip: 'Downvote',
         ),
-        tooltip: 'Downvote',
       ),
     );
   }
@@ -226,56 +233,10 @@ class _CommentPageState extends State<CommentPage> {
           if (PostsManager.posts[postIndex].imageUrl != null &&
               PostsManager.posts[postIndex].imageUrl!.isNotEmpty)
             ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.network(
-                PostsManager.posts[postIndex].imageUrl!,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return SizedBox(
-                    height: 200,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 180,
-                    color: colorScheme.surfaceVariant,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.broken_image_rounded,
-                            size: 40,
-                            color:
-                                colorScheme.onSurfaceVariant.withOpacity(0.6),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Image could not be loaded',
-                            style: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
+                child: ApiHelper.image(PostsManager.posts[postIndex].imageUrl!,
+                    "api/posts/GetPostAttachment")),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

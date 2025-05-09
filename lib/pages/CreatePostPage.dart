@@ -91,6 +91,19 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
       // Make regular API call for text-only post
         final response = await ApiHelper.post('api/Posts/Setpost', postData);
+        if(response['succeeded'] == false) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'], style: TextStyle(color: Colors.white),),
+              backgroundColor: Colors.red,
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+            _isProcessing = false;
+          });
+          return;
+        }
         print(response);
         if(response['succeeded'] == true) {
           int postId = response['parameters']['PostID'];
@@ -205,17 +218,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return Scaffold(
       backgroundColor: colorScheme.background,
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Icon(Icons.create_rounded, size: 24),
-            SizedBox(width: 8),
-            Text(
-              'Create Post',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        title: const Text(
+          'Create Post',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,

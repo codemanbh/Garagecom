@@ -18,7 +18,8 @@ class Comment {
     required this.text,
     required this.createdIn,
     required this.modifiedIn,
-    this.username = 'Anonymous', // Default to 'Anonymous' if no username provided
+    this.username =
+        'Anonymous', // Default to 'Anonymous' if no username provided
     this.upvotes = 0,
     this.downvotes = 0,
   });

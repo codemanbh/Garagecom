@@ -101,7 +101,7 @@ class ApiHelper {
     if (token != null) {
       headers = {"Authorization": token};
     }
-    return Image.network(fullImageUrl, headers: headers, fit: BoxFit.cover);
+    return Image.network(fullImageUrl, headers: headers, fit: BoxFit.cover, width: double.infinity,);
   }
 
   static FutureBuilder<Image> image(String imageName, String path) {
