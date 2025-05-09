@@ -60,7 +60,7 @@ class ApiHelper {
 
     navigatorKey.currentState?.pushNamedAndRemoveUntil(
       '/loginPage',
-      (route) => false,
+          (route) => false,
     );
     // final messenger = ScaffoldMessenger.of(navigatorKey.currentContext!);
     // messenger.showSnackBar(
@@ -100,31 +100,6 @@ class ApiHelper {
     if (options?['userId'] != null) {
       extra = "&userId=${options['userId'].toString()}&";
     }
-  static Future<Response<dynamic>> getWithFullResponse(
-      String path, Map<String, dynamic> data) async {
-    try {
-      Dio client = await Client();
-      print('GET Request to: ${client.options.baseUrl}$path');
-      print('Parameters: $data');
-
-      final response = await client.get(
-        path,
-        queryParameters: data,
-      );
-
-      _handleResponse(response);
-      return response;
-    } catch (e) {
-      print('GET Error: $e');
-      return Response(
-        requestOptions: RequestOptions(path: path),
-        statusCode: 500,
-        data: {'error': e.toString()},
-      );
-    }
-  }
-
-  static Future<Image> _image(String imageName, String path) async {
     final prefs = await SharedPreferences.getInstance();
     final token = await prefs.getString('token');
     String fullImageUrl = '$mainDomain$path?${extra}filename=$imageName';
@@ -217,7 +192,7 @@ class ApiHelper {
       return {
         'status': 'success',
         'message':
-            'Internet connection is working, status code: ${response.statusCode}'
+        'Internet connection is working, status code: ${response.statusCode}'
       };
     } catch (e) {
       return {
@@ -247,6 +222,30 @@ class ApiHelper {
     final jpgFile = File(newPath)..writeAsBytesSync(jpgBytes);
 
     return jpgFile;
+  }
+
+  static Future<Response<dynamic>> getWithFullResponse(
+      String path, Map<String, dynamic> data) async {
+    try {
+      Dio client = await Client();
+      print('GET Request to: ${client.options.baseUrl}$path');
+      print('Parameters: $data');
+
+      final response = await client.get(
+        path,
+        queryParameters: data,
+      );
+
+      _handleResponse(response);
+      return response;
+    } catch (e) {
+      print('GET Error: $e');
+      return Response(
+        requestOptions: RequestOptions(path: path),
+        statusCode: 500,
+        data: {'error': e.toString()},
+      );
+    }
   }
 
   static Future<Map<String, dynamic>> uploadImage(File image, String path,

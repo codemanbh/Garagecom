@@ -287,19 +287,6 @@ class _CommentPageState extends State<CommentPage> {
                       autherId: post.autherId,
                       autherUsername:
                           post.autherUsername,
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: colorScheme.primaryContainer,
-                      child: Text(
-                        post.autherUsername.isNotEmpty
-                            ? post.autherUsername[0]
-                                .toUpperCase()
-                            : '?',
-                        style: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ),
                     const SizedBox(width: 10),
                     Column(
