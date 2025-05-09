@@ -74,14 +74,15 @@ class _ServicePageState extends State<ServicePage> {
     final carPart = CarPart(
       partName: part['part']['partName'],
       lastReplacedDate:
-          DateFormat('MMM dd, yyyy').format(DateTime.parse(part['createdIn'])),
+          DateFormat('yyyy-MM-dd').format(DateTime.parse(part['createdIn'])),
       nextReplacedDate: DateFormat('MMM dd, yyyy')
           .format(DateTime.parse(part['nextDueDate'])),
       replacementInterval: '${part['lifeTimeInterval']} Months',
       lifespanProgress:
           calculateLifespanProgress(part['createdIn'], part['nextDueDate']),
-      carId: userCars[currentCarIndex]
-          ['carID'], // Change from userCarID to carID
+      carId: userCars[currentCarIndex]['carID'],
+      carPartId: part['carPartID'], // Add this line to pass the carPartID
+      notes: part['notes'], // Also pass the notes if available
     );
 
     Navigator.of(context)
@@ -90,8 +91,17 @@ class _ServicePageState extends State<ServicePage> {
         builder: (context) => PartDetailsPage(part: carPart),
       ),
     )
-        .then((_) {
-      // Refresh data when coming back
+        .then((result) {
+      // Refresh data when coming back, especially after deletion
+      if (result == true) {
+        // Part was deleted
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Part has been removed from your inventory'),
+            backgroundColor: Colors.blueGrey,
+          ),
+        );
+      }
       setState(() {
         fetchUserCarsWithParts();
       });
