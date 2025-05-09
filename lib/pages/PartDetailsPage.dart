@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../models/CarPart.dart';
 import 'package:intl/intl.dart';
+import '../helpers/ApiHelper.dart';
 
 class PartDetailsPage extends StatefulWidget {
   final CarPart part;
@@ -114,24 +115,93 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
     });
   }
 
-  void _saveChanges() {
+  Future<void> updateCarPart() async {
+    // First check if the last replacement date is set when interval is changed
+    if (part.lastReplacedDate == null || part.lastReplacedDate!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Last replacement date is required when updating the service interval.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // Format the replacement interval with the selected value and unit
-      if (selectedIntervalValue != null && selectedIntervalUnit != null) {
-        part.replacementInterval = '$selectedIntervalValue $selectedIntervalUnit';
-      }
+      try {
+        // Show loading indicator
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Saving changes...'),
+            duration: Duration(seconds: 1),
+          ),
+        );
 
-      setState(() {
-        isEditing = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Changes saved successfully!'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
+        // Extract numeric value from the replacement interval if possible
+        String intervalStr = part.replacementInterval ?? '';
+        int? lifeTimeInterval;
+
+        // Extract numeric values using regex
+        final RegExp regExp = RegExp(r'(\d+)');
+        final match = regExp.firstMatch(intervalStr);
+        if (match != null) {
+          lifeTimeInterval = int.tryParse(match.group(1) ?? '');
+        }
+
+        // If no valid number found, default to 3 months
+        lifeTimeInterval ??= 3;
+
+        // Get the correct carPartID from the widget arguments or navigation params
+        final int carPartId = widget.part.carPartId ?? 0;
+
+        // Prepare the API request with the correct ID
+        final response = await ApiHelper.post('api/Cars/UpdateCarPart', {
+          'carPartId': carPartId, 
+          'lifeTimeInterval': lifeTimeInterval,
+          'notes': part.notes,
+          'lastReplacementDate': part.lastReplacedDate != null ? 
+              DateFormat('yyyy-MM-dd').format(_parseDate(part.lastReplacedDate) ?? DateTime.now()) : null,
+        });
+
+        if (response['succeeded'] == true) {
+          setState(() {
+            isEditing = false;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Changes saved successfully!'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
+        } else {
+          // Handle error response
+          String errorMessage = response['message'] ?? 'Failed to update part';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $errorMessage'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        // Handle exception
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _saveChanges() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      updateCarPart();
     }
   }
 
@@ -207,6 +277,88 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
     } else {
       return Colors.red;
     }
+  }
+
+  void _confirmDelete() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Part'),
+          content: Text('Are you sure you want to delete ${part.partName ?? 'this part'}?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deletePart();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deletePart() async {
+    try {
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Deleting part...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+
+      final int carPartId = widget.part.carPartId ?? 0;
+      
+      // Call the delete endpoint
+      final response = await ApiHelper.post('api/Cars/DeleteCarPart', {
+        'carPartId': carPartId,
+      });
+
+      if (response['succeeded'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Part deleted successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Navigate back to the previous screen
+        Navigator.of(context).pop(true); // Return true to indicate successful deletion
+      } else {
+        // Handle error response
+        String errorMessage = response['message'] ?? 'Failed to delete part';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $errorMessage'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle exception
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  String? _extractNumericValue(String? text) {
+    if (text == null || text.isEmpty) return null;
+    final RegExp regExp = RegExp(r'(\d+)');
+    final match = regExp.firstMatch(text);
+    return match?.group(1);
   }
 
   @override
@@ -328,24 +480,26 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
                                 ),
                               ],
                             ),
-                            child: TextFormField(
-                              initialValue: part.partName,
-                              decoration: InputDecoration(
-                                labelText: 'Part Name',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                prefixIcon: Icon(Icons.build, color: colorScheme.primary),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            child: ListTile(
+                              leading: Icon(
+                                Icons.build,
+                                color: colorScheme.primary,
                               ),
-                              onSaved: (value) => part.partName = value,
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Please enter a part name';
-                                }
-                                return null;
-                              },
+                              title: Text(
+                                'Part Name',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              subtitle: Text(
+                                part.partName ?? 'Not specified',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
                             ),
                           )
                         : Container(
@@ -484,79 +638,7 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Next Service Date
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: isEditing
-                          ? ListTile(
-                              title: Text(
-                                'Next Service Date',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                              subtitle: Text(
-                                nextReplacedController.text.isNotEmpty
-                                    ? nextReplacedController.text
-                                    : 'Select Date',
-                                style: TextStyle(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                              leading: Icon(
-                                Icons.event,
-                                color: colorScheme.primary,
-                              ),
-                              trailing: Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              onTap: () => _selectDate(context, false),
-                            )
-                          : ListTile(
-                              leading: Icon(
-                                Icons.event,
-                                color: colorScheme.primary,
-                              ),
-                              title: Text(
-                                'Next Service Date',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                              subtitle: Text(
-                                part.nextReplacedDate ?? 'Not specified',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                            ),
-                    ),
-
-                    // Service Interval
+                    // Service Interval - Simplified without unit selection
                     const SizedBox(height: 16),
                     Text(
                       'Service Interval',
@@ -597,53 +679,22 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: DropdownButtonFormField<String>(
-                                        value: selectedIntervalValue,
-                                        decoration: InputDecoration(
-                                          labelText: 'Value',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        items: presetIntervalValues[selectedIntervalUnit]?.map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList() ?? [],
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            selectedIntervalValue = newValue;
-                                            replacementIntervalController.text = newValue ?? '';
-                                          });
-                                        },
-                                      ),
+                                TextFormField(
+                                  initialValue: _extractNumericValue(part.replacementInterval),
+                                  decoration: InputDecoration(
+                                    labelText: 'Interval in months',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      flex: 2,
-                                      child: DropdownButtonFormField<String>(
-                                        value: selectedIntervalUnit,
-                                        decoration: InputDecoration(
-                                          labelText: 'Unit',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        items: intervalUnits.map((String unit) {
-                                          return DropdownMenuItem<String>(
-                                            value: unit,
-                                            child: Text(unit),
-                                          );
-                                        }).toList(),
-                                        onChanged: _handleIntervalUnitChange,
-                                      ),
+                                    hintText: 'e.g., 6',
+                                    helperText: 'Last replacement date is required when updating interval',
+                                    helperStyle: TextStyle(
+                                      color: colorScheme.error.withOpacity(0.8),
+                                      fontSize: 12,
                                     ),
-                                  ],
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  onSaved: (value) => part.replacementInterval = value,
                                 ),
                               ],
                             )
@@ -747,347 +798,78 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
 
                     // Additional Details
                     const SizedBox(height: 24),
-                    // Text(
-                    //   'Additional Details',
-                    //   style: TextStyle(
-                    //     fontSize: 16,
-                    //     fontWeight: FontWeight.bold,
-                    //     color: colorScheme.onSurface,
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 16),
+                    Text(
+                      'Additional Details',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
-                    // // Store Location
-                    // isEditing
-                    //     ? Container(
-                    //         margin: const EdgeInsets.only(bottom: 16),
-                    //         decoration: BoxDecoration(
-                    //           color: colorScheme.surface,
-                    //           borderRadius: BorderRadius.circular(12),
-                    //           border: Border.all(
-                    //             color: colorScheme.primary.withOpacity(0.2),
-                    //             width: 1,
-                    //           ),
-                    //           boxShadow: [
-                    //             BoxShadow(
-                    //               color: colorScheme.primary.withOpacity(0.1),
-                    //               blurRadius: 4,
-                    //               offset: const Offset(0, 2),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //         child: TextFormField(
-                    //           initialValue: part.storeLocation,
-                    //           decoration: InputDecoration(
-                    //             labelText: 'Store Location',
-                    //             border: OutlineInputBorder(
-                    //               borderRadius: BorderRadius.circular(12),
-                    //               borderSide: BorderSide.none,
-                    //             ),
-                    //             prefixIcon: Icon(Icons.store, color: colorScheme.primary),
-                    //             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    //           ),
-                    //           onSaved: (value) => part.storeLocation = value,
-                    //         ),
-                    //       )
-                    //     : part.storeLocation != null && part.storeLocation!.isNotEmpty
-                    //         ? Container(
-                    //             margin: const EdgeInsets.only(bottom: 16),
-                    //             decoration: BoxDecoration(
-                    //               color: colorScheme.surface,
-                    //               borderRadius: BorderRadius.circular(12),
-                    //               border: Border.all(
-                    //                 color: colorScheme.primary.withOpacity(0.2),
-                    //                 width: 1,
-                    //               ),
-                    //               boxShadow: [
-                    //                 BoxShadow(
-                    //                   color: colorScheme.primary.withOpacity(0.1),
-                    //                   blurRadius: 4,
-                    //                   offset: const Offset(0, 2),
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //             child: ListTile(
-                    //               leading: Icon(
-                    //                 Icons.store,
-                    //                 color: colorScheme.primary,
-                    //               ),
-                    //               title: Text(
-                    //                 'Store Location',
-                    //                 style: TextStyle(
-                    //                   fontSize: 14,
-                    //                   color: colorScheme.onSurfaceVariant,
-                    //                 ),
-                    //               ),
-                    //               subtitle: Text(
-                    //                 part.storeLocation ?? '',
-                    //                 style: TextStyle(
-                    //                   fontSize: 16,
-                    //                   fontWeight: FontWeight.w500,
-                    //                   color: colorScheme.onSurface,
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           )
-                    //         : const SizedBox.shrink(),
-
-                    // // Notes
-                    // isEditing
-                    //     ? Container(
-                    //         margin: const EdgeInsets.only(bottom: 16),
-                    //         decoration: BoxDecoration(
-                    //           color: colorScheme.surface,
-                    //           borderRadius: BorderRadius.circular(12),
-                    //           border: Border.all(
-                    //             color: colorScheme.primary.withOpacity(0.2),
-                    //             width: 1,
-                    //           ),
-                    //           boxShadow: [
-                    //             BoxShadow(
-                    //               color: colorScheme.primary.withOpacity(0.1),
-                    //               blurRadius: 4,
-                    //               offset: const Offset(0, 2),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //         child: TextFormField(
-                    //           initialValue: part.notes,
-                    //           decoration: InputDecoration(
-                    //             labelText: 'Notes',
-                    //             border: OutlineInputBorder(
-                    //               borderRadius: BorderRadius.circular(12),
-                    //               borderSide: BorderSide.none,
-                    //             ),
-                    //             prefixIcon: Icon(Icons.note, color: colorScheme.primary),
-                    //             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    //           ),
-                    //           maxLines: 3,
-                    //           onSaved: (value) => part.notes = value,
-                    //         ),
-                    //       )
-                    //     : part.notes != null && part.notes!.isNotEmpty
-                    //         ? Container(
-                    //             margin: const EdgeInsets.only(bottom: 16),
-                    //             decoration: BoxDecoration(
-                    //               color: colorScheme.surface,
-                    //               borderRadius: BorderRadius.circular(12),
-                    //               border: Border.all(
-                    //                 color: colorScheme.primary.withOpacity(0.2),
-                    //                 width: 1,
-                    //               ),
-                    //               boxShadow: [
-                    //                 BoxShadow(
-                    //                   color: colorScheme.primary.withOpacity(0.1),
-                    //                   blurRadius: 4,
-                    //                   offset: const Offset(0, 2),
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //             child: ListTile(
-                    //               leading: Icon(
-                    //                 Icons.note,
-                    //                 color: colorScheme.primary,
-                    //               ),
-                    //               title: Text(
-                    //                 'Notes',
-                    //                 style: TextStyle(
-                    //                   fontSize: 14,
-                    //                   color: colorScheme.onSurfaceVariant,
-                    //                 ),
-                    //               ),
-                    //               subtitle: Text(
-                    //                 part.notes ?? '',
-                    //                 style: TextStyle(
-                    //                   fontSize: 16,
-                    //                   fontWeight: FontWeight.w500,
-                    //                   color: colorScheme.onSurface,
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           )
-                    //         : const SizedBox.shrink(),
-
-                    // // Images section
-                    // const SizedBox(height: 24),
-                    // Text(
-                    //   'Images',
-                    //   style: TextStyle(
-                    //     fontSize: 16,
-                    //     fontWeight: FontWeight.bold,
-                    //     color: colorScheme.onSurface,
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 16),
-
-                    // // Item Image
-                    // Container(
-                    //   margin: const EdgeInsets.only(bottom: 16),
-                    //   padding: const EdgeInsets.all(8),
-                    //   decoration: BoxDecoration(
-                    //     color: colorScheme.surface,
-                    //     borderRadius: BorderRadius.circular(12),
-                    //     border: Border.all(
-                    //       color: colorScheme.primary.withOpacity(0.2),
-                    //       width: 1,
-                    //     ),
-                    //     boxShadow: [
-                    //       BoxShadow(
-                    //         color: colorScheme.primary.withOpacity(0.1),
-                    //         blurRadius: 4,
-                    //         offset: const Offset(0, 2),
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       Padding(
-                    //         padding: const EdgeInsets.only(left: 8, top: 8, bottom: 8),
-                    //         child: Text(
-                    //           'Item Image',
-                    //           style: TextStyle(
-                    //             fontSize: 14,
-                    //             fontWeight: FontWeight.w500,
-                    //             color: colorScheme.onSurfaceVariant,
-                    //           ),
-                    //         ),
-                    //       ),
-                    //       GestureDetector(
-                    //         onTap: isEditing ? () => _pickImage(false) : null,
-                    //         child: Container(
-                    //           width: double.infinity,
-                    //           height: 150,
-                    //           decoration: BoxDecoration(
-                    //             color: theme.colorScheme.surfaceContainerLow,
-                    //             borderRadius: BorderRadius.circular(8),
-                    //           ),
-                    //           child: part.itemImagePath != null
-                    //               ? ClipRRect(
-                    //                   borderRadius: BorderRadius.circular(8),
-                    //                   child: Image.file(
-                    //                     File(part.itemImagePath!),
-                    //                     width: double.infinity,
-                    //                     height: 150,
-                    //                     fit: BoxFit.cover,
-                    //                   ),
-                    //                 )
-                    //               : Center(
-                    //                   child: Column(
-                    //                     mainAxisAlignment: MainAxisAlignment.center,
-                    //                     children: [
-                    //                       Icon(
-                    //                         Icons.add_a_photo,
-                    //                         size: 40,
-                    //                         color: isEditing
-                    //                             ? colorScheme.primary
-                    //                             : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                    //                       ),
-                    //                       const SizedBox(height: 8.0),
-                    //                       Text(
-                    //                         isEditing ? 'Tap to upload image' : 'No image available',
-                    //                         style: TextStyle(
-                    //                           color: isEditing
-                    //                               ? colorScheme.onSurfaceVariant
-                    //                               : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                    //                         ),
-                    //                       ),
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-
-                    // // Receipt Image
-                    // Container(
-                    //   margin: const EdgeInsets.only(bottom: 16),
-                    //   padding: const EdgeInsets.all(8),
-                    //   decoration: BoxDecoration(
-                    //     color: colorScheme.surface,
-                    //     borderRadius: BorderRadius.circular(12),
-                    //     border: Border.all(
-                    //       color: colorScheme.primary.withOpacity(0.2),
-                    //       width: 1,
-                    //     ),
-                    //     boxShadow: [
-                    //       BoxShadow(
-                    //         color: colorScheme.primary.withOpacity(0.1),
-                    //         blurRadius: 4,
-                    //         offset: const Offset(0, 2),
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       Padding(
-                    //         padding: const EdgeInsets.only(left: 8, top: 8, bottom: 8),
-                    //         child: Text(
-                    //           'Receipt Image',
-                    //           style: TextStyle(
-                    //             fontSize: 14,
-                    //             fontWeight: FontWeight.w500,
-                    //             color: colorScheme.onSurfaceVariant,
-                    //           ),
-                    //         ),
-                    //       ),
-                    //       GestureDetector(
-                    //         onTap: isEditing ? () => _pickImage(true) : null,
-                    //         child: Container(
-                    //           width: double.infinity,
-                    //           height: 150,
-                    //           decoration: BoxDecoration(
-                    //             color: theme.colorScheme.surfaceContainerLow,
-                    //             borderRadius: BorderRadius.circular(8),
-                    //           ),
-                    //           child: part.receiptImagePath != null
-                    //               ? ClipRRect(
-                    //                   borderRadius: BorderRadius.circular(8),
-                    //                   child: Image.file(
-                    //                     File(part.receiptImagePath!),
-                    //                     width: double.infinity,
-                    //                     height: 150,
-                    //                     fit: BoxFit.cover,
-                    //                   ),
-                    //                 )
-                    //               : Center(
-                    //                   child: Column(
-                    //                     mainAxisAlignment: MainAxisAlignment.center,
-                    //                     children: [
-                    //                       Icon(
-                    //                         Icons.add_a_photo,
-                    //                         size: 40,
-                    //                         color: isEditing
-                    //                             ? colorScheme.primary
-                    //                             : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                    //                       ),
-                    //                       const SizedBox(height: 8.0),
-                    //                       Text(
-                    //                         isEditing ? 'Tap to upload receipt' : 'No receipt available',
-                    //                         style: TextStyle(
-                    //                           color: isEditing
-                    //                               ? colorScheme.onSurfaceVariant
-                    //                               : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                    //                         ),
-                    //                       ),
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
+                    // Notes - Always show the notes section regardless of edit mode
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: isEditing
+                          ? TextFormField(
+                              initialValue: part.notes,
+                              decoration: InputDecoration(
+                                labelText: 'Notes',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: Icon(Icons.note, color: colorScheme.primary),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              ),
+                              maxLines: 3,
+                              onSaved: (value) => part.notes = value,
+                            )
+                          : ListTile(
+                              leading: Icon(
+                                Icons.note,
+                                color: colorScheme.primary,
+                              ),
+                              title: Text(
+                                'Notes',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              subtitle: Text(
+                                part.notes ?? 'No notes available',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                    ),
 
                     // Save button (only visible in edit mode)
                     if (isEditing)
                       Center(
                         child: ElevatedButton.icon(
                           onPressed: _saveChanges,
-                          icon: const Icon(Icons.save),
+                          icon: const Icon(Icons.save ,color: Colors.white,),
                           label: const Text('Save Changes'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: colorScheme.primary,
@@ -1109,6 +891,15 @@ class _PartDetailsPageState extends State<PartDetailsPage> {
           ),
         ),
       ),
+      floatingActionButton: !isEditing
+          ? FloatingActionButton.extended(
+              onPressed: _confirmDelete,
+              icon: const Icon(Icons.delete_outline),
+              label: const Text('Delete Part'),
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            )
+          : null,
     );
   }
 }
