@@ -52,6 +52,7 @@ class PostsManager {
                       postData['attachment'].isNotEmpty
                   ? postData['attachment']
                   : null,
+              autherId: postData['userID'] ?? -1,
               numOfVotes:
                   postData['countVotes'] != null ? postData['countVotes'] : 0,
               voteValue:
@@ -100,6 +101,7 @@ class PostsManager {
         postID: postMap['id'],
         title: postMap['title'],
         numOfVotes: 0,
+        autherId: postMap['userID'] ?? -1,
         autherUsername: postMap['autherUsername'],
         imageUrl: postMap.containsKey('image') ? postMap['image'] : null,
         description: postMap['content'],

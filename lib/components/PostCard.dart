@@ -4,6 +4,7 @@ import 'package:garagecom/managers/PostsManager.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/Post.dart';
 import '../pages/CommentPage.dart';
+import './PostActionsMenu.dart';
 
 class PostCard extends StatefulWidget {
   // final Post post;
@@ -36,7 +37,6 @@ class _PostCardState extends State<PostCard> {
         "${PostsManager.posts[postIndex].description}\n\n"
         "Posted by: ${PostsManager.posts[postIndex].autherUsername}"
         "https:\\\\garagcom.com\\posts\\${PostsManager.posts[postIndex].postID}";
-
 
     try {
       // Show loading indicator
@@ -177,7 +177,8 @@ class _PostCardState extends State<PostCard> {
                           ),
                         ),
                         Text(
-                        PostsManager.posts[postIndex].createdIn ?? 'Unknown date', 
+                          PostsManager.posts[postIndex].createdIn ??
+                              'Unknown date',
                           style: TextStyle(
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
@@ -186,16 +187,12 @@ class _PostCardState extends State<PostCard> {
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.more_vert,
-                      color: colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      // Show post options
-                    },
-                  ),
+                  PostActionsMenu(
+                    autherId: PostsManager.posts[postIndex].autherId,
+                    itemId: PostsManager.posts[postIndex].postID,
+                    isPost: true,
+                    isComment: false,
+                  )
                 ],
               ),
             ),

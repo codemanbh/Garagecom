@@ -5,6 +5,7 @@ import '../components/CommentCard.dart';
 import '../models/Comment.dart';
 import '../managers/CommentsManager.dart';
 import '../models/Post.dart';
+import '../components/PostActionsMenu.dart';
 
 class CommentPage extends StatefulWidget {
   late int postIndex;
@@ -225,7 +226,8 @@ class _CommentPageState extends State<CommentPage> {
           if (PostsManager.posts[postIndex].imageUrl != null &&
               PostsManager.posts[postIndex].imageUrl!.isNotEmpty)
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
               child: Image.network(
                 PostsManager.posts[postIndex].imageUrl!,
                 width: double.infinity,
@@ -257,7 +259,8 @@ class _CommentPageState extends State<CommentPage> {
                           Icon(
                             Icons.broken_image_rounded,
                             size: 40,
-                            color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                            color:
+                                colorScheme.onSurfaceVariant.withOpacity(0.6),
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -412,13 +415,10 @@ class _CommentPageState extends State<CommentPage> {
         elevation: 0,
         title: const Text('Discussion'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.sort),
-            tooltip: 'Sort comments',
-            onPressed: () {
-              // Show sort options
-            },
-          ),
+          PostActionsMenu(
+              autherId: PostsManager.posts[postIndex].autherId,
+              itemId: PostsManager.posts[postIndex].postID,
+              isPost: true)
         ],
       ),
       body: Column(
@@ -580,26 +580,14 @@ class _CommentPageState extends State<CommentPage> {
                             if (index == 0) {
                               print('All comments: $comments');
                               for (int i = 0; i < comments.length; i++) {
-                                print('Comment $i: username="${comments[i].username}"');
+                                print(
+                                    'Comment $i: username="${comments[i].username}"');
                               }
                             }
-                            
+
                             final comment = comments[index];
                             return CommentCard(
-                              username: comment.username.isNotEmpty ? comment.username : 'Anonymous',
-                              content: comment.text,
-                              timeAgo: comment.getFormattedDate(),
-                              upvotes: comment.upvotes,
-                              downvotes: comment.downvotes,
-                              onUpvote: () {
-                                // Handle upvote
-                              },
-                              onDownvote: () {
-                                // Handle downvote
-                              },
-                              onReply: () {
-                                // Handle reply
-                              },
+                              comment: comment,
                             );
                           },
                         ),

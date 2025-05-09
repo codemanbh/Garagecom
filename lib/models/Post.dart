@@ -12,12 +12,13 @@ class Post {
   String? categoryName; // New field for category name
   int userVote = 0;
   int voteValue = 0;
-
+  int autherId;
   Post({
     required this.postID,
     required this.title,
     required this.description,
     required this.autherUsername,
+    this.autherId = -1,
     this.imageUrl,
     this.numOfVotes = 0,
     this.createdIn,

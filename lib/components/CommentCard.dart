@@ -1,25 +1,13 @@
 import 'package:flutter/material.dart';
+import './PostActionsMenu.dart';
+import './../models/Comment.dart';
 
 class CommentCard extends StatefulWidget {
-  final String username;
-  final String content;
-  final String timeAgo;
-  final int upvotes;
-  final int downvotes;
-  final VoidCallback onUpvote;
-  final VoidCallback onDownvote;
-  final VoidCallback onReply;
+  final Comment comment;
 
   const CommentCard({
     super.key,
-    required this.username,
-    required this.content,
-    required this.timeAgo,
-    required this.upvotes,
-    required this.downvotes,
-    required this.onUpvote,
-    required this.onDownvote,
-    required this.onReply,
+    required this.comment,
   });
 
   @override
@@ -53,8 +41,8 @@ class _CommentCardState extends State<CommentCard> {
                   radius: 14,
                   backgroundColor: colorScheme.primaryContainer,
                   child: Text(
-                    widget.username.isNotEmpty
-                        ? widget.username[0].toUpperCase()
+                    widget.comment.username.isNotEmpty
+                        ? widget.comment.username[0].toUpperCase()
                         : "?",
                     style: TextStyle(
                       fontSize: 12,
@@ -68,7 +56,7 @@ class _CommentCardState extends State<CommentCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '@${widget.username}',
+                      '@${widget.comment.username}',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
@@ -76,7 +64,7 @@ class _CommentCardState extends State<CommentCard> {
                       ),
                     ),
                     Text(
-                      widget.timeAgo,
+                      widget.comment.createdIn,
                       style: TextStyle(
                         fontSize: 12,
                         color: colorScheme.onSurfaceVariant,
@@ -86,36 +74,18 @@ class _CommentCardState extends State<CommentCard> {
                 ),
                 const Spacer(),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: (widget.upvotes - widget.downvotes) > 0
-                        ? colorScheme.primary.withOpacity(0.1)
-                        : (widget.upvotes - widget.downvotes) < 0
-                            ? colorScheme.error.withOpacity(0.1)
-                            : colorScheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '${widget.upvotes - widget.downvotes}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      color: (widget.upvotes - widget.downvotes) > 0
-                          ? colorScheme.primary
-                          : (widget.upvotes - widget.downvotes) < 0
-                              ? colorScheme.error
-                              : colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
+                    child: PostActionsMenu(
+                  autherId: widget.comment.userID,
+                  itemId: widget.comment.commentID,
+                  isComment: true,
+                )),
               ],
             ),
 
             // Comment content
             const SizedBox(height: 8),
             Text(
-              widget.content,
+              widget.comment.text,
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontSize: 14,
