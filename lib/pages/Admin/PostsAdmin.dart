@@ -49,7 +49,8 @@ class PostsAdminTabState extends State<PostsAdminTab>
 
     try {
       // Call the specific endpoint for getting new reports
-      final response = await ApiHelper.get('api/Administrations/GetNewReport', {});
+      final response =
+          await ApiHelper.get('api/Administrations/GetNewReport', {});
       print('Admin reports response: $response'); // Add logging to debug
 
       if (response['succeeded'] == true && response['parameters'] != null) {
@@ -57,28 +58,29 @@ class PostsAdminTabState extends State<PostsAdminTab>
         // It contains a single Report object, not an array of reports
         final reportData = response['parameters']['Report'];
         print('Report data: $reportData'); // Debug info
-        
+
         if (reportData != null) {
           // Get the specific post ID that was reported
           final int? postId = reportData['postID'];
           final int? commentId = reportData['commentID'];
-          
+
           if (postId != null) {
             // If we have a postId, we need to fetch the post details
-            final postResponse = await ApiHelper.get('api/Posts/GetPostByPostID', {'postId': postId});
+            final postResponse = await ApiHelper.get(
+                'api/Posts/GetPostByPostID', {'postId': postId});
             print('Post details response: $postResponse');
-            
-            if (postResponse['succeeded'] == true && 
-                postResponse['parameters'] != null && 
+
+            if (postResponse['succeeded'] == true &&
+                postResponse['parameters'] != null &&
                 postResponse['parameters']['Post'] != null) {
-              
               final postData = postResponse['parameters']['Post'];
-              
+
               setState(() {
                 // Clear existing posts
-                PostsManager.posts = []; // Update the static list in PostsManager
+                PostsManager.posts =
+                    []; // Update the static list in PostsManager
                 posts = []; // Clear local list
-                
+
                 // Create a Post object from the post data
                 Post post = Post(
                   postID: postData['postID'] ?? 0,
@@ -87,17 +89,18 @@ class PostsAdminTabState extends State<PostsAdminTab>
                   autherUsername: postData['userName'] ?? 'Unknown User',
                   imageUrl: postData['attachment'],
                   autherId: postData['userID'] ?? -1,
+                  allowComments: postData['allowComments'],
                   numOfVotes: postData['countVotes'] ?? 0,
                   voteValue: postData['voteValue'] ?? 0,
                   createdIn: postData['createdIn'] ?? '',
-                  categoryName: postData['postCategory'] != null 
-                    ? postData['postCategory']['title'] 
-                    : '',
+                  categoryName: postData['postCategory'] != null
+                      ? postData['postCategory']['title']
+                      : '',
                 );
-                
+
                 posts.add(post);
                 PostsManager.posts.add(post); // Add to the static list too
-                
+
                 _currentPostIndex = 0;
                 _isLoading = false;
               });
@@ -109,7 +112,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
                 _currentPostIndex = -1;
                 _isLoading = false;
               });
-              
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Failed to load post details'),
@@ -126,7 +129,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
               _currentPostIndex = -1;
               _isLoading = false;
             });
-            
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Comment reports are not implemented yet'),
@@ -141,7 +144,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
               _currentPostIndex = -1;
               _isLoading = false;
             });
-            
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Invalid report data received'),
@@ -157,7 +160,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
             _currentPostIndex = -1;
             _isLoading = false;
           });
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('No pending reports found'),
@@ -175,7 +178,8 @@ class PostsAdminTabState extends State<PostsAdminTab>
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response['message'] ?? 'Failed to load pending reports'),
+            content:
+                Text(response['message'] ?? 'Failed to load pending reports'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -200,17 +204,11 @@ class PostsAdminTabState extends State<PostsAdminTab>
     try {
       print('Approving post: ${post.postID}');
       // Call API to approve the post
-      final response = await ApiHelper.post(
-        'api/Administrations/ProcessReport',
-        {
-          'postId': post.postID,
-          'commentId': null,
-          'action': 'allow'
-        }
-      );
-      
+      final response = await ApiHelper.post('api/Administrations/ProcessReport',
+          {'postId': post.postID, 'commentId': null, 'action': 'allow'});
+
       print('Approve post response: $response'); // Add logging
-      
+
       if (response['succeeded'] == true) {
         // Successfully processed the report
         setState(() {
@@ -225,13 +223,14 @@ class PostsAdminTabState extends State<PostsAdminTab>
             backgroundColor: Colors.green,
           ),
         );
-        
+
         // Load the next report if available
         _loadPendingPosts();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to approve post: ${response['message'] ?? 'Unknown error'}'),
+            content: Text(
+                'Failed to approve post: ${response['message'] ?? 'Unknown error'}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -251,17 +250,11 @@ class PostsAdminTabState extends State<PostsAdminTab>
     try {
       print('Blocking post: ${post.postID}');
       // Call API to block the post
-      final response = await ApiHelper.post(
-        'api/Administrations/ProcessReport',
-        {
-          'postId': post.postID,
-          'commentId': null,
-          'action': 'block'
-        }
-      );
-      
+      final response = await ApiHelper.post('api/Administrations/ProcessReport',
+          {'postId': post.postID, 'commentId': null, 'action': 'block'});
+
       print('Block post response: $response'); // Add logging
-      
+
       if (response['succeeded'] == true) {
         // Successfully processed the report
         setState(() {
@@ -276,13 +269,14 @@ class PostsAdminTabState extends State<PostsAdminTab>
             backgroundColor: Colors.red,
           ),
         );
-        
+
         // Load the next report if available
         _loadPendingPosts();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to block post: ${response['message'] ?? 'Unknown error'}'),
+            content: Text(
+                'Failed to block post: ${response['message'] ?? 'Unknown error'}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -416,7 +410,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
                   : Column(
                       children: [
                         // Navigation buttons
-                        
 
                         // Current post card
                         Expanded(
