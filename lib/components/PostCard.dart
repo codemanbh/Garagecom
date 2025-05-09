@@ -187,6 +187,9 @@ class _PostCardState extends State<PostCard> {
                       ],
                     ),
                   ),
+                  !PostsManager.posts[postIndex].allowComments
+                      ? Icon(Icons.lock)
+                      : SizedBox(),
                   PostActionsMenu(
                     autherId: PostsManager.posts[postIndex].autherId,
                     itemId: PostsManager.posts[postIndex].postID,

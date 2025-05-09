@@ -59,7 +59,7 @@ class _PostActionsMenuState extends State<PostActionsMenu> {
         // Handle action selection
         if (value == 'close') {
           // Do edit
-          _handelReport();
+          _handelClose();
         } else if (value == 'report') {
           _handelReport();
         }

@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PostsManager {
   static List<Post> posts = [];
   final Dio _dio = Dio();
+  static int postsPage = 0;
 
   // PostsManager() {
   //   fetchPosts();
@@ -18,9 +19,13 @@ class PostsManager {
 
   static Future<bool> fetchPosts() async {
     try {
+      postsPage++;
       // Fetch posts from API
-      Map<String, dynamic> response = await ApiHelper.get('api/Posts/GetPosts',
-          {'categoryId': CategoryManager.selectedCategories});
+      Map<String, dynamic> response = await ApiHelper.get(
+          'api/Posts/GetPosts', {
+        'categoryId': CategoryManager.selectedCategories,
+        'page': postsPage
+      });
 
       print('API Response received');
       print(response);
@@ -53,6 +58,7 @@ class PostsManager {
                   ? postData['attachment']
                   : null,
               autherId: postData['userID'] ?? -1,
+              allowComments: postData['allowComments'],
               numOfVotes:
                   postData['countVotes'] != null ? postData['countVotes'] : 0,
               voteValue:
@@ -88,29 +94,6 @@ class PostsManager {
 
   // Helper method to load fallback posts
   static Future<bool> _loadFallbackPosts() async {
-    print('Loading fallback posts...');
-
-    List<Map<String, dynamic>> postsMap = [];
-
-    // Clear existing posts
-    posts.clear();
-
-    // Create new post objects from the map data
-    for (var postMap in postsMap) {
-      Post post = Post(
-        postID: postMap['id'],
-        title: postMap['title'],
-        numOfVotes: 0,
-        autherId: postMap['userID'] ?? -1,
-        autherUsername: postMap['autherUsername'],
-        imageUrl: postMap.containsKey('image') ? postMap['image'] : null,
-        description: postMap['content'],
-        createdIn: postMap['createdIn'],
-      );
-      posts.add(post);
-    }
-
-    print('Loaded ${posts.length} fallback posts');
     return true;
   }
 }

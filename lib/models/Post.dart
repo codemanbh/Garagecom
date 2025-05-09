@@ -13,18 +13,19 @@ class Post {
   int userVote = 0;
   int voteValue = 0;
   int autherId;
-  Post({
-    required this.postID,
-    required this.title,
-    required this.description,
-    required this.autherUsername,
-    this.autherId = -1,
-    this.imageUrl,
-    this.numOfVotes = 0,
-    this.createdIn,
-    this.categoryName,
-    this.voteValue = 0,
-  });
+  bool allowComments;
+  Post(
+      {required this.postID,
+      required this.title,
+      required this.description,
+      required this.autherUsername,
+      this.autherId = -1,
+      this.imageUrl,
+      this.numOfVotes = 0,
+      this.createdIn,
+      this.categoryName,
+      this.voteValue = 0,
+      required this.allowComments});
 
   Future<void> handleUpvote() async {
     if (voteValue == 0 || voteValue == -1) {

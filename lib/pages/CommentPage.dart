@@ -605,9 +605,12 @@ class _CommentPageState extends State<CommentPage> {
                       controller: commentController,
                       maxLines: null,
                       minLines: 1,
+                      enabled: PostsManager.posts[postIndex].allowComments,
                       textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
-                        hintText: 'Write a comment...',
+                        hintText: PostsManager.posts[postIndex].allowComments
+                            ? 'Write a comment...'
+                            : "Commenting is disabled",
                         filled: true,
                         fillColor: colorScheme.surfaceContainerLow,
                         contentPadding: const EdgeInsets.symmetric(
@@ -633,7 +636,9 @@ class _CommentPageState extends State<CommentPage> {
                         ),
                       )
                     : FloatingActionButton.small(
-                        onPressed: addComment,
+                        onPressed: PostsManager.posts[postIndex].allowComments
+                            ? addComment
+                            : null,
                         backgroundColor: colorScheme.primary,
                         foregroundColor: colorScheme.onPrimary,
                         elevation: 4,
