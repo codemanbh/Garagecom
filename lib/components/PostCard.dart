@@ -25,10 +25,12 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   late int postIndex;
+  late final bool isAdminView;
 
   @override
   void initState() {
     super.initState();
+    isAdminView = widget.isAdminView;
     postIndex = widget.postIndex;
   }
 
@@ -71,13 +73,25 @@ class _PostCardState extends State<PostCard> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Add error handling to check if post exists
+    if (postIndex < 0 || postIndex >= PostsManager.posts.length) {
+      return Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Text(
+              "Post not available",
+              style: TextStyle(color: colorScheme.error),
+            ),
+          ),
+        ),
+      );
+    }
+
     BoxDecoration buildPressedStyle() {
       return BoxDecoration(
         shape: BoxShape.circle,
-        // border: Border.all(
-        //   color: Colors.grey, // Border color
-        //   // width: 1.0,
-        // ),
         color: const Color.fromARGB(42, 255, 255, 255), // Background color
       );
     }
@@ -188,6 +202,7 @@ class _PostCardState extends State<PostCard> {
                     itemId: PostsManager.posts[postIndex].postID,
                     isPost: true,
                     isComment: false,
+                    isAdminView: isAdminView,
                   )
                 ],
               ),
@@ -235,48 +250,6 @@ class _PostCardState extends State<PostCard> {
                   child: ApiHelper.image(
                       PostsManager.posts[postIndex].imageUrl!,
                       "api/posts/GetPostAttachment"),
-                  // Image.network(
-                  //   post.imageUrl!,
-                  //   fit: BoxFit.cover,
-                  //   loadingBuilder: (context, child, loadingProgress) {
-                  //     if (loadingProgress == null) return child;
-                  //     return Center(
-                  //       child: CircularProgressIndicator(
-                  //         value: loadingProgress.expectedTotalBytes != null
-                  //             ? loadingProgress.cumulativeBytesLoaded /
-                  //                 loadingProgress.expectedTotalBytes!
-                  //             : null,
-                  //         color: colorScheme.primary,
-                  //       ),
-                  //     );
-                  //   },
-                  //   errorBuilder: (context, error, stackTrace) {
-                  //     return Container(
-                  //       alignment: Alignment.center,
-                  //       color: colorScheme.surfaceVariant,
-                  //       child: Column(
-                  //         mainAxisAlignment: MainAxisAlignment.center,
-                  //         children: [
-                  //           Icon(
-                  //             Icons.broken_image_rounded,
-                  //             color:
-                  //                 colorScheme.onSurfaceVariant.withOpacity(0.5),
-                  //             size: 36,
-                  //           ),
-                  //           const SizedBox(height: 8),
-                  //           Text(
-                  //             "Image not available",
-                  //             style: TextStyle(
-                  //               color: colorScheme.onSurfaceVariant
-                  //                   .withOpacity(0.7),
-                  //               fontSize: 12,
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
                 ),
               ),
 
@@ -287,51 +260,61 @@ class _PostCardState extends State<PostCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   // Votes section
-                  Row(
-                    children: [
-                      _buildUpVote(),
-                      Text(
-                        PostsManager.posts[postIndex].numOfVotes.toString(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: PostsManager.posts[postIndex].numOfVotes > 0
-                              ? colorScheme.primary
-                              : PostsManager.posts[postIndex].numOfVotes < 0
-                                  ? colorScheme.error
-                                  : colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      _buildDownVote(),
-                    ],
-                  ),
+                  !isAdminView
+                      ? Row(
+                          children: [
+                            _buildUpVote(),
+                            Text(
+                              PostsManager.posts[postIndex].numOfVotes
+                                  .toString(),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: PostsManager.posts[postIndex]
+                                            .numOfVotes >
+                                        0
+                                    ? colorScheme.primary
+                                    : PostsManager.posts[postIndex]
+                                                .numOfVotes <
+                                            0
+                                        ? colorScheme.error
+                                        : colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            _buildDownVote(),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
 
                   // Comment button
-                  TextButton.icon(
-                    onPressed: () => navigateToCommentPage(postIndex),
-                    icon: Icon(
-                      Icons.comment_outlined,
-                      size: 20,
-                      color: colorScheme.secondary,
-                    ),
-                    label: Text(
-                      'Comments',
-                      style: TextStyle(
-                        color: colorScheme.secondary,
-                      ),
-                    ),
-                  ),
+                  !isAdminView
+                      ? TextButton.icon(
+                          onPressed: () => navigateToCommentPage(postIndex),
+                          icon: Icon(
+                            Icons.comment_outlined,
+                            size: 20,
+                            color: colorScheme.secondary,
+                          ),
+                          label: Text(
+                            'Comments',
+                            style: TextStyle(
+                              color: colorScheme.secondary,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
 
-                  // Share button with functionality
-                  IconButton(
-                    onPressed: () => _sharePost(context),
-                    icon: Icon(
-                      Icons.share_outlined,
-                      size: 20,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    tooltip: 'Share',
-                  ),
+                  !isAdminView
+                      ? IconButton(
+                          onPressed: () => _sharePost(context),
+                          icon: Icon(
+                            Icons.share_outlined,
+                            size: 20,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          tooltip: 'Share',
+                        )
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),

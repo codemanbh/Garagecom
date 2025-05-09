@@ -8,12 +8,14 @@ class PostActionsMenu extends StatefulWidget {
   final bool isPost;
   final bool isComment;
   final int itemId;
+  final bool isAdminView;
   PostActionsMenu(
       {Key? key,
       required this.autherId,
       required this.itemId,
       this.isPost = false,
-      this.isComment = false})
+      this.isComment = false,
+      this.isAdminView = false})
       : super(key: key);
 
   @override
@@ -22,11 +24,13 @@ class PostActionsMenu extends StatefulWidget {
 
 class _PostActionsMenuState extends State<PostActionsMenu> {
   int userId = -1;
+  bool isAdminView = false;
 
   @override
   void initState() {
     super.initState();
     fetchUserID();
+    isAdminView = widget.isAdminView;
   }
 
   fetchUserID() async {
@@ -75,11 +79,14 @@ class _PostActionsMenuState extends State<PostActionsMenu> {
                 child: Text('Report'),
               ),
       ],
-      icon: Icon(
+      
+      icon: 
+      !isAdminView?
+      Icon(
         Icons.more_vert,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
         size: 20,
-      ),
+      ) : const SizedBox.shrink(),
     );
   }
 }
