@@ -12,6 +12,35 @@ class ProfileImage extends StatefulWidget {
   State<ProfileImage> createState() => _ProfileImageState();
 }
 
+Future<void> showDeleteAvatarDialog(
+    BuildContext context, VoidCallback onConfirm) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Confirm Deletion'),
+        content: const Text('Are you sure you want to delete your avatar?'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+          TextButton(
+            child: const Text('Delete'),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              onConfirm(); // Trigger the confirm action
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class _ProfileImageState extends State<ProfileImage> {
   File? _selectedImage;
   Uint8List? _currentImageBytes;
@@ -20,6 +49,7 @@ class _ProfileImageState extends State<ProfileImage> {
   @override
   void initState() {
     super.initState();
+
     filename = widget.filename;
   }
 
@@ -27,7 +57,7 @@ class _ProfileImageState extends State<ProfileImage> {
 
   Future<void> _pickImage(ImageSource source) async {
     final XFile? imageFile = await _picker.pickImage(source: source);
-    if (imageFile != null) {
+    if (!(imageFile == null)) {
       await ApiHelper.uploadImage(
           File(imageFile.path), 'api/Profile/SetAvatarAttachment');
       setState(() {
@@ -93,6 +123,8 @@ class _ProfileImageState extends State<ProfileImage> {
   }
 
   void _deleteImage() {
+    ApiHelper.post('api/Profile/DeleteAvatar', {});
+
     setState(() {
       _removeExistingImage = true;
       _selectedImage = null;
@@ -111,9 +143,10 @@ class _ProfileImageState extends State<ProfileImage> {
           backgroundColor: Colors.red,
           radius: 18,
           child: IconButton(
-            icon: const Icon(Icons.delete, color: Colors.white, size: 18),
-            onPressed: _deleteImage,
-          ),
+              icon: const Icon(Icons.delete, color: Colors.white, size: 18),
+              onPressed: () {
+                showDeleteAvatarDialog(context, _deleteImage);
+              }),
         ),
       );
     }
