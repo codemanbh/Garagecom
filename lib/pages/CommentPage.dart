@@ -307,7 +307,7 @@ class _CommentPageState extends State<CommentPage> {
                           ),
                         ),
                         Text(
-                          'Posted 2 days ago',
+                          PostsManager.posts[postIndex].createdIn ?? 'Unknown date',
                           style: TextStyle(
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
