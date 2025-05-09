@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../components/PostCard.dart';
-import '../models/Post.dart';
 import '../managers/PostsManager.dart';
 import '../searchDelegates/PostSearchDelegate.dart';
 import '../components/CategoriesDialog.dart';
@@ -83,7 +82,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 showSearch(
                   context: context,
-                  delegate: PostSearchDelegate(PostsManager.posts),
+                  delegate: PostSearchDelegate(),
                 );
               },
               icon: const Icon(Icons.search))

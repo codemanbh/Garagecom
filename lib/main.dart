@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/pages/SplashScreen.dart';
 
 // theme
 import './theme/flutter_midnight_neon_theme.dart';
@@ -7,9 +8,8 @@ import './theme/flutter_midnight_neon_theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // firebase
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 // providers
 import 'package:garagecom/providers/NavProvider.dart';
@@ -33,15 +33,14 @@ import './pages/AdminPage.dart';
 
 // Helpers
 import './helpers/navigationHeper.dart';
-import './models/Post.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await dotenv.load(fileName: 'assets/.env'); // loud the env variables
-  // print(dotenv.env);
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: 'assets/.env'); // loud the env variables
+  print(dotenv.env);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // list of providers
   runApp(MultiProvider(
     providers: [
@@ -64,8 +63,9 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
-      initialRoute: '/mainPage',
+      initialRoute: '/',
       routes: {
+        '/': (context) => const SplashScreen(),
         '/loginPage': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/homePage': (context) => const HomePage(),
@@ -78,7 +78,7 @@ class MyApp extends StatelessWidget {
         '/AddPartPage': (context) => const AddPartPage(),
         '/AccountSettingsPage': (context) => const AccountSettingsPage(),
         '/mainPage': (context) => const MainPage(),
-        '/commentPage': (context) => CommentPage(postIndex: 0),
+        '/commentPage': (context) => CommentPage(postId: -1),
         '/addAndEditCarsPage': (context) => AddAndEditCars(),
         '/adminPage': (context) => const AdminPage(),
       },

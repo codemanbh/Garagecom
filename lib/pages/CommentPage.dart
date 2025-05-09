@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:garagecom/managers/PostsManager.dart';
 import 'package:share_plus/share_plus.dart';
 import '../components/CommentCard.dart';
 import '../helpers/apiHelper.dart';
@@ -9,11 +8,10 @@ import '../models/Post.dart';
 import '../components/PostActionsMenu.dart';
 
 class CommentPage extends StatefulWidget {
-  late int postIndex;
-
+  late final int postId;
   CommentPage({
     super.key,
-    required this.postIndex,
+    required this.postId,
   });
 
   @override
@@ -22,15 +20,54 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   List<Comment> comments = [];
+  Post post = Post(postID: -1, title: "", description: "", autherUsername: "", imageUrl: "", numOfVotes: 0, voteValue: 0, createdIn: "", categoryName: "", allowComments: true);
   bool _isLoading = true;
-  late int postIndex;
+
 
   final TextEditingController commentController = TextEditingController();
+
+  Future<void> _loadPost() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    print("PostID (FROM COMMENT PAGE): ${widget.postId}");
+
+    var response = await ApiHelper.get(
+      'api/Posts/GetPostByPostID',
+      {'postId': widget.postId},
+    );
+    print('API Response received');
+    print(response);
+    if(response['succeeded'] == true) {
+      var postData = response['parameters']['Post'];
+      post = Post(
+        postID: postData['postID'] ?? 0,
+        title: postData['title'] ?? 'No Title',
+        description: postData['description'] ?? 'No Content',
+        autherUsername: postData['userName'] ?? '',
+        imageUrl: postData['attachment'] != null && postData['attachment'].isNotEmpty
+            ? postData['attachment']
+            : null,
+        numOfVotes: postData['countVotes'] ?? 0,
+        voteValue: postData['voteValue'] ?? 0,
+        createdIn: postData['createdIn'] ?? '',
+        categoryName: postData['postCategory'] != null
+            ? postData['postCategory']['title']
+            : '',
+        allowComments: true
+      );
+    }
+    this.post = post;
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    postIndex = widget.postIndex;
+    _loadPost();
     _loadComments();
   }
 
@@ -41,7 +78,7 @@ class _CommentPageState extends State<CommentPage> {
 
     try {
       final success = await CommentsManager.fetchComments(
-          PostsManager.posts[postIndex].postID);
+          widget.postId);
 
       if (success) {
         setState(() {
@@ -50,7 +87,7 @@ class _CommentPageState extends State<CommentPage> {
         });
 
         print(
-            'Loaded ${comments.length} comments for post ${PostsManager.posts[postIndex].postID}');
+            'Loaded ${comments.length} comments for post ${post}');
       } else {
         setState(() {
           comments = [];
@@ -97,7 +134,7 @@ class _CommentPageState extends State<CommentPage> {
 
     try {
       final success = await CommentsManager.addComment(
-          PostsManager.posts[postIndex].postID, newCommentText);
+          widget.postId, newCommentText);
 
       if (success) {
         setState(() {
@@ -141,8 +178,8 @@ class _CommentPageState extends State<CommentPage> {
 
   void _sharePost() async {
     final String postContent = "Check out this discussion from GarageCom:\n\n"
-        "${PostsManager.posts[postIndex].title}\n\n"
-        "${PostsManager.posts[postIndex].description}\n\n"
+        "${post.title}\n\n"
+        "${post.description}\n\n"
         "Join the conversation with ${comments.length} comments!";
 
     try {
@@ -156,7 +193,7 @@ class _CommentPageState extends State<CommentPage> {
 
       await Share.share(
         postContent,
-        subject: PostsManager.posts[postIndex].title,
+        subject: post.title,
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -176,7 +213,7 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   Widget _buildUpVote() {
-    bool isUpVoted = PostsManager.posts[postIndex].voteValue == 1;
+    bool isUpVoted = post.voteValue == 1;
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -184,7 +221,7 @@ class _CommentPageState extends State<CommentPage> {
         decoration: isUpVoted ? buildPressedStyle() : BoxDecoration(),
         child: IconButton(
           onPressed: () async {
-            await PostsManager.posts[postIndex].handleUpvote();
+            await post.handleUpvote();
             setState(() {});
           },
           icon: Icon(Icons.arrow_upward_rounded,
@@ -196,14 +233,14 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   Widget _buildDownVote() {
-    bool isDownVoted = PostsManager.posts[postIndex].voteValue == -1;
+    bool isDownVoted = post.voteValue == -1;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
         decoration: isDownVoted ? buildPressedStyle() : BoxDecoration(),
         child: IconButton(
           onPressed: () async {
-            await PostsManager.posts[postIndex].handleDownvote();
+            await post.handleDownvote();
             setState(() {});
           },
           icon: Icon(
@@ -230,13 +267,14 @@ class _CommentPageState extends State<CommentPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (PostsManager.posts[postIndex].imageUrl != null &&
-              PostsManager.posts[postIndex].imageUrl!.isNotEmpty)
+          if (post.imageUrl != null &&
+              post.imageUrl!.isNotEmpty)
             ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: ApiHelper.image(PostsManager.posts[postIndex].imageUrl!,
-                    "api/posts/GetPostAttachment")),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              child: ApiHelper.image(
+                  post.imageUrl!,
+                  "api/posts/GetPostAttachment")
+            ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -248,8 +286,8 @@ class _CommentPageState extends State<CommentPage> {
                       radius: 18,
                       backgroundColor: colorScheme.primaryContainer,
                       child: Text(
-                        PostsManager.posts[postIndex].autherUsername.isNotEmpty
-                            ? PostsManager.posts[postIndex].autherUsername[0]
+                        post.autherUsername.isNotEmpty
+                            ? post.autherUsername[0]
                                 .toUpperCase()
                             : '?',
                         style: TextStyle(
@@ -263,7 +301,7 @@ class _CommentPageState extends State<CommentPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '@${PostsManager.posts[postIndex].autherUsername}',
+                          '@${post.autherUsername}',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -271,7 +309,7 @@ class _CommentPageState extends State<CommentPage> {
                           ),
                         ),
                         Text(
-                          'Posted 2 days ago',
+                          post.createdIn ?? 'Unknown date',
                           style: TextStyle(
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
@@ -283,7 +321,7 @@ class _CommentPageState extends State<CommentPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  PostsManager.posts[postIndex].title,
+                  post.title,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -301,7 +339,7 @@ class _CommentPageState extends State<CommentPage> {
                     ),
                   ),
                   child: Text(
-                    PostsManager.posts[postIndex].description,
+                    post.description,
                     style: TextStyle(
                       fontSize: 16,
                       color: colorScheme.onSurface,
@@ -317,29 +355,29 @@ class _CommentPageState extends State<CommentPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: PostsManager.posts[postIndex].numOfVotes > 0
+                        color: post.numOfVotes > 0
                             ? colorScheme.primary.withOpacity(0.1)
-                            : PostsManager.posts[postIndex].numOfVotes < 0
+                            : post.numOfVotes < 0
                                 ? colorScheme.error.withOpacity(0.1)
-                                : colorScheme.surfaceVariant,
+                                : colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: PostsManager.posts[postIndex].numOfVotes > 0
+                          color: post.numOfVotes > 0
                               ? colorScheme.primary.withOpacity(0.5)
-                              : PostsManager.posts[postIndex].numOfVotes < 0
+                              : post.numOfVotes < 0
                                   ? colorScheme.error.withOpacity(0.5)
                                   : colorScheme.outline.withOpacity(0.3),
                           width: 1,
                         ),
                       ),
                       child: Text(
-                        PostsManager.posts[postIndex].numOfVotes.toString(),
+                        post.numOfVotes.toString(),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: PostsManager.posts[postIndex].numOfVotes > 0
+                          color: post.numOfVotes > 0
                               ? colorScheme.primary
-                              : PostsManager.posts[postIndex].numOfVotes < 0
+                              : post.numOfVotes < 0
                                   ? colorScheme.error
                                   : colorScheme.onSurfaceVariant,
                         ),
@@ -377,8 +415,8 @@ class _CommentPageState extends State<CommentPage> {
         title: const Text('Discussion'),
         actions: [
           PostActionsMenu(
-              autherId: PostsManager.posts[postIndex].autherId,
-              itemId: PostsManager.posts[postIndex].postID,
+              autherId: post.autherId,
+              itemId: post.postID,
               isPost: true)
         ],
       ),
@@ -605,10 +643,10 @@ class _CommentPageState extends State<CommentPage> {
                       controller: commentController,
                       maxLines: null,
                       minLines: 1,
-                      enabled: PostsManager.posts[postIndex].allowComments,
+                      enabled: post.allowComments,
                       textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
-                        hintText: PostsManager.posts[postIndex].allowComments
+                        hintText: post.allowComments
                             ? 'Write a comment...'
                             : "Commenting is disabled",
                         filled: true,
@@ -636,7 +674,7 @@ class _CommentPageState extends State<CommentPage> {
                         ),
                       )
                     : FloatingActionButton.small(
-                        onPressed: PostsManager.posts[postIndex].allowComments
+                        onPressed: post.allowComments
                             ? addComment
                             : null,
                         backgroundColor: colorScheme.primary,

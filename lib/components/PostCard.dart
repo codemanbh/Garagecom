@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:garagecom/managers/PostsManager.dart';
 import 'package:share_plus/share_plus.dart';
-import '../models/Post.dart';
 import '../pages/CommentPage.dart';
 import './PostActionsMenu.dart';
 
@@ -116,11 +115,11 @@ class _PostCardState extends State<PostCard> {
       );
     }
 
-    void navigateToCommentPage(int pageIndex) {
+    void navigateToCommentPage(int postId) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => CommentPage(postIndex: postIndex),
+          builder: (context) => CommentPage(postId: postId),
         ),
       );
     }
@@ -139,7 +138,7 @@ class _PostCardState extends State<PostCard> {
         side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
       ),
       child: InkWell(
-        onTap: () => navigateToCommentPage(postIndex),
+        onTap: () => navigateToCommentPage(PostsManager.posts[postIndex].postID),
         borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,7 +234,7 @@ class _PostCardState extends State<PostCard> {
                 margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  color: colorScheme.surfaceVariant,
+                  color: colorScheme.surfaceContainerHighest,
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
@@ -315,7 +314,7 @@ class _PostCardState extends State<PostCard> {
 
                   // Comment button
                   TextButton.icon(
-                    onPressed: () => navigateToCommentPage(postIndex),
+                    onPressed: () => navigateToCommentPage(PostsManager.posts[postIndex].postID),
                     icon: Icon(
                       Icons.comment_outlined,
                       size: 20,

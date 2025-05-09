@@ -91,6 +91,30 @@ class ApiHelper {
     }
   }
 
+  static Future<Response<dynamic>> getWithFullResponse(
+      String path, Map<String, dynamic> data) async {
+    try {
+      Dio client = await Client();
+      print('GET Request to: ${client.options.baseUrl}$path');
+      print('Parameters: $data');
+
+      final response = await client.get(
+        path,
+        queryParameters: data,
+      );
+
+      _handleResponse(response);
+      return response;
+    } catch (e) {
+      print('GET Error: $e');
+      return Response(
+        requestOptions: RequestOptions(path: path),
+        statusCode: 500,
+        data: {'error': e.toString()},
+      );
+    }
+  }
+
   static Future<Image> _image(String imageName, String path) async {
     final prefs = await SharedPreferences.getInstance();
     final token = await prefs.getString('token');
