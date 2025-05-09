@@ -4,7 +4,12 @@ import '../helpers/apiHelper.dart';
 class UserAvatar extends StatefulWidget {
   final int autherId;
   final String autherUsername;
-  UserAvatar({Key? key, required this.autherId, required this.autherUsername})
+  final bool isComment;
+  UserAvatar(
+      {Key? key,
+      required this.autherId,
+      required this.autherUsername,
+      this.isComment = false})
       : super(key: key);
 
   @override
@@ -18,7 +23,7 @@ class _UserAvatarState extends State<UserAvatar> {
     final colorScheme = theme.colorScheme;
 
     return CircleAvatar(
-      radius: 20,
+      radius: widget.isComment ? 17 : 20,
       backgroundColor: colorScheme.primaryContainer,
       child: ClipOval(
         child: ApiHelper.image(

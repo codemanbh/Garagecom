@@ -7,6 +7,7 @@ import '../models/Comment.dart';
 import '../managers/CommentsManager.dart';
 import '../models/Post.dart';
 import '../components/PostActionsMenu.dart';
+import './../components/UserAvatar.dart';
 
 class CommentPage extends StatefulWidget {
   late int postIndex;
@@ -244,19 +245,10 @@ class _CommentPageState extends State<CommentPage> {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: colorScheme.primaryContainer,
-                      child: Text(
-                        PostsManager.posts[postIndex].autherUsername.isNotEmpty
-                            ? PostsManager.posts[postIndex].autherUsername[0]
-                                .toUpperCase()
-                            : '?',
-                        style: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    UserAvatar(
+                      autherId: PostsManager.posts[postIndex].autherId,
+                      autherUsername:
+                          PostsManager.posts[postIndex].autherUsername,
                     ),
                     const SizedBox(width: 10),
                     Column(

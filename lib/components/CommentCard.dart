@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './PostActionsMenu.dart';
 import './../models/Comment.dart';
+import './UserAvatar.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
@@ -37,19 +38,10 @@ class _CommentCardState extends State<CommentCard> {
             // Comment header with user info
             Row(
               children: [
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: colorScheme.primaryContainer,
-                  child: Text(
-                    widget.comment.username.isNotEmpty
-                        ? widget.comment.username[0].toUpperCase()
-                        : "?",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onPrimaryContainer,
-                    ),
-                  ),
+                UserAvatar(
+                  autherId: widget.comment.userID,
+                  autherUsername: widget.comment.username,
+                  isComment: true,
                 ),
                 const SizedBox(width: 8),
                 Column(
