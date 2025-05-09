@@ -88,7 +88,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
                   autherUsername: postData['userName'] ?? 'Unknown User',
                   imageUrl: postData['attachment'],
                   autherId: postData['userID'] ?? -1,
-                  allowComments: postData['allowComments'],
+                  allowComments: postData['allowComments'] ?? true,
                   numOfVotes: postData['countVotes'] ?? 0,
                   voteValue: postData['voteValue'] ?? 0,
                   createdIn: postData['createdIn'] ?? '',
