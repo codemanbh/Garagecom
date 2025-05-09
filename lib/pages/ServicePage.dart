@@ -422,17 +422,57 @@ class _ServicePageState extends State<ServicePage> {
                                                   child: Text('Cancel'),
                                                 ),
                                                 TextButton(
-                                                  onPressed: () {
+                                                  onPressed: () async {
                                                     Navigator.pop(context);
-                                                    // TODO: Implement API call to update renewal date
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      SnackBar(
-                                                          content: Text(
-                                                              '$partName renewal scheduled')),
+                                                    
+                                                    // Show loading indicator
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text('Processing renewal...'),
+                                                        duration: Duration(seconds: 1),
+                                                      ),
                                                     );
-                                                    fetchUserCarsWithParts(); // Refresh data
+                                                    
+                                                    try {
+                                                      // Get the carPartId from the part object
+                                                      final int carPartId = part['carPartID'];
+                                                      
+                                                      // Call the API endpoint
+                                                      final response = await ApiHelper.post(
+                                                        'api/Cars/RenewCarPart', 
+                                                        {'carPartId': carPartId}
+                                                      );
+                                                      
+                                                      // Check if the API call was successful
+                                                      if (response['succeeded'] == true) {
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          SnackBar(
+                                                            content: Text('$partName renewed successfully'),
+                                                            backgroundColor: Colors.green,
+                                                          ),
+                                                        );
+                                                        
+                                                        // Refresh the data
+                                                        fetchUserCarsWithParts();
+                                                      } else {
+                                                        // Show error message if the API call failed
+                                                        String errorMessage = response['message'] ?? 'Failed to renew part';
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          SnackBar(
+                                                            content: Text(errorMessage),
+                                                            backgroundColor: Colors.red,
+                                                          ),
+                                                        );
+                                                      }
+                                                    } catch (e) {
+                                                      // Show error message if an exception occurred
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text('Error: ${e.toString()}'),
+                                                          backgroundColor: Colors.red,
+                                                        ),
+                                                      );
+                                                    }
                                                   },
                                                   child: Text('Confirm'),
                                                 ),
