@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:garagecom/managers/PostsManager.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/Post.dart';
 import '../pages/CommentPage.dart';
 import './PostActionsMenu.dart';
+import './UserAvatar.dart';
 
 class PostCard extends StatefulWidget {
   // final Post post;
@@ -149,21 +151,12 @@ class _PostCardState extends State<PostCard> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: colorScheme.primaryContainer,
-                    child: Text(
-                      PostsManager.posts[postIndex].autherUsername.isNotEmpty
-                          ? PostsManager.posts[postIndex].autherUsername[0]
-                              .toUpperCase()
-                          : "?",
-                      style: TextStyle(
-                        color: colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  UserAvatar(
+                    autherId: PostsManager.posts[postIndex].autherId,
+                    autherUsername:
+                        PostsManager.posts[postIndex].autherUsername,
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
