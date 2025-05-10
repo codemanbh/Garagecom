@@ -285,21 +285,7 @@ class _PostCardState extends State<PostCard> {
                         )
                       : const SizedBox.shrink(),
 
-                  // Comment button
-                  TextButton.icon(
-                    onPressed: () => navigateToCommentPage(PostsManager.posts[postIndex].postID),
-                    icon: Icon(
-                      Icons.comment_outlined,
-                      size: 20,
-                      color: colorScheme.secondary,
-                    ),
-                    label: Text(
-                      'Comments',
-                      style: TextStyle(
-                        color: colorScheme.secondary,
-                      ),
-                    ),
-                  ),
+                 
                   !isAdminView
                       ? TextButton.icon(
                           onPressed: () => navigateToCommentPage(postIndex),

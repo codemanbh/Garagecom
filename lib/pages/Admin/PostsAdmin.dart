@@ -66,43 +66,89 @@ class PostsAdminTabState extends State<PostsAdminTab>
 
           if (postId != null) {
             // If we have a postId, we need to fetch the post details
-            final postResponse = await ApiHelper.get('api/Posts/GetPostByPostID', {'postId': postId});
+            final postResponse = await ApiHelper.get('api/Posts/GetPostByPostId', {'postId': postId});
             print('Post details response: $postResponse');
 
             if (postResponse['succeeded'] == true &&
-                postResponse['parameters'] != null &&
-                postResponse['parameters']['Post'] != null) {
-              final postData = postResponse['parameters']['Post'];
+                postResponse['parameters'] != null) {
+              
+              // Check which format the API is returning
+              dynamic postData;
+              
+              // First check if there's a single Post object
+              if (postResponse['parameters']['Post'] != null) {
+                postData = postResponse['parameters']['Post'];
+              } 
+              // Check if there's a Posts array and the postId matches
+              else if (postResponse['parameters']['Posts'] != null && 
+                       postResponse['parameters']['Posts'] is List &&
+                       postResponse['parameters']['Posts'].isNotEmpty) {
+                
+                // Find the post with matching ID in the list
+                final posts = postResponse['parameters']['Posts'];
+                for (var post in posts) {
+                  if (post['postID'] == postId) {
+                    postData = post;
+                    break;
+                  }
+                }
+                
+                // If we couldn't find the exact post, use the first one
+                if (postData == null && posts.isNotEmpty) {
+                  postData = posts[0];
+                }
+              }
 
-              setState(() {
-                posts = []; // Clear local list
+              if (postData != null) {
+                setState(() {
+                  // Clear existing posts
+                  PostsManager.posts = []; // Update the static list in PostsManager
+                  posts = []; // Clear local list
 
-                // Create a Post object from the post data
-                Post post = Post(
-                  postID: postData['postID'] ?? 0,
-                  title: postData['title'] ?? 'No Title',
-                  description: postData['description'] ?? 'No Content',
-                  autherUsername: postData['userName'] ?? 'Unknown User',
-                  imageUrl: postData['attachment'],
-                  autherId: postData['userID'] ?? -1,
-                  allowComments: postData['allowComments'] ?? true,
-                  numOfVotes: postData['countVotes'] ?? 0,
-                  voteValue: postData['voteValue'] ?? 0,
-                  createdIn: postData['createdIn'] ?? '',
-                  categoryName: postData['postCategory'] != null
-                      ? postData['postCategory']['title']
-                      : '',
+                  // Create a Post object from the post data
+                  Post post = Post(
+                    postID: postData['postID'] ?? 0,
+                    title: postData['title'] ?? 'No Title',
+                    description: postData['description'] ?? 'No Content',
+                    autherUsername: postData['userName'] ?? 'Unknown User',
+                    imageUrl: postData['attachment'],
+                    autherId: postData['userID'] ?? -1,
+                    allowComments: postData['allowComments'] ?? true,
+                    numOfVotes: postData['countVotes'] ?? 0,
+                    voteValue: postData['voteValue'] ?? 0,
+                    createdIn: postData['createdIn'] ?? '',
+                    categoryName: postData['postCategory'] != null
+                        ? postData['postCategory']['title']
+                        : '',
+                  );
+
+                  posts.add(post);
+                  PostsManager.posts.add(post); // Add to the static list too
+
+                  _currentPostIndex = 0;
+                  _isLoading = false;
+                });
+              } else {
+                // No matching post data found
+                setState(() {
+                  posts = [];
+                  PostsManager.posts = [];
+                  _currentPostIndex = -1;
+                  _isLoading = false;
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Could not find post with ID: $postId'),
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
                 );
-
-                posts.add(post);
-
-                _currentPostIndex = 0;
-                _isLoading = false;
-              });
+              }
             } else {
               // Couldn't fetch post details
               setState(() {
                 posts = [];
+                PostsManager.posts = [];
                 _currentPostIndex = -1;
                 _isLoading = false;
               });
@@ -119,6 +165,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
             // For now, just show a message that we have a comment report
             setState(() {
               posts = [];
+              PostsManager.posts = [];
               _currentPostIndex = -1;
               _isLoading = false;
             });
@@ -133,6 +180,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
             // No post or comment ID in the report
             setState(() {
               posts = [];
+              PostsManager.posts = [];
               _currentPostIndex = -1;
               _isLoading = false;
             });
@@ -148,6 +196,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
           // No reports found
           setState(() {
             posts = [];
+            PostsManager.posts = [];
             _currentPostIndex = -1;
             _isLoading = false;
           });
@@ -162,6 +211,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
       } else {
         setState(() {
           posts = [];
+          PostsManager.posts = []; // Clear the static list too
           _currentPostIndex = -1;
           _isLoading = false;
         });
@@ -203,6 +253,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
         // Successfully processed the report
         setState(() {
           posts.clear();
+          PostsManager.posts.clear();
           _currentPostIndex = -1;
         });
 
@@ -248,6 +299,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
         // Successfully processed the report
         setState(() {
           posts.clear();
+          PostsManager.posts.clear();
           _currentPostIndex = -1;
         });
 
