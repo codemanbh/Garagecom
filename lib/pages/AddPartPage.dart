@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
+import 'package:garagecom/utils/Validators.dart';
 import 'package:intl/intl.dart';
 
 class AddPartPage extends StatefulWidget {
@@ -54,7 +55,7 @@ class _AddPartPageState extends State<AddPartPage> {
     replacementDate = DateTime.now(); // Default to today
     nextServiceDate = DateTime.now()
         .add(const Duration(days: 180)); // Default to 6 months from now
-;
+    ;
     selectedIntervalValue = '3'; // Default to 3 months
     intervalValueController.text = selectedIntervalValue!;
     getPartTypes();
@@ -490,6 +491,7 @@ class _AddPartPageState extends State<AddPartPage> {
                                     Expanded(
                                         flex: 3,
                                         child: TextFormField(
+                                          validator: Validators.interval,
                                           controller: intervalValueController,
                                           keyboardType: TextInputType.number,
                                         )),

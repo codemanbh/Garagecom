@@ -60,4 +60,19 @@ class Validators {
       return "Unvalid phone number";
     }
   }
+
+  static String? interval(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Can't be empty";
+    }
+    if (!RegExp(r"^\d+$").hasMatch(value)) {
+      return "Only numbers are accepted";
+    }
+    if (int.parse(value) < 1) {
+      return "The minimam is 1";
+    }
+    if (int.parse(value) > 999) {
+      return "The maximum is 99";
+    }
+  }
 }
