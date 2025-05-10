@@ -75,9 +75,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
               final postData = postResponse['parameters']['Post'];
 
               setState(() {
-                // Clear existing posts
-                PostsManager.posts =
-                    []; // Update the static list in PostsManager
                 posts = []; // Clear local list
 
                 // Create a Post object from the post data
@@ -98,7 +95,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
                 );
 
                 posts.add(post);
-                PostsManager.posts.add(post); // Add to the static list too
 
                 _currentPostIndex = 0;
                 _isLoading = false;
@@ -107,7 +103,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
               // Couldn't fetch post details
               setState(() {
                 posts = [];
-                PostsManager.posts = [];
                 _currentPostIndex = -1;
                 _isLoading = false;
               });
@@ -124,7 +119,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
             // For now, just show a message that we have a comment report
             setState(() {
               posts = [];
-              PostsManager.posts = [];
               _currentPostIndex = -1;
               _isLoading = false;
             });
@@ -139,7 +133,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
             // No post or comment ID in the report
             setState(() {
               posts = [];
-              PostsManager.posts = [];
               _currentPostIndex = -1;
               _isLoading = false;
             });
@@ -155,7 +148,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
           // No reports found
           setState(() {
             posts = [];
-            PostsManager.posts = [];
             _currentPostIndex = -1;
             _isLoading = false;
           });
@@ -170,7 +162,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
       } else {
         setState(() {
           posts = [];
-          PostsManager.posts = []; // Clear the static list too
           _currentPostIndex = -1;
           _isLoading = false;
         });
@@ -212,7 +203,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
         // Successfully processed the report
         setState(() {
           posts.clear();
-          PostsManager.posts.clear();
           _currentPostIndex = -1;
         });
 
@@ -258,7 +248,6 @@ class PostsAdminTabState extends State<PostsAdminTab>
         // Successfully processed the report
         setState(() {
           posts.clear();
-          PostsManager.posts.clear();
           _currentPostIndex = -1;
         });
 
