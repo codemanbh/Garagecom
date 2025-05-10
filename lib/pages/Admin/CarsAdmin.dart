@@ -429,7 +429,7 @@ class _CarsAdminState extends State<CarsAdmin> with SingleTickerProviderStateMix
                 
                 try {
                   // API call to add a new brand
-                  final response = await ApiHelper.post('/api/Cars/SetBrand', {
+                  final response = await ApiHelper.post('api/Administrations/SetBrand', {
                     'brandName': brandNameController.text
                   });
                   
@@ -545,10 +545,10 @@ class _CarsAdminState extends State<CarsAdmin> with SingleTickerProviderStateMix
                   });
                   
                   try {
-                    // API call to add a new model
-                    final response = await ApiHelper.post('/api/Cars/SetCarModel', {
-                      'brandID': selectedBrand['brandID'],
-                      'modelName': modelNameController.text
+                    // API call to add a new model with the correct parameter names
+                    final response = await ApiHelper.post('api/Administrations/SetModel', {
+                      'modelName': modelNameController.text,
+                      'brandId': selectedBrand['brandID']
                     });
                     
                     if (response['succeeded'] == true) {
@@ -595,7 +595,6 @@ class _CarsAdminState extends State<CarsAdmin> with SingleTickerProviderStateMix
 
   void _showAddPartDialog() {
     final TextEditingController partNameController = TextEditingController();
-    final TextEditingController noteController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -604,26 +603,19 @@ class _CarsAdminState extends State<CarsAdmin> with SingleTickerProviderStateMix
         title: const Text('Add New Car Part'),
         content: Form(
           key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: partNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Part Name',
-                  hintText: 'Enter part name (e.g., Engine Oil, Air Filter)',
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a part name';
-                  }
-                  return null;
-                },
-                textCapitalization: TextCapitalization.words,
-              ),
-              const SizedBox(height: 16),
-             
-            ],
+          child: TextFormField(
+            controller: partNameController,
+            decoration: const InputDecoration(
+              labelText: 'Part Name',
+              hintText: 'Enter part name (e.g., Engine Oil, Air Filter)',
+            ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter a part name';
+              }
+              return null;
+            },
+            textCapitalization: TextCapitalization.words,
           ),
         ),
         actions: [
@@ -641,10 +633,9 @@ class _CarsAdminState extends State<CarsAdmin> with SingleTickerProviderStateMix
                 });
                 
                 try {
-                  // API call to add a new part
-                  final response = await ApiHelper.post('/api/Cars/SetPart', {
-                    'partName': partNameController.text,
-                    'notes': noteController.text
+                  // API call to add a new part using simplified parameters
+                  final response = await ApiHelper.post('api/Administrations/SetPart', {
+                    'partName': partNameController.text
                   });
                   
                   if (response['succeeded'] == true) {
