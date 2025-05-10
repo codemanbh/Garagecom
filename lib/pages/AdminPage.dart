@@ -73,11 +73,6 @@ class _AdminPageState extends State<AdminPage> with SingleTickerProviderStateMix
               icon: Icon(Icons.branding_watermark),
               text: "Cars",
             ),
-            Tab(
-              icon: Icon(Icons.directions_car),
-              text: "Users",
-            ),
-            
           ],
         ),
       ),

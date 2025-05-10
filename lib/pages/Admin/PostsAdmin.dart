@@ -66,7 +66,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
 
           if (postId != null) {
             // If we have a postId, we need to fetch the post details
-            final postResponse = await ApiHelper.get('api/Posts/GetPostByUserID', {'postId': postId});
+            final postResponse = await ApiHelper.get('api/Posts/GetPostByPostID', {'postId': postId});
             print('Post details response: $postResponse');
 
             if (postResponse['succeeded'] == true &&
