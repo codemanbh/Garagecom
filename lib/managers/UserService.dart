@@ -205,4 +205,20 @@ class UserService {
       throw Exception('Error uploading profile picture: $e');
     }
   }
+
+  // Get posts created by the user
+  static Future<Map<String, dynamic>> getUserPosts(int userId) async {
+    try {
+      final response = await ApiHelper.get('api/Posts/GetPostByUserId', {'userId': userId});
+
+      if (response['succeeded'] == true && response['parameters'] != null) {
+        return response;
+      } else {
+        throw Exception(
+            'Failed to load user posts: ${response['message'] ?? "Unknown error"}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching user posts: $e');
+    }
+  }
 }
