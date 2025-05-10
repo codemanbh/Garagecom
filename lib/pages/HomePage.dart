@@ -93,7 +93,9 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/createPostPage');
+          Navigator.pushNamed(context, '/createPostPage').then((_) {
+            _loadPosts();
+          });
         },
         backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,

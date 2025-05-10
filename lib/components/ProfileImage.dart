@@ -6,7 +6,8 @@ import 'package:image_picker/image_picker.dart';
 
 class ProfileImage extends StatefulWidget {
   final String? filename;
-  ProfileImage({this.filename});
+  final String username;
+  ProfileImage({this.filename, required this.username});
 
   @override
   State<ProfileImage> createState() => _ProfileImageState();
@@ -106,6 +107,8 @@ class _ProfileImageState extends State<ProfileImage> {
     );
   }
 
+  // Widget onErrorImage
+
   Widget _buildImageDisplay() {
     if (_selectedImage != null) {
       return Image.file(_selectedImage!, fit: BoxFit.cover);
@@ -114,10 +117,11 @@ class _ProfileImageState extends State<ProfileImage> {
       return Image.memory(_currentImageBytes!, fit: BoxFit.cover);
     }
     if (filename != null && !_removeExistingImage) {
-      return ApiHelper.image(
-        filename ?? '',
-        'api/Profile/GetAvatarAttachment',
-      );
+      return ApiHelper.image(filename ?? '', 'api/Profile/GetAvatarAttachment',
+          errorBuilder:
+              (BuildContext context, Object error, StackTrace? stackTrace) {
+        return Text('widget.username[0].toUpperCase()asdaskdhaksjdhashdashd');
+      });
     }
     return _buildAddPhotoPrompt(Theme.of(context).colorScheme.primary);
   }

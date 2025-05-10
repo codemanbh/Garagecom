@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'MainPage.dart';
 
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
@@ -25,12 +24,11 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _initializeApp() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    final response = await ApiHelper.getWithFullResponse("api/Registration/ValidateUser", {"token": token});
+    final response = await ApiHelper.getWithFullResponse(
+        "api/Registration/ValidateUser", {"token": token});
     await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const MainPage()
-      ),
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const MainPage()),
     );
   }
 
@@ -45,8 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
               tween: Tween(begin: 0.8, end: 1.0),
               duration: const Duration(milliseconds: 800),
               curve: Curves.easeOutBack,
-              builder:
-                  (context, scale, child) =>
+              builder: (context, scale, child) =>
                   Transform.scale(scale: scale, child: child),
               child: Center(
                 child: Padding(

@@ -694,7 +694,10 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(height: 20),
-                        ProfileImage(filename: userData!['attachmentName']),
+                        ProfileImage(
+                          filename: userData!['attachmentName'],
+                          username: 'asd',
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           userData != null
