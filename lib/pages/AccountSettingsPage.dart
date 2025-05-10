@@ -638,451 +638,464 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             ),
         ],
       ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : isError
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: colorScheme.error,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Error loading profile',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        child: Text(
-                          errorMessage,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: colorScheme.onSurfaceVariant),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: loadUserData,
-                        child: const Text('Try Again'),
-                      ),
-                    ],
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 20),
-                      ProfileImage(filename: userData!['attachmentName']),
-                      const SizedBox(height: 16),
-                      Text(
-                        userData != null
-                            ? '${userData!['firstName'] ?? ''} ${userData!['lastName'] ?? ''}'
-                            : 'User',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      Text(
-                        userData != null
-                            ? userData!['email'] ?? 'Email'
-                            : 'Email',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      if (!isEditMode) ...[
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerLow
-                                .withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: colorScheme.primary.withOpacity(0.2),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: colorScheme.primary.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(
-                                  'Personal Information',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                onPressed: () {
-                  // Navigate to the signup page
-                  Navigator.of(context).pushNamed('/adminPage');
-                },
-                child: Text(
-                  'Admin Page',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
-                              buildInfoItem(
-                                  'Username',
-                                  userData != null
-                                      ? userData!['userName'] ?? ''
-                                      : '',
-                                  Icons.account_circle),
-                              buildInfoItem(
-                                  'Full Name',
-                                  userData != null
-                                      ? '${userData!['firstName'] ?? ''} ${userData!['lastName'] ?? ''}'
-                                      : '',
-                                  Icons.person),
-                              buildInfoItem(
-                                  'Email',
-                                  userData != null
-                                      ? userData!['email'] ?? ''
-                                      : '',
-                                  Icons.email),
-                              buildInfoItem(
-                                  'Phone',
-                                  userData != null
-                                      ? userData!['phoneNumber'] ?? ''
-                                      : '',
-                                  Icons.phone),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerLow
-                                .withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: colorScheme.primary.withOpacity(0.2),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: colorScheme.primary.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'My Cars',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${userCars.length} ${userCars.length == 1 ? 'car' : 'cars'}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              userCars.isEmpty
-                                  ? Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(20.0),
-                                        child: Column(
-                                          children: [
-                                            Icon(
-                                              Icons.directions_car_outlined,
-                                              size: 48,
-                                              color: colorScheme
-                                                  .onSurfaceVariant
-                                                  .withOpacity(0.5),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            Text(
-                                              'No cars added yet',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: colorScheme
-                                                    .onSurfaceVariant,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              'Add your cars to enhance your experience',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: colorScheme
-                                                    .onSurfaceVariant
-                                                    .withOpacity(0.7),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  : Column(
-                                      children: userCars
-                                          .map<Widget>(
-                                              (car) => buildCarCard(car))
-                                          .toList(),
-                                    ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              isEditMode = true;
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                          ),
-                          label: const Text('Edit Profile'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 8),
-                            backgroundColor: colorScheme.primary,
-                            foregroundColor: colorScheme.onPrimary,
-                            elevation: 4,
-                            shadowColor: colorScheme.primary.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        ElevatedButton.icon(
-                          icon: Icon(Icons.logout),
-                          onPressed: _handleLogout,
-                          label: Text('Logout'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 8),
-                            backgroundColor: colorScheme.error,
-                            foregroundColor: colorScheme.onPrimary,
-                            elevation: 4,
-                            shadowColor: colorScheme.primary.withOpacity(0.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                        ),
-                      ] else ...[
-                        // Edit mode UI
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerLow
-                                .withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: colorScheme.primary.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(
-                                  'Personal Information',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                              buildEditableField(
-                                label: 'Username',
-                                icon: Icons.account_circle,
-                                controller: usernameController,
-                              ),
-                              buildEditableField(
-                                label: 'First Name',
-                                icon: Icons.person_outline,
-                                controller: firstNameController,
-                              ),
-                              buildEditableField(
-                                label: 'Last Name',
-                                icon: Icons.person,
-                                controller: lastNameController,
-                              ),
-                              buildEditableField(
-                                label: 'Email',
-                                icon: Icons.email,
-                                controller: emailController,
-                              ),
-                              buildEditableField(
-                                label: 'Phone Number',
-                                icon: Icons.phone,
-                                controller: phoneController,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: updateProfile,
-                                child: const Text('Save Profile'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primary,
-                                  foregroundColor: colorScheme.onPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Load user data
+          loadUserData();
 
+          // Load car brands from API
+          loadBrands();
+        },
+        color: colorScheme.primary,
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : isError
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: colorScheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error loading profile',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Text(
+                            errorMessage,
+                            textAlign: TextAlign.center,
+                            style:
+                                TextStyle(color: colorScheme.onSurfaceVariant),
+                          ),
+                        ),
                         const SizedBox(height: 24),
-
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerLow
-                                .withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: colorScheme.primary.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'My Cars',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                  ElevatedButton.icon(
-                                    onPressed: currentEditingCar == null
-                                        ? addNewCar
-                                        : null,
-                                    icon: const Icon(Icons.add),
-                                    label: const Text('Add Car'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          colorScheme.primaryContainer,
-                                      foregroundColor:
-                                          colorScheme.onPrimaryContainer,
-                                      disabledBackgroundColor:
-                                          colorScheme.surfaceVariant,
-                                      disabledForegroundColor: colorScheme
-                                          .onSurfaceVariant
-                                          .withOpacity(0.5),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              if (currentEditingCar != null)
-                                buildCarEditForm()
-                              else if (userCars.isEmpty)
-                                Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      children: [
-                                        Icon(
-                                          Icons.directions_car_outlined,
-                                          size: 48,
-                                          color: colorScheme.onSurfaceVariant
-                                              .withOpacity(0.5),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          'No cars added yet',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: colorScheme.onSurfaceVariant,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        ElevatedButton.icon(
-                                          onPressed: addNewCar,
-                                          icon: const Icon(Icons.add),
-                                          label:
-                                              const Text('Add Your First Car'),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                colorScheme.primary,
-                                            foregroundColor:
-                                                colorScheme.onPrimary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              else
-                                Column(
-                                  children: userCars
-                                      .map<Widget>((car) => buildCarCard(car))
-                                      .toList(),
-                                ),
-                            ],
-                          ),
+                        ElevatedButton(
+                          onPressed: loadUserData,
+                          child: const Text('Try Again'),
                         ),
                       ],
-                      const SizedBox(height: 30),
-                    ],
+                    ),
+                  )
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 20),
+                        ProfileImage(filename: userData!['attachmentName']),
+                        const SizedBox(height: 16),
+                        Text(
+                          userData != null
+                              ? '${userData!['firstName'] ?? ''} ${userData!['lastName'] ?? ''}'
+                              : 'User',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        Text(
+                          userData != null
+                              ? userData!['email'] ?? 'Email'
+                              : 'Email',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        if (!isEditMode) ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerLow
+                                  .withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  child: Text(
+                                    'Personal Information',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // Navigate to the signup page
+                                    Navigator.of(context)
+                                        .pushNamed('/adminPage');
+                                  },
+                                  child: Text(
+                                    'Admin Page',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                                buildInfoItem(
+                                    'Username',
+                                    userData != null
+                                        ? userData!['userName'] ?? ''
+                                        : '',
+                                    Icons.account_circle),
+                                buildInfoItem(
+                                    'Full Name',
+                                    userData != null
+                                        ? '${userData!['firstName'] ?? ''} ${userData!['lastName'] ?? ''}'
+                                        : '',
+                                    Icons.person),
+                                buildInfoItem(
+                                    'Email',
+                                    userData != null
+                                        ? userData!['email'] ?? ''
+                                        : '',
+                                    Icons.email),
+                                buildInfoItem(
+                                    'Phone',
+                                    userData != null
+                                        ? userData!['phoneNumber'] ?? ''
+                                        : '',
+                                    Icons.phone),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerLow
+                                  .withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colorScheme.primary.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'My Cars',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${userCars.length} ${userCars.length == 1 ? 'car' : 'cars'}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                userCars.isEmpty
+                                    ? Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Column(
+                                            children: [
+                                              Icon(
+                                                Icons.directions_car_outlined,
+                                                size: 48,
+                                                color: colorScheme
+                                                    .onSurfaceVariant
+                                                    .withOpacity(0.5),
+                                              ),
+                                              const SizedBox(height: 16),
+                                              Text(
+                                                'No cars added yet',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                'Add your cars to enhance your experience',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: colorScheme
+                                                      .onSurfaceVariant
+                                                      .withOpacity(0.7),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    : Column(
+                                        children: userCars
+                                            .map<Widget>(
+                                                (car) => buildCarCard(car))
+                                            .toList(),
+                                      ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                isEditMode = true;
+                              });
+                            },
+                            icon: const Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                            ),
+                            label: const Text('Edit Profile'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 8),
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
+                              elevation: 4,
+                              shadowColor: colorScheme.primary.withOpacity(0.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          ElevatedButton.icon(
+                            icon: Icon(Icons.logout),
+                            onPressed: _handleLogout,
+                            label: Text('Logout'),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 8),
+                              backgroundColor: colorScheme.error,
+                              foregroundColor: colorScheme.onPrimary,
+                              elevation: 4,
+                              shadowColor: colorScheme.primary.withOpacity(0.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                          ),
+                        ] else ...[
+                          // Edit mode UI
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerLow
+                                  .withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  child: Text(
+                                    'Personal Information',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                                buildEditableField(
+                                  label: 'Username',
+                                  icon: Icons.account_circle,
+                                  controller: usernameController,
+                                ),
+                                buildEditableField(
+                                  label: 'First Name',
+                                  icon: Icons.person_outline,
+                                  controller: firstNameController,
+                                ),
+                                buildEditableField(
+                                  label: 'Last Name',
+                                  icon: Icons.person,
+                                  controller: lastNameController,
+                                ),
+                                buildEditableField(
+                                  label: 'Email',
+                                  icon: Icons.email,
+                                  controller: emailController,
+                                ),
+                                buildEditableField(
+                                  label: 'Phone Number',
+                                  icon: Icons.phone,
+                                  controller: phoneController,
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: updateProfile,
+                                  child: const Text('Save Profile'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: colorScheme.primary,
+                                    foregroundColor: colorScheme.onPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerLow
+                                  .withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'My Cars',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    ElevatedButton.icon(
+                                      onPressed: currentEditingCar == null
+                                          ? addNewCar
+                                          : null,
+                                      icon: const Icon(Icons.add),
+                                      label: const Text('Add Car'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            colorScheme.primaryContainer,
+                                        foregroundColor:
+                                            colorScheme.onPrimaryContainer,
+                                        disabledBackgroundColor:
+                                            colorScheme.surfaceVariant,
+                                        disabledForegroundColor: colorScheme
+                                            .onSurfaceVariant
+                                            .withOpacity(0.5),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                if (currentEditingCar != null)
+                                  buildCarEditForm()
+                                else if (userCars.isEmpty)
+                                  Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Column(
+                                        children: [
+                                          Icon(
+                                            Icons.directions_car_outlined,
+                                            size: 48,
+                                            color: colorScheme.onSurfaceVariant
+                                                .withOpacity(0.5),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Text(
+                                            'No cars added yet',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          ElevatedButton.icon(
+                                            onPressed: addNewCar,
+                                            icon: const Icon(Icons.add),
+                                            label: const Text(
+                                                'Add Your First Car'),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  colorScheme.primary,
+                                              foregroundColor:
+                                                  colorScheme.onPrimary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  Column(
+                                    children: userCars
+                                        .map<Widget>((car) => buildCarCard(car))
+                                        .toList(),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
-                ),
+      ),
     );
   }
 
