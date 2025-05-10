@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/utils/Validators.dart';
 import '../managers/UserService.dart';
 import '../helpers/apiHelper.dart';
 import '../components/ProfileImage.dart';
@@ -14,6 +15,8 @@ class AccountSettingsPage extends StatefulWidget {
 }
 
 class _AccountSettingsPageState extends State<AccountSettingsPage> {
+  final _formKey = GlobalKey<FormState>();
+
   // API data
   Map<String, dynamic>? userData;
   List<Post> userPosts = [];
@@ -160,6 +163,10 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 
   Future<void> updateProfile() async {
+    if (!_formKey.currentState!.validate()) {
+      // Form is valid, do something
+      return;
+    }
     if (userData == null) return;
 
     setState(() {
@@ -180,7 +187,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
       // Call API to update profile
       final response = await UserService.updateUserProfile(updatedUserData);
-
+      await loadUserData();
       setState(() {
         isLoading = false;
         isEditMode = false;
@@ -388,7 +395,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
- ElevatedButton.icon(
+                          ElevatedButton.icon(
                             onPressed: () {
                               setState(() {
                                 isEditMode = true;
@@ -440,7 +447,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 16.0),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         'My Posts',
@@ -461,7 +469,6 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                                     ],
                                   ),
                                 ),
-
                                 if (isLoadingPosts)
                                   Center(
                                     child: Padding(
@@ -496,15 +503,18 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                                             postsErrorMessage,
                                             style: TextStyle(
                                               fontSize: 12,
-                                              color: colorScheme.onSurfaceVariant,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             textAlign: TextAlign.center,
                                           ),
                                           const SizedBox(height: 8),
                                           TextButton(
                                             onPressed: () {
-                                              if (userData != null && userData!['userID'] != null) {
-                                                loadUserPosts(userData!['userID']);
+                                              if (userData != null &&
+                                                  userData!['userID'] != null) {
+                                                loadUserPosts(
+                                                    userData!['userID']);
                                               }
                                             },
                                             child: Text('Try Again'),
@@ -529,7 +539,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                                             'You haven\'t created any posts yet',
                                             style: TextStyle(
                                               fontSize: 16,
-                                              color: colorScheme.onSurfaceVariant,
+                                              color:
+                                                  colorScheme.onSurfaceVariant,
                                             ),
                                             textAlign: TextAlign.center,
                                           ),
@@ -537,13 +548,16 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                                           ElevatedButton.icon(
                                             onPressed: () {
                                               // Navigate to create post page
-                                              Navigator.of(context).pushNamed('/createPost');
+                                              Navigator.of(context)
+                                                  .pushNamed('/createPost');
                                             },
                                             icon: Icon(Icons.add),
                                             label: Text('Create Post'),
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: colorScheme.primary,
-                                              foregroundColor: colorScheme.onPrimary,
+                                              backgroundColor:
+                                                  colorScheme.primary,
+                                              foregroundColor:
+                                                  colorScheme.onPrimary,
                                             ),
                                           ),
                                         ],
@@ -558,11 +572,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                                     itemCount: userPosts.length,
                                     itemBuilder: (context, index) {
                                       // Add posts to PostsManager to be used by PostCard
-                                      if (!PostsManager.posts.contains(userPosts[index])) {
-                                        PostsManager.posts.add(userPosts[index]);
+                                      if (!PostsManager.posts
+                                          .contains(userPosts[index])) {
+                                        PostsManager.posts
+                                            .add(userPosts[index]);
                                       }
                                       // Find the index of the post in the PostsManager.posts list
-                                      int postIndex = PostsManager.posts.indexOf(userPosts[index]);
+                                      int postIndex = PostsManager.posts
+                                          .indexOf(userPosts[index]);
                                       return PostCard(
                                         postIndex: postIndex,
                                         isAdminView: false,
@@ -574,7 +591,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                           ),
 
                           const SizedBox(height: 24),
-                         
+
                           ElevatedButton.icon(
                             icon: Icon(Icons.logout),
                             onPressed: _handleLogout,
@@ -593,69 +610,76 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                           ),
                         ] else ...[
                           // Edit mode UI
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerLow
-                                  .withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: colorScheme.primary.withOpacity(0.3),
-                                width: 1,
+                          Form(
+                            key: _formKey,
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerLow
+                                    .withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: colorScheme.primary.withOpacity(0.3),
+                                  width: 1,
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
-                                  child: Text(
-                                    'Personal Information',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: Text(
+                                      'Personal Information',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.onSurface,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                buildEditableField(
-                                  label: 'Username',
-                                  icon: Icons.account_circle,
-                                  controller: usernameController,
-                                  enabled: false,
-                                ),
-                                buildEditableField(
-                                  label: 'First Name',
-                                  icon: Icons.person_outline,
-                                  controller: firstNameController,
-                                ),
-                                buildEditableField(
-                                  label: 'Last Name',
-                                  icon: Icons.person,
-                                  controller: lastNameController,
-                                ),
-                                buildEditableField(
-                                  label: 'Email',
-                                  icon: Icons.email,
-                                  controller: emailController,
-                                  enabled: false,
-                                ),
-                                buildEditableField(
-                                  label: 'Phone Number',
-                                  icon: Icons.phone,
-                                  controller: phoneController,
-                                ),
-                                const SizedBox(height: 16),
-                                ElevatedButton(
-                                  onPressed: updateProfile,
-                                  child: const Text('Save Profile'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: colorScheme.primary,
-                                    foregroundColor: colorScheme.onPrimary,
+                                  buildEditableField(
+                                    label: 'Username',
+                                    icon: Icons.account_circle,
+                                    controller: usernameController,
+                                    enabled: false,
                                   ),
-                                ),
-                              ],
+                                  buildEditableField(
+                                    label: 'First Name',
+                                    icon: Icons.person_outline,
+                                    validator: Validators.name,
+                                    controller: firstNameController,
+                                  ),
+                                  buildEditableField(
+                                    label: 'Last Name',
+                                    icon: Icons.person,
+                                    validator: Validators.name,
+                                    controller: lastNameController,
+                                  ),
+                                  buildEditableField(
+                                    label: 'Email',
+                                    icon: Icons.email,
+                                    controller: emailController,
+                                    enabled: false,
+                                  ),
+                                  buildEditableField(
+                                    label: 'Phone Number',
+                                    icon: Icons.phone,
+                                    validator: Validators.phone,
+                                    controller: phoneController,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton(
+                                    onPressed: updateProfile,
+                                    child: const Text('Save Profile'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: colorScheme.primary,
+                                      foregroundColor: colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -715,6 +739,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     required TextEditingController controller,
     bool obscureText = false,
     int maxLines = 1,
+    String? Function(String?)? validator,
     TextInputType keyboardType = TextInputType.text,
     bool enabled = true,
   }) {
@@ -723,12 +748,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextField(
+      child: TextFormField(
         controller: controller,
         obscureText: obscureText,
         maxLines: maxLines,
         keyboardType: keyboardType,
         enabled: enabled,
+        validator: validator,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon),
@@ -736,7 +762,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             borderRadius: BorderRadius.circular(12),
           ),
           filled: true,
-          fillColor: enabled 
+          fillColor: enabled
               ? theme.colorScheme.surface
               : theme.colorScheme.surfaceVariant.withOpacity(0.5),
           contentPadding:
