@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
 import 'dart:convert';
 import '../helpers/notificationHelper.dart';
+import './../models/User.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -241,6 +242,7 @@ class _LoginPageState extends State<LoginPage> {
                               SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
                               await prefs.setString("token", token);
+                              User.token = token;
 
                               if (userId != null) {
                                 await prefs.setInt("userId", userId);

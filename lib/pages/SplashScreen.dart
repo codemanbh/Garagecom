@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
+import 'package:garagecom/pages/LoginPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../models/User.dart';
 import 'MainPage.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -26,10 +27,19 @@ class _SplashScreenState extends State<SplashScreen> {
     var token = prefs.getString('token');
     final response = await ApiHelper.getWithFullResponse(
         "api/Registration/ValidateUser", {"token": token});
-    await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const MainPage()),
-    );
+
+    if (token != null && token != '') {
+      User.token = token;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    }
+
+    // await Future.delayed(const Duration(seconds: 1, milliseconds: 500));
   }
 
   @override

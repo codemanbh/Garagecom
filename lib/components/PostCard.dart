@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../pages/CommentPage.dart';
 import './PostActionsMenu.dart';
 import './UserAvatar.dart';
+import './../models/User.dart';
 
 class PostCard extends StatefulWidget {
   // final Post post;
@@ -154,7 +155,8 @@ class _PostCardState extends State<PostCard> {
         side: BorderSide(color: colorScheme.primary.withOpacity(0.2), width: 1),
       ),
       child: InkWell(
-        onTap: () => navigateToCommentPage(PostsManager.posts[postIndex].postID),
+        onTap: () =>
+            navigateToCommentPage(PostsManager.posts[postIndex].postID),
         borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,9 +248,10 @@ class _PostCardState extends State<PostCard> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: ApiHelper.image(
-                      PostsManager.posts[postIndex].imageUrl!,
-                      "api/posts/GetPostAttachment"),
+                  child: Image.network(
+                      "${ApiHelper.mainDomain}api/posts/GetPostAttachment?filename=${PostsManager.posts[postIndex].imageUrl!}",
+                      headers: {"Authorization": User.token ?? ''},
+                      fit: BoxFit.cover),
                 ),
               ),
 
@@ -269,15 +272,14 @@ class _PostCardState extends State<PostCard> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: PostsManager.posts[postIndex]
-                                            .numOfVotes >
-                                        0
-                                    ? colorScheme.primary
-                                    : PostsManager.posts[postIndex]
-                                                .numOfVotes <
-                                            0
-                                        ? colorScheme.error
-                                        : colorScheme.onSurfaceVariant,
+                                color:
+                                    PostsManager.posts[postIndex].numOfVotes > 0
+                                        ? colorScheme.primary
+                                        : PostsManager.posts[postIndex]
+                                                    .numOfVotes <
+                                                0
+                                            ? colorScheme.error
+                                            : colorScheme.onSurfaceVariant,
                               ),
                             ),
                             _buildDownVote(),
@@ -285,7 +287,6 @@ class _PostCardState extends State<PostCard> {
                         )
                       : const SizedBox.shrink(),
 
-                 
                   !isAdminView
                       ? TextButton.icon(
                           onPressed: () => navigateToCommentPage(postIndex),

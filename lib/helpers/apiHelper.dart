@@ -10,7 +10,8 @@ import 'package:image/image.dart' as img;
 
 class ApiHelper {
   // late Dio dio;
-  static String mainDomain = 'https://assuring-fox-conversely.ngrok-free.app/';
+  static String mainDomain =
+      'https://55ac-2001-1a40-100f-4700-9822-a5d9-b897-d978.ngrok-free.app/';
 
   static Future<Dio> Client() async {
     final prefs = await SharedPreferences.getInstance();
@@ -60,7 +61,7 @@ class ApiHelper {
 
     navigatorKey.currentState?.pushNamedAndRemoveUntil(
       '/loginPage',
-          (route) => false,
+      (route) => false,
     );
     // final messenger = ScaffoldMessenger.of(navigatorKey.currentContext!);
     // messenger.showSnackBar(
@@ -192,7 +193,7 @@ class ApiHelper {
       return {
         'status': 'success',
         'message':
-        'Internet connection is working, status code: ${response.statusCode}'
+            'Internet connection is working, status code: ${response.statusCode}'
       };
     } catch (e) {
       return {
