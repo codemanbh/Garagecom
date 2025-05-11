@@ -153,7 +153,7 @@ class _ServicePageState extends State<ServicePage> {
       return ElevatedButton.icon(
           onPressed: navigateToAddEditCars,
           label: Text('Add Cars'),
-          icon: Icon(Icons.add));
+          icon: Icon(Icons.add ,));
     }
 
     final theme = Theme.of(context);
@@ -191,7 +191,7 @@ class _ServicePageState extends State<ServicePage> {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: navigateToAddEditCars,
-                icon: const Icon(Icons.add_circle_outline),
+                icon: const Icon(Icons.add_circle_outline , color: Colors.white,),
                 label: const Text('Add a Car'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
