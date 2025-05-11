@@ -424,7 +424,9 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                           // My Posts Section
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 16),
+                            margin: const EdgeInsets.symmetric(horizontal: 0),
                             decoration: BoxDecoration(
                               color: theme.colorScheme.surfaceContainerLow
                                   .withOpacity(0.5),
@@ -445,7 +447,8 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  padding: const EdgeInsets.only(
+                                      bottom: 16.0, left: 8.0, right: 8.0),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
