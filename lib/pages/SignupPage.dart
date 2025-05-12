@@ -323,6 +323,15 @@ class _SignupPageState extends State<SignupPage> {
                               await prefs.setString(
                                   "role", response["parameters"]['RoleName']);
 
+                              String deviceToken =
+                                  await notificationHelper.getNotiToken();
+
+                              print("deviceToken: ${deviceToken}");
+
+                              response = await ApiHelper.post(
+                                  "api/Profile/SetDeviceToken",
+                                  {"deviceToken": deviceToken});
+
                               Navigator.of(context)
                                   .popAndPushNamed('/mainPage');
                             } else {

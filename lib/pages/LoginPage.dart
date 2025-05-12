@@ -214,9 +214,6 @@ class _LoginPageState extends State<LoginPage> {
                             print(response["succeeded"]);
 
                             // Reset loading state after getting response
-                            setState(() {
-                              _isLoading = false;
-                            });
 
                             if (response["succeeded"] == true) {
                               String token = response["parameters"]["Token"];
@@ -253,9 +250,17 @@ class _LoginPageState extends State<LoginPage> {
                               String deviceToken =
                                   await notificationHelper.getNotiToken();
 
-                              await ApiHelper.post("api/profile/SetDeviceToken",
-                                  {"token": deviceToken});
+                              print(deviceToken);
 
+                              response = await ApiHelper.post(
+                                  "api/Profile/SetDeviceToken",
+                                  {"deviceToken": deviceToken});
+
+                              print(response);
+
+                              setState(() {
+                                _isLoading = false;
+                              });
                               // Navigate to home page
                               Navigator.of(context)
                                   .popAndPushNamed('/mainPage');

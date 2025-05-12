@@ -1082,7 +1082,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
             label: 'Car Year',
             icon: Icons.calendar_today,
             value: selectedYear,
-            items: List.generate(15, (index) => DateTime.now().year - index),
+            items: List.generate(24, (index) => DateTime.now().year - index),
             onChanged: (newValue) {
               setState(() {
                 selectedYear = newValue;
