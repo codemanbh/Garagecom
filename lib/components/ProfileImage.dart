@@ -119,15 +119,16 @@ class _ProfileImageState extends State<ProfileImage> {
     }
     if (filename != null && !_removeExistingImage) {
       return Image.network(
-        '${ApiHelper.mainDomain}api/posts/GetUserAvatarByUserId?userId=${User.userId}',
+        '${ApiHelper.mainDomain}api/Profile/GetAvatarAttachment?filename=${widget.filename}',
         headers: {
           "Authorization": "Bearer ${User.token}",
         },
+        fit: BoxFit.cover,
         errorBuilder:
             (BuildContext context, Object error, StackTrace? stackTrace) {
           print("token : ${User.token}");
           print(error);
-          return Text('widget.username[0].toUpperCase()asdaskdhaksjdhashdashd');
+          return Text(widget.username[0].toUpperCase());
         },
       );
     }

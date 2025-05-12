@@ -250,8 +250,18 @@ class _PostCardState extends State<PostCard> {
                   borderRadius: BorderRadius.circular(12),
                   child: Image.network(
                       "${ApiHelper.mainDomain}api/posts/GetPostAttachment?filename=${PostsManager.posts[postIndex].imageUrl!}",
-                      headers: {"Authorization": User.token ?? ''},
-                      fit: BoxFit.cover),
+                      headers: {
+                        "Authorization": "Bearer ${User.token}" ?? ''
+                      }, loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      // Image has finished loading
+                      return child;
+                    }
+                    return SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: CircularProgressIndicator());
+                  }, fit: BoxFit.cover),
                 ),
               ),
 
@@ -289,7 +299,8 @@ class _PostCardState extends State<PostCard> {
 
                   !isAdminView
                       ? TextButton.icon(
-                          onPressed: () => navigateToCommentPage(PostsManager.posts[postIndex].postID),
+                          onPressed: () => navigateToCommentPage(
+                              PostsManager.posts[postIndex].postID),
                           icon: Icon(
                             Icons.comment_outlined,
                             size: 20,

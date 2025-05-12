@@ -27,15 +27,20 @@ class _UserAvatarState extends State<UserAvatar> {
     return CircleAvatar(
       radius: widget.isComment ? 17 : 20,
       backgroundColor: colorScheme.primaryContainer,
-      child: Image.network(
-        '${ApiHelper.mainDomain}api/posts/GetUserAvatarByUserId?userId=${widget.autherId}',
-        headers: {
-          "Authentication": User.token ?? '',
-        },
-        // errorBuilder:
-        //     (BuildContext context, Object error, StackTrace? stackTrace) {
-        //   return Text(widget.autherUsername[0].toUpperCase());
-        // },
+      child: ClipOval(
+        child: Image.network(
+          '${ApiHelper.mainDomain}api/posts/GetUserAvatarByUserId?userId=${widget.autherId}',
+          headers: {
+            "Authorization": "Bearer ${User.token}" ?? '',
+          },
+          fit: BoxFit.cover,
+          height: 2 * (widget.isComment ? 17 : 20),
+          width: 2 * (widget.isComment ? 17 : 20),
+          errorBuilder:
+              (BuildContext context, Object error, StackTrace? stackTrace) {
+            return Text(widget.autherUsername[0].toUpperCase());
+          },
+        ),
       ),
     );
   }
