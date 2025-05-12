@@ -243,6 +243,7 @@ class _LoginPageState extends State<LoginPage> {
                                   await SharedPreferences.getInstance();
                               await prefs.setString("token", token);
                               User.token = token;
+                              User.userId = userId;
 
                               if (userId != null) {
                                 await prefs.setInt("userId", userId);

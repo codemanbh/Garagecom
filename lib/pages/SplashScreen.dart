@@ -24,12 +24,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _initializeApp() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('token');
+    var token = prefs.getString('token') ?? '';
+    int userId = prefs.getInt("userId") ?? 0;
+
     final response = await ApiHelper.getWithFullResponse(
         "api/Registration/ValidateUser", {"token": token});
 
     if (token != null && token != '') {
       User.token = token;
+      User.userId = userId;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const MainPage()),
       );

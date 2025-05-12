@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../helpers/apiHelper.dart';
+import './../models/User.dart';
 
 class UserAvatar extends StatefulWidget {
   final int autherId;
@@ -25,18 +27,15 @@ class _UserAvatarState extends State<UserAvatar> {
     return CircleAvatar(
       radius: widget.isComment ? 17 : 20,
       backgroundColor: colorScheme.primaryContainer,
-      child: ClipOval(
-        child: ApiHelper.image(
-          '',
-          'api/posts/GetUserAvatarByUserId',
-          options: {
-            "userId": widget.autherId,
-          },
-          errorBuilder:
-              (BuildContext context, Object error, StackTrace? stackTrace) {
-            return Text(widget.autherUsername[0].toUpperCase());
-          },
-        ),
+      child: Image.network(
+        '${ApiHelper.mainDomain}api/posts/GetUserAvatarByUserId?userId=${widget.autherId}',
+        headers: {
+          "Authentication": User.token ?? '',
+        },
+        // errorBuilder:
+        //     (BuildContext context, Object error, StackTrace? stackTrace) {
+        //   return Text(widget.autherUsername[0].toUpperCase());
+        // },
       ),
     );
   }

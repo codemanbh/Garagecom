@@ -3,6 +3,7 @@ import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:garagecom/helpers/notificationHelper.dart';
 import 'package:garagecom/utils/Validators.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/User.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -315,6 +316,9 @@ class _SignupPageState extends State<SignupPage> {
                                   await SharedPreferences.getInstance();
                               await prefs.setString("token", token);
                               await prefs.setInt("userId", userId);
+
+                              User.token = token;
+                              User.userId = userId;
 
                               Navigator.of(context)
                                   .popAndPushNamed('/mainPage');

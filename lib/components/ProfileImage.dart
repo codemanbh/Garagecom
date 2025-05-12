@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:garagecom/helpers/apiHelper.dart';
 import 'package:image_picker/image_picker.dart';
+import './../models/User.dart';
 
 class ProfileImage extends StatefulWidget {
   final String? filename;
@@ -117,11 +118,18 @@ class _ProfileImageState extends State<ProfileImage> {
       return Image.memory(_currentImageBytes!, fit: BoxFit.cover);
     }
     if (filename != null && !_removeExistingImage) {
-      return ApiHelper.image(filename ?? '', 'api/Profile/GetAvatarAttachment',
-          errorBuilder:
-              (BuildContext context, Object error, StackTrace? stackTrace) {
-        return Text('widget.username[0].toUpperCase()asdaskdhaksjdhashdashd');
-      });
+      return Image.network(
+        '${ApiHelper.mainDomain}api/posts/GetUserAvatarByUserId?userId=${User.userId}',
+        headers: {
+          "Authorization": "Bearer ${User.token}",
+        },
+        errorBuilder:
+            (BuildContext context, Object error, StackTrace? stackTrace) {
+          print("token : ${User.token}");
+          print(error);
+          return Text('widget.username[0].toUpperCase()asdaskdhaksjdhashdashd');
+        },
+      );
     }
     return _buildAddPhotoPrompt(Theme.of(context).colorScheme.primary);
   }
