@@ -289,7 +289,7 @@ class _PostCardState extends State<PostCard> {
 
                   !isAdminView
                       ? TextButton.icon(
-                          onPressed: () => navigateToCommentPage(postIndex),
+                          onPressed: () => navigateToCommentPage(PostsManager.posts[postIndex].postID),
                           icon: Icon(
                             Icons.comment_outlined,
                             size: 20,
