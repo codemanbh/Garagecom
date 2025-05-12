@@ -152,8 +152,10 @@ class _ServicePageState extends State<ServicePage> {
     Widget _buildAddCarsPage() {
       return ElevatedButton.icon(
           onPressed: navigateToAddEditCars,
-          label: Text('Add Cars'),
-          icon: Icon(Icons.add ,));
+          label: Text('My Cars'),
+          icon: Icon(
+            Icons.list,
+          ));
     }
 
     final theme = Theme.of(context);
@@ -191,7 +193,10 @@ class _ServicePageState extends State<ServicePage> {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: navigateToAddEditCars,
-                icon: const Icon(Icons.add_circle_outline , color: Colors.white,),
+                icon: const Icon(
+                  Icons.add_circle_outline,
+                  color: Colors.white,
+                ),
                 label: const Text('Add a Car'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,

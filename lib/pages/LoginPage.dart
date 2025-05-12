@@ -198,7 +198,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           try {
                             print('login button pressed');
-                            // String deviceToken = await notificationHelper.getNotiToken();
 
                             Map<String, dynamic> data = {
                               'userName': usernameController.text,
@@ -244,10 +243,18 @@ class _LoginPageState extends State<LoginPage> {
                               await prefs.setString("token", token);
                               User.token = token;
                               User.userId = userId;
+                              User.role = response["parameters"]['RoleName'];
 
                               if (userId != null) {
                                 await prefs.setInt("userId", userId);
+                                await prefs.setString(
+                                    "role", response["parameters"]['RoleName']);
                               }
+                              String deviceToken =
+                                  await notificationHelper.getNotiToken();
+
+                              await ApiHelper.post("api/profile/SetDeviceToken",
+                                  {"token": deviceToken});
 
                               // Navigate to home page
                               Navigator.of(context)

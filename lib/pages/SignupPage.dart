@@ -319,6 +319,9 @@ class _SignupPageState extends State<SignupPage> {
 
                               User.token = token;
                               User.userId = userId;
+                              User.role = response["parameters"]['RoleName'];
+                              await prefs.setString(
+                                  "role", response["parameters"]['RoleName']);
 
                               Navigator.of(context)
                                   .popAndPushNamed('/mainPage');

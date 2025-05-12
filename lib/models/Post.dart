@@ -29,14 +29,21 @@ class Post {
 
   Future<void> handleUpvote() async {
     if (voteValue == 0 || voteValue == -1) {
-      ApiHelper.post(
+      if (voteValue == -1) {
+        await ApiHelper.post(
+          'api/posts/DeleteVote',
+          {'PostID': postID},
+        );
+      }
+
+      await ApiHelper.post(
         'api/posts/SetVote',
         {'PostID': postID, 'value': 1},
       );
       voteValue = 1;
       numOfVotes++;
     } else if (voteValue == 1) {
-      ApiHelper.post(
+      await ApiHelper.post(
         'api/posts/DeleteVote',
         {'PostID': postID},
       );
@@ -46,15 +53,27 @@ class Post {
   }
 
   Future<void> handleDownvote() async {
+    print('--- downvote hit');
+    print("voteValue: ${voteValue}");
+
     if (voteValue == 0 || voteValue == 1) {
-      ApiHelper.post(
+      print("inside 1");
+      if (voteValue == 1) {
+        await ApiHelper.post(
+          'api/posts/DeleteVote',
+          {'PostID': postID},
+        );
+      }
+
+      await ApiHelper.post(
         'api/posts/SetVote',
         {'PostID': postID, 'value': -1},
       );
       voteValue = -1;
       numOfVotes--;
     } else if (voteValue == -1) {
-      ApiHelper.post(
+      print("inside 2");
+      await ApiHelper.post(
         'api/posts/DeleteVote',
         {'PostID': postID},
       );

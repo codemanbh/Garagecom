@@ -614,7 +614,7 @@ class _AddAndEditCarsState extends State<AddAndEditCars> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Cars'),
+        title: const Text('My Cars'),
         actions: [
           if (!isLoading && !isError)
             IconButton(

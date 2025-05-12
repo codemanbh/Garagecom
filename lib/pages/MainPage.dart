@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garagecom/pages/AdminPage.dart';
 import './../providers/NavProvider.dart';
 import 'package:provider/provider.dart';
 import './HomePage.dart';
@@ -10,7 +11,7 @@ import '../components/CustomNavBar.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     final pageIndex = context.watch<NavProvider>().pageIndex;
@@ -22,6 +23,7 @@ class MainPage extends StatelessWidget {
       HomePage(),
       // CreatePostPage(),
       AccountSettingsPage(),
+      AdminPage()
     ];
 
     return Scaffold(

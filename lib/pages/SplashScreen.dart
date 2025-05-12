@@ -26,6 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token') ?? '';
     int userId = prefs.getInt("userId") ?? 0;
+    User.role = prefs.getString('role');
 
     final response = await ApiHelper.getWithFullResponse(
         "api/Registration/ValidateUser", {"token": token});
