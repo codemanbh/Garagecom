@@ -12,8 +12,7 @@ class ApiHelper {
   // late Dio dio;
   // static String mainDomain = 'https://55ac-2001-1a40-100f-4700-9822-a5d9-b897-d978.ngrok-free.app/';
   static String mainDomain =
-      'https://assuring-fox-conversely.ngrok-free.app/'; // fixed ngrok
-  // static String mainDomain = 'https://10.0.2.2:5294/'; // fixed ngrok
+      'https://98f1-193-188-13-253.ngrok-free.app/'; // fixed ngrok
 
   static Future<Dio> Client() async {
     final prefs = await SharedPreferences.getInstance();
