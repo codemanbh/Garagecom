@@ -38,7 +38,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: 'assets/.env'); // loud the env variables
   print(dotenv.env);
-  await Firebase.initializeApp(
+  await Firebase.initializeApp( 
     options: DefaultFirebaseOptions.currentPlatform,
   );
   // list of providers

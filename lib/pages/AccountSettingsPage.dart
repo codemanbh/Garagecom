@@ -353,20 +353,20 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                                     ),
                                   ),
                                 ),
-                                TextButton(
-                                  onPressed: () {
-                                    // Navigate to the admin page
-                                    Navigator.of(context)
-                                        .pushNamed('/adminPage');
-                                  },
-                                  child: Text(
-                                    'Admin Page',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: colorScheme.primary,
-                                    ),
-                                  ),
-                                ),
+                                // TextButton(
+                                //   onPressed: () {
+                                //     // Navigate to the admin page
+                                //     Navigator.of(context)
+                                //         .pushNamed('/adminPage');
+                                //   },
+                                //   child: Text(
+                                //     'Admin Page',
+                                //     style: TextStyle(
+                                //       fontSize: 16,
+                                //       color: colorScheme.primary,
+                                //     ),
+                                //   ),
+                                // ),
                                 buildInfoItem(
                                     'Username',
                                     userData != null

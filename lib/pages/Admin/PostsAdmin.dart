@@ -492,7 +492,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
                                             child: ElevatedButton.icon(
                                               onPressed: () => _blockPost(
                                                   posts[_currentPostIndex]),
-                                              icon: const Icon(Icons.block),
+                                              icon: const Icon(Icons.block, color: Colors.white),
                                               label: const Text('Block'),
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.red,
@@ -517,7 +517,7 @@ class PostsAdminTabState extends State<PostsAdminTab>
                                               onPressed: () => _approvePost(
                                                   posts[_currentPostIndex]),
                                               icon: const Icon(
-                                                  Icons.check_circle_outline),
+                                                  Icons.check_circle_outline, color: Colors.white,),
                                               label: const Text('Approve'),
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: Colors.green,
